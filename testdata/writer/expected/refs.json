@@ -1,0 +1,836 @@
+{
+ "_meta": {
+  "icechunk": "2.2.2",
+  "numpy": "2.5.3",
+  "zarr": "3.4.0"
+ },
+ "canonical": {
+  "ancestry": {
+   "branch:": [
+    "c1",
+    "Repository initialized"
+   ],
+   "branch:dev": [
+    "on dev",
+    "Repository initialized"
+   ],
+   "branch:feature/x": [
+    "on feature",
+    "c2",
+    "c1",
+    "Repository initialized"
+   ],
+   "branch:main": [
+    "after reset",
+    "c1",
+    "Repository initialized"
+   ],
+   "branch:ünïcode": [
+    "c1",
+    "Repository initialized"
+   ],
+   "tag:": [
+    "c2",
+    "c1",
+    "Repository initialized"
+   ],
+   "tag:rel/1.0": [
+    "c1",
+    "Repository initialized"
+   ],
+   "tag:v1": [
+    "c1",
+    "Repository initialized"
+   ],
+   "tag:with space": [
+    "c2",
+    "c1",
+    "Repository initialized"
+   ]
+  },
+  "branches": {
+   "": "c1",
+   "dev": "on dev",
+   "feature/x": "on feature",
+   "main": "after reset",
+   "ünïcode": "c1"
+  },
+  "commits": {
+   "Repository initialized": {
+    "metadata": {
+     "__icechunk": {
+      "is_root": true
+     }
+    },
+    "parent": null
+   },
+   "after reset": {
+    "metadata": {},
+    "parent": "c1"
+   },
+   "c1": {
+    "metadata": {},
+    "parent": "Repository initialized"
+   },
+   "c2": {
+    "metadata": {
+     "n": 2
+    },
+    "parent": "c1"
+   },
+   "on dev": {
+    "metadata": {},
+    "parent": "Repository initialized"
+   },
+   "on feature": {
+    "metadata": {
+     "branch": "feature/x"
+    },
+    "parent": "c2"
+   }
+  },
+  "config": null,
+  "deleted_tags": [
+   "v2"
+  ],
+  "diffs": {
+   "after reset": {
+    "deleted_arrays": [],
+    "deleted_groups": [],
+    "new_arrays": [],
+    "new_groups": [],
+    "updated_arrays": [],
+    "updated_chunks": {
+     "/a": [
+      [
+       1
+      ]
+     ]
+    },
+    "updated_groups": []
+   },
+   "c1": {
+    "deleted_arrays": [],
+    "deleted_groups": [],
+    "new_arrays": [
+     "/a"
+    ],
+    "new_groups": [
+     "/"
+    ],
+    "updated_arrays": [],
+    "updated_chunks": {
+     "/a": [
+      [
+       0
+      ],
+      [
+       1
+      ]
+     ]
+    },
+    "updated_groups": []
+   },
+   "c2": {
+    "deleted_arrays": [],
+    "deleted_groups": [],
+    "new_arrays": [],
+    "new_groups": [],
+    "updated_arrays": [],
+    "updated_chunks": {
+     "/a": [
+      [
+       0
+      ]
+     ]
+    },
+    "updated_groups": []
+   },
+   "on dev": {
+    "deleted_arrays": [],
+    "deleted_groups": [],
+    "new_arrays": [
+     "/b"
+    ],
+    "new_groups": [
+     "/"
+    ],
+    "updated_arrays": [],
+    "updated_chunks": {
+     "/b": [
+      [
+       0
+      ]
+     ]
+    },
+    "updated_groups": []
+   },
+   "on feature": {
+    "deleted_arrays": [],
+    "deleted_groups": [],
+    "new_arrays": [],
+    "new_groups": [],
+    "updated_arrays": [],
+    "updated_chunks": {
+     "/a": [
+      [
+       1
+      ]
+     ]
+    },
+    "updated_groups": []
+   }
+  },
+  "ops_log": [
+   [
+    "NewCommit",
+    "main",
+    "after reset",
+    null
+   ],
+   [
+    "BranchReset",
+    "main",
+    null,
+    "c2"
+   ],
+   [
+    "NewCommit",
+    "feature/x",
+    "on feature",
+    null
+   ],
+   [
+    "NewCommit",
+    "dev",
+    "on dev",
+    null
+   ],
+   [
+    "TagCreated",
+    "",
+    null,
+    null
+   ],
+   [
+    "BranchCreated",
+    "",
+    null,
+    null
+   ],
+   [
+    "BranchReset",
+    "dev",
+    null,
+    "c1"
+   ],
+   [
+    "BranchDeleted",
+    "temp",
+    null,
+    "c1"
+   ],
+   [
+    "BranchCreated",
+    "temp",
+    null,
+    null
+   ],
+   [
+    "TagCreated",
+    "with space",
+    null,
+    null
+   ],
+   [
+    "BranchCreated",
+    "ünïcode",
+    null,
+    null
+   ],
+   [
+    "TagCreated",
+    "rel/1.0",
+    null,
+    null
+   ],
+   [
+    "BranchCreated",
+    "feature/x",
+    null,
+    null
+   ],
+   [
+    "TagDeleted",
+    "v2",
+    null,
+    "c2"
+   ],
+   [
+    "TagCreated",
+    "v2",
+    null,
+    null
+   ],
+   [
+    "TagCreated",
+    "v1",
+    null,
+    null
+   ],
+   [
+    "BranchCreated",
+    "dev",
+    null,
+    null
+   ],
+   [
+    "NewCommit",
+    "main",
+    "c2",
+    null
+   ],
+   [
+    "NewCommit",
+    "main",
+    "c1",
+    null
+   ],
+   [
+    "RepoInitialized",
+    null,
+    null,
+    null
+   ]
+  ],
+  "snapshots": {
+   "Repository initialized": {
+    "keys": [],
+    "nodes": {}
+   },
+   "after reset": {
+    "keys": [
+     "a/c/0",
+     "a/c/1",
+     "a/zarr.json",
+     "zarr.json"
+    ],
+    "nodes": {
+     "/": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/a": {
+      "chunks": {
+       "0": "inline:ecaec67f921770e3",
+       "1": "inline:8641d76ab65031ba"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "fa7828278f94cc2d",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        4
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     }
+    }
+   },
+   "c1": {
+    "keys": [
+     "a/c/0",
+     "a/c/1",
+     "a/zarr.json",
+     "zarr.json"
+    ],
+    "nodes": {
+     "/": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/a": {
+      "chunks": {
+       "0": "inline:ecaec67f921770e3",
+       "1": "inline:02143a7ae8357c4d"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "f14609acd088137d",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        4
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     }
+    }
+   },
+   "c2": {
+    "keys": [
+     "a/c/0",
+     "a/c/1",
+     "a/zarr.json",
+     "zarr.json"
+    ],
+    "nodes": {
+     "/": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/a": {
+      "chunks": {
+       "0": "inline:315af205e74a2409",
+       "1": "inline:02143a7ae8357c4d"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "c6547da949e15546",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        4
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     }
+    }
+   },
+   "on dev": {
+    "keys": [
+     "b/c/0",
+     "b/zarr.json",
+     "zarr.json"
+    ],
+    "nodes": {
+     "/": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {
+        "on": "dev"
+       },
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/b": {
+      "chunks": {
+       "0": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         1
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "6abfc0fc1e2741db",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          3
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "checksum": false,
+          "level": 0
+         },
+         "name": "zstd"
+        }
+       ],
+       "data_type": "float64",
+       "fill_value": 0.0,
+       "node_type": "array",
+       "shape": [
+        3
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     }
+    }
+   },
+   "on feature": {
+    "keys": [
+     "a/c/0",
+     "a/c/1",
+     "a/zarr.json",
+     "zarr.json"
+    ],
+    "nodes": {
+     "/": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/a": {
+      "chunks": {
+       "0": "inline:315af205e74a2409",
+       "1": "inline:7d7a47e7f9890640"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "89dc3a5b67fba8a7",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        4
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     }
+    }
+   }
+  },
+  "status": "online",
+  "tags": {
+   "": "c2",
+   "rel/1.0": "c1",
+   "v1": "c1",
+   "with space": "c2"
+  },
+  "updates": [
+   [
+    "NewCommit",
+    "main",
+    "after reset",
+    null
+   ],
+   [
+    "BranchReset",
+    "main",
+    null,
+    "c2"
+   ],
+   [
+    "NewCommit",
+    "feature/x",
+    "on feature",
+    null
+   ],
+   [
+    "NewCommit",
+    "dev",
+    "on dev",
+    null
+   ],
+   [
+    "TagCreated",
+    "",
+    null,
+    null
+   ],
+   [
+    "BranchCreated",
+    "",
+    null,
+    null
+   ],
+   [
+    "BranchReset",
+    "dev",
+    null,
+    "c1"
+   ],
+   [
+    "BranchDeleted",
+    "temp",
+    null,
+    "c1"
+   ],
+   [
+    "BranchCreated",
+    "temp",
+    null,
+    null
+   ],
+   [
+    "TagCreated",
+    "with space",
+    null,
+    null
+   ],
+   [
+    "BranchCreated",
+    "ünïcode",
+    null,
+    null
+   ],
+   [
+    "TagCreated",
+    "rel/1.0",
+    null,
+    null
+   ],
+   [
+    "BranchCreated",
+    "feature/x",
+    null,
+    null
+   ],
+   [
+    "TagDeleted",
+    "v2",
+    null,
+    "c2"
+   ],
+   [
+    "TagCreated",
+    "v2",
+    null,
+    null
+   ],
+   [
+    "TagCreated",
+    "v1",
+    null,
+    null
+   ],
+   [
+    "BranchCreated",
+    "dev",
+    null,
+    null
+   ],
+   [
+    "NewCommit",
+    "main",
+    "c2",
+    null
+   ],
+   [
+    "NewCommit",
+    "main",
+    "c1",
+    null
+   ],
+   [
+    "RepoInitialized",
+    null,
+    null,
+    null
+   ]
+  ]
+ },
+ "outcomes": [
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "error:exists",
+  "ok",
+  "error:exists",
+  "ok",
+  "ok",
+  "error:exists",
+  "error:not_found",
+  "error:not_found",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "error:not_found",
+  "error:session",
+  "ok",
+  "error:not_found",
+  "error:not_found",
+  "error:not_found",
+  "ok",
+  "ok",
+  "error:exists",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "error:not_found",
+  "ok",
+  "ok",
+  "ok",
+  "ok"
+ ]
+}

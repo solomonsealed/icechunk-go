@@ -1,0 +1,3761 @@
+{
+ "_meta": {
+  "icechunk": "2.2.2",
+  "numpy": "2.5.3",
+  "zarr": "3.4.0"
+ },
+ "canonical": {
+  "ancestry": {
+   "branch:b1": [
+    "c3 some splits",
+    "c2 second half",
+    "c1",
+    "Repository initialized"
+   ],
+   "branch:main": [
+    "c4",
+    "c3 some splits",
+    "c2 second half",
+    "c1",
+    "Repository initialized"
+   ],
+   "tag:t1": [
+    "c2 second half",
+    "c1",
+    "Repository initialized"
+   ]
+  },
+  "branches": {
+   "b1": "c3 some splits",
+   "main": "c4"
+  },
+  "commits": {
+   "Repository initialized": {
+    "metadata": {
+     "__icechunk": {
+      "is_root": true
+     }
+    },
+    "parent": null
+   },
+   "c1": {
+    "metadata": {},
+    "parent": "Repository initialized"
+   },
+   "c2 second half": {
+    "metadata": {},
+    "parent": "c1"
+   },
+   "c3 some splits": {
+    "metadata": {},
+    "parent": "c2 second half"
+   },
+   "c4": {
+    "metadata": {},
+    "parent": "c3 some splits"
+   }
+  },
+  "config": {
+   "compression.level": null,
+   "get_partial_values_concurrency": null,
+   "inline_chunk_threshold_bytes": 64,
+   "manifest.splitting": true,
+   "manifest.virtual_chunk_location_compression.min_num_chunks": null,
+   "num_updates_per_repo_info_file": 6,
+   "virtual_chunk_containers": {}
+  },
+  "deleted_tags": [
+   "t2"
+  ],
+  "diffs": {
+   "c1": {
+    "deleted_arrays": [],
+    "deleted_groups": [],
+    "new_arrays": [
+     "/nosplit/grid",
+     "/small/i32_16",
+     "/small/i32_17",
+     "/split/grid"
+    ],
+    "new_groups": [
+     "/",
+     "/nosplit",
+     "/small",
+     "/split"
+    ],
+    "updated_arrays": [],
+    "updated_chunks": {
+     "/nosplit/grid": [
+      [
+       0,
+       0
+      ],
+      [
+       0,
+       1
+      ],
+      [
+       0,
+       2
+      ],
+      [
+       0,
+       3
+      ],
+      [
+       0,
+       4
+      ],
+      [
+       0,
+       5
+      ],
+      [
+       1,
+       0
+      ],
+      [
+       1,
+       1
+      ],
+      [
+       1,
+       2
+      ],
+      [
+       1,
+       3
+      ],
+      [
+       1,
+       4
+      ],
+      [
+       1,
+       5
+      ],
+      [
+       2,
+       0
+      ],
+      [
+       2,
+       1
+      ],
+      [
+       2,
+       2
+      ],
+      [
+       2,
+       3
+      ],
+      [
+       2,
+       4
+      ],
+      [
+       2,
+       5
+      ],
+      [
+       3,
+       0
+      ],
+      [
+       3,
+       1
+      ],
+      [
+       3,
+       2
+      ],
+      [
+       3,
+       3
+      ],
+      [
+       3,
+       4
+      ],
+      [
+       3,
+       5
+      ],
+      [
+       4,
+       0
+      ],
+      [
+       4,
+       1
+      ],
+      [
+       4,
+       2
+      ],
+      [
+       4,
+       3
+      ],
+      [
+       4,
+       4
+      ],
+      [
+       4,
+       5
+      ],
+      [
+       5,
+       0
+      ],
+      [
+       5,
+       1
+      ],
+      [
+       5,
+       2
+      ],
+      [
+       5,
+       3
+      ],
+      [
+       5,
+       4
+      ],
+      [
+       5,
+       5
+      ]
+     ],
+     "/small/i32_16": [
+      [
+       0
+      ],
+      [
+       1
+      ]
+     ],
+     "/small/i32_17": [
+      [
+       0
+      ],
+      [
+       1
+      ]
+     ],
+     "/split/grid": [
+      [
+       0,
+       0
+      ],
+      [
+       0,
+       1
+      ],
+      [
+       0,
+       2
+      ],
+      [
+       0,
+       3
+      ],
+      [
+       0,
+       4
+      ],
+      [
+       0,
+       5
+      ],
+      [
+       0,
+       6
+      ],
+      [
+       0,
+       7
+      ],
+      [
+       0,
+       8
+      ],
+      [
+       1,
+       0
+      ],
+      [
+       1,
+       1
+      ],
+      [
+       1,
+       2
+      ],
+      [
+       1,
+       3
+      ],
+      [
+       1,
+       4
+      ],
+      [
+       1,
+       5
+      ],
+      [
+       1,
+       6
+      ],
+      [
+       1,
+       7
+      ],
+      [
+       1,
+       8
+      ],
+      [
+       2,
+       0
+      ],
+      [
+       2,
+       1
+      ],
+      [
+       2,
+       2
+      ],
+      [
+       2,
+       3
+      ],
+      [
+       2,
+       4
+      ],
+      [
+       2,
+       5
+      ],
+      [
+       2,
+       6
+      ],
+      [
+       2,
+       7
+      ],
+      [
+       2,
+       8
+      ],
+      [
+       3,
+       0
+      ],
+      [
+       3,
+       1
+      ],
+      [
+       3,
+       2
+      ],
+      [
+       3,
+       3
+      ],
+      [
+       3,
+       4
+      ],
+      [
+       3,
+       5
+      ],
+      [
+       3,
+       6
+      ],
+      [
+       3,
+       7
+      ],
+      [
+       3,
+       8
+      ],
+      [
+       4,
+       0
+      ],
+      [
+       4,
+       1
+      ],
+      [
+       4,
+       2
+      ],
+      [
+       4,
+       3
+      ],
+      [
+       4,
+       4
+      ],
+      [
+       4,
+       5
+      ],
+      [
+       4,
+       6
+      ],
+      [
+       4,
+       7
+      ],
+      [
+       4,
+       8
+      ],
+      [
+       5,
+       0
+      ],
+      [
+       5,
+       1
+      ],
+      [
+       5,
+       2
+      ],
+      [
+       5,
+       3
+      ],
+      [
+       5,
+       4
+      ],
+      [
+       5,
+       5
+      ],
+      [
+       5,
+       6
+      ],
+      [
+       5,
+       7
+      ],
+      [
+       5,
+       8
+      ]
+     ]
+    },
+    "updated_groups": []
+   },
+   "c2 second half": {
+    "deleted_arrays": [],
+    "deleted_groups": [],
+    "new_arrays": [],
+    "new_groups": [],
+    "updated_arrays": [],
+    "updated_chunks": {
+     "/split/grid": [
+      [
+       6,
+       0
+      ],
+      [
+       6,
+       1
+      ],
+      [
+       6,
+       2
+      ],
+      [
+       6,
+       3
+      ],
+      [
+       6,
+       4
+      ],
+      [
+       6,
+       5
+      ],
+      [
+       6,
+       6
+      ],
+      [
+       6,
+       7
+      ],
+      [
+       6,
+       8
+      ],
+      [
+       7,
+       0
+      ],
+      [
+       7,
+       1
+      ],
+      [
+       7,
+       2
+      ],
+      [
+       7,
+       3
+      ],
+      [
+       7,
+       4
+      ],
+      [
+       7,
+       5
+      ],
+      [
+       7,
+       6
+      ],
+      [
+       7,
+       7
+      ],
+      [
+       7,
+       8
+      ],
+      [
+       8,
+       0
+      ],
+      [
+       8,
+       1
+      ],
+      [
+       8,
+       2
+      ],
+      [
+       8,
+       3
+      ],
+      [
+       8,
+       4
+      ],
+      [
+       8,
+       5
+      ],
+      [
+       8,
+       6
+      ],
+      [
+       8,
+       7
+      ],
+      [
+       8,
+       8
+      ],
+      [
+       9,
+       0
+      ],
+      [
+       9,
+       1
+      ],
+      [
+       9,
+       2
+      ],
+      [
+       9,
+       3
+      ],
+      [
+       9,
+       4
+      ],
+      [
+       9,
+       5
+      ],
+      [
+       9,
+       6
+      ],
+      [
+       9,
+       7
+      ],
+      [
+       9,
+       8
+      ],
+      [
+       10,
+       0
+      ],
+      [
+       10,
+       1
+      ],
+      [
+       10,
+       2
+      ],
+      [
+       10,
+       3
+      ],
+      [
+       10,
+       4
+      ],
+      [
+       10,
+       5
+      ],
+      [
+       10,
+       6
+      ],
+      [
+       10,
+       7
+      ],
+      [
+       10,
+       8
+      ],
+      [
+       11,
+       0
+      ],
+      [
+       11,
+       1
+      ],
+      [
+       11,
+       2
+      ],
+      [
+       11,
+       3
+      ],
+      [
+       11,
+       4
+      ],
+      [
+       11,
+       5
+      ],
+      [
+       11,
+       6
+      ],
+      [
+       11,
+       7
+      ],
+      [
+       11,
+       8
+      ]
+     ]
+    },
+    "updated_groups": []
+   },
+   "c3 some splits": {
+    "deleted_arrays": [],
+    "deleted_groups": [],
+    "new_arrays": [],
+    "new_groups": [],
+    "updated_arrays": [],
+    "updated_chunks": {
+     "/split/grid": [
+      [
+       3,
+       3
+      ],
+      [
+       3,
+       4
+      ],
+      [
+       4,
+       3
+      ],
+      [
+       4,
+       4
+      ]
+     ]
+    },
+    "updated_groups": []
+   },
+   "c4": {
+    "deleted_arrays": [],
+    "deleted_groups": [],
+    "new_arrays": [],
+    "new_groups": [],
+    "updated_arrays": [],
+    "updated_chunks": {
+     "/small/i32_16": [
+      [
+       0
+      ]
+     ]
+    },
+    "updated_groups": []
+   }
+  },
+  "ops_log": [
+   [
+    "TagDeleted",
+    "t2",
+    null,
+    "c4"
+   ],
+   [
+    "TagCreated",
+    "t2",
+    null,
+    null
+   ],
+   [
+    "NewCommit",
+    "main",
+    "c4",
+    null
+   ],
+   [
+    "BranchDeleted",
+    "b2",
+    null,
+    "c3 some splits"
+   ],
+   [
+    "BranchReset",
+    "b1",
+    null,
+    "c1"
+   ],
+   [
+    "BranchCreated",
+    "b2",
+    null,
+    null
+   ],
+   [
+    "TagCreated",
+    "t1",
+    null,
+    null
+   ],
+   [
+    "BranchCreated",
+    "b1",
+    null,
+    null
+   ],
+   [
+    "NewCommit",
+    "main",
+    "c3 some splits",
+    null
+   ],
+   [
+    "NewCommit",
+    "main",
+    "c2 second half",
+    null
+   ],
+   [
+    "NewCommit",
+    "main",
+    "c1",
+    null
+   ],
+   [
+    "RepoInitialized",
+    null,
+    null,
+    null
+   ]
+  ],
+  "snapshots": {
+   "Repository initialized": {
+    "keys": [],
+    "nodes": {}
+   },
+   "c1": {
+    "keys": [
+     "nosplit/grid/c/0/0",
+     "nosplit/grid/c/0/1",
+     "nosplit/grid/c/0/2",
+     "nosplit/grid/c/0/3",
+     "nosplit/grid/c/0/4",
+     "nosplit/grid/c/0/5",
+     "nosplit/grid/c/1/0",
+     "nosplit/grid/c/1/1",
+     "nosplit/grid/c/1/2",
+     "nosplit/grid/c/1/3",
+     "nosplit/grid/c/1/4",
+     "nosplit/grid/c/1/5",
+     "nosplit/grid/c/2/0",
+     "nosplit/grid/c/2/1",
+     "nosplit/grid/c/2/2",
+     "nosplit/grid/c/2/3",
+     "nosplit/grid/c/2/4",
+     "nosplit/grid/c/2/5",
+     "nosplit/grid/c/3/0",
+     "nosplit/grid/c/3/1",
+     "nosplit/grid/c/3/2",
+     "nosplit/grid/c/3/3",
+     "nosplit/grid/c/3/4",
+     "nosplit/grid/c/3/5",
+     "nosplit/grid/c/4/0",
+     "nosplit/grid/c/4/1",
+     "nosplit/grid/c/4/2",
+     "nosplit/grid/c/4/3",
+     "nosplit/grid/c/4/4",
+     "nosplit/grid/c/4/5",
+     "nosplit/grid/c/5/0",
+     "nosplit/grid/c/5/1",
+     "nosplit/grid/c/5/2",
+     "nosplit/grid/c/5/3",
+     "nosplit/grid/c/5/4",
+     "nosplit/grid/c/5/5",
+     "nosplit/grid/zarr.json",
+     "nosplit/zarr.json",
+     "small/i32_16/c/0",
+     "small/i32_16/c/1",
+     "small/i32_16/zarr.json",
+     "small/i32_17/c/0",
+     "small/i32_17/c/1",
+     "small/i32_17/zarr.json",
+     "small/zarr.json",
+     "split/grid/c/0/0",
+     "split/grid/c/0/1",
+     "split/grid/c/0/2",
+     "split/grid/c/0/3",
+     "split/grid/c/0/4",
+     "split/grid/c/0/5",
+     "split/grid/c/0/6",
+     "split/grid/c/0/7",
+     "split/grid/c/0/8",
+     "split/grid/c/1/0",
+     "split/grid/c/1/1",
+     "split/grid/c/1/2",
+     "split/grid/c/1/3",
+     "split/grid/c/1/4",
+     "split/grid/c/1/5",
+     "split/grid/c/1/6",
+     "split/grid/c/1/7",
+     "split/grid/c/1/8",
+     "split/grid/c/2/0",
+     "split/grid/c/2/1",
+     "split/grid/c/2/2",
+     "split/grid/c/2/3",
+     "split/grid/c/2/4",
+     "split/grid/c/2/5",
+     "split/grid/c/2/6",
+     "split/grid/c/2/7",
+     "split/grid/c/2/8",
+     "split/grid/c/3/0",
+     "split/grid/c/3/1",
+     "split/grid/c/3/2",
+     "split/grid/c/3/3",
+     "split/grid/c/3/4",
+     "split/grid/c/3/5",
+     "split/grid/c/3/6",
+     "split/grid/c/3/7",
+     "split/grid/c/3/8",
+     "split/grid/c/4/0",
+     "split/grid/c/4/1",
+     "split/grid/c/4/2",
+     "split/grid/c/4/3",
+     "split/grid/c/4/4",
+     "split/grid/c/4/5",
+     "split/grid/c/4/6",
+     "split/grid/c/4/7",
+     "split/grid/c/4/8",
+     "split/grid/c/5/0",
+     "split/grid/c/5/1",
+     "split/grid/c/5/2",
+     "split/grid/c/5/3",
+     "split/grid/c/5/4",
+     "split/grid/c/5/5",
+     "split/grid/c/5/6",
+     "split/grid/c/5/7",
+     "split/grid/c/5/8",
+     "split/grid/zarr.json",
+     "split/zarr.json",
+     "zarr.json"
+    ],
+    "nodes": {
+     "/": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/nosplit": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/nosplit/grid": {
+      "chunks": {
+       "0,0": "inline:c3c50a2f05a4e55a",
+       "0,1": "inline:b7f6e5e02b25374c",
+       "0,2": "inline:306b7f7f76f0cb7f",
+       "0,3": "inline:e378d278b8544414",
+       "0,4": "inline:c046838f32463d30",
+       "0,5": "inline:f3f17d0731920b86",
+       "1,0": "inline:e071d9a77250342c",
+       "1,1": "inline:b00be63c91c300b9",
+       "1,2": "inline:cae1efc6256f7e37",
+       "1,3": "inline:472e7d6d98447bb0",
+       "1,4": "inline:17a7f995a9be188f",
+       "1,5": "inline:3da7ee36b277b63d",
+       "2,0": "inline:b997db2b64954069",
+       "2,1": "inline:54083d9d008e2365",
+       "2,2": "inline:64bf3571bc225db8",
+       "2,3": "inline:c60ef4e2d6a4d4bb",
+       "2,4": "inline:f8fbf93b5de57131",
+       "2,5": "inline:9900f943720e49fb",
+       "3,0": "inline:19c6b3fd7cbacc4f",
+       "3,1": "inline:85c61621ebd04403",
+       "3,2": "inline:779dc59c8ea354f1",
+       "3,3": "inline:b1d6b91b67c2afa5",
+       "3,4": "inline:159fc8b2b11cb572",
+       "3,5": "inline:de6a85cd62edaba0",
+       "4,0": "inline:a426f8cebd518880",
+       "4,1": "inline:67b8efed79cc0f29",
+       "4,2": "inline:dff15f15759a92c0",
+       "4,3": "inline:cfb6f9621ccc6b91",
+       "4,4": "inline:f91de08b876ad1f2",
+       "4,5": "inline:00251fd28a3caaa8",
+       "5,0": "inline:3c357224a74c2719",
+       "5,1": "inline:e75d1509b86b903f",
+       "5,2": "inline:214668704cc34b50",
+       "5,3": "inline:04f410a64892c22a",
+       "5,4": "inline:f9ef4dfe69379d54",
+       "5,5": "inline:25fbf86579700fa5"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ],
+        [
+         0,
+         3
+        ]
+       ],
+       [
+        [
+         0,
+         2
+        ],
+        [
+         3,
+         6
+        ]
+       ],
+       [
+        [
+         2,
+         4
+        ],
+        [
+         0,
+         3
+        ]
+       ],
+       [
+        [
+         2,
+         4
+        ],
+        [
+         3,
+         6
+        ]
+       ],
+       [
+        [
+         4,
+         6
+        ],
+        [
+         0,
+         3
+        ]
+       ],
+       [
+        [
+         4,
+         6
+        ],
+        [
+         3,
+         6
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "36e3537805e0f7f1",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          1,
+          1
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": -1,
+       "node_type": "array",
+       "shape": [
+        6,
+        6
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/small": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/small/i32_16": {
+      "chunks": {
+       "0": "inline:1c550f2d30865e10",
+       "1": "inline:b6d0253071ba4281"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "97f93a576b8c29e3",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          16
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        32
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/small/i32_17": {
+      "chunks": {
+       "0": "native:8c10f8e3f61da13d",
+       "1": "native:61f4d091e2c62a26"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "14e115f58c58fbef",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          17
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        34
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/split": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/split/grid": {
+      "chunks": {
+       "0,0": "inline:749fce9e09fd3f2e",
+       "0,1": "inline:f188fa700eb15b4b",
+       "0,2": "inline:1ee49526209bd8d4",
+       "0,3": "inline:a01764f91818d424",
+       "0,4": "inline:a4c2f8ae99202911",
+       "0,5": "inline:fe9941fd4beab29d",
+       "0,6": "inline:c8f055db38f6fc5f",
+       "0,7": "inline:87bbd4fa2ac8fbeb",
+       "0,8": "inline:3748ea2433972b24",
+       "1,0": "inline:6c284c6e2b4497d1",
+       "1,1": "inline:0c417e5c106b715d",
+       "1,2": "inline:88415f320c8eadfe",
+       "1,3": "inline:b22dd4ce41e3f79f",
+       "1,4": "inline:c0ab38fe45d04360",
+       "1,5": "inline:d75888eb76b23a38",
+       "1,6": "inline:a76f524a04a08dbb",
+       "1,7": "inline:1a7a8192b6605f72",
+       "1,8": "inline:25b453f0dfa75c7e",
+       "2,0": "inline:04b3885231c49b57",
+       "2,1": "inline:a7727dc1df811ea3",
+       "2,2": "inline:97b1761cc593e1a2",
+       "2,3": "inline:3e700e9a850b834f",
+       "2,4": "inline:ca596cbe0f2dd5bc",
+       "2,5": "inline:7cfcca3e1b323dce",
+       "2,6": "inline:2dd60108765505d6",
+       "2,7": "inline:372230c678669f72",
+       "2,8": "inline:73e95dae23635b26",
+       "3,0": "inline:a6d5ac706d15d3e4",
+       "3,1": "inline:12a0f65cb25738c3",
+       "3,2": "inline:cee35d795bab03dd",
+       "3,3": "inline:39cf8942b4f4424e",
+       "3,4": "inline:bffdf965d0697115",
+       "3,5": "inline:1e248252db3267a3",
+       "3,6": "inline:911c7cb01af452e5",
+       "3,7": "inline:774c82ef367f65a9",
+       "3,8": "inline:97ac1226a41dec46",
+       "4,0": "inline:5951c7b77dce083a",
+       "4,1": "inline:d61d8fde520b10bf",
+       "4,2": "inline:402d45b922fafa9f",
+       "4,3": "inline:61f0dc591e206875",
+       "4,4": "inline:1c126b1166680d61",
+       "4,5": "inline:921fc37a4e81c242",
+       "4,6": "inline:52994b32f8bf123a",
+       "4,7": "inline:347b044727257825",
+       "4,8": "inline:40c8e24c74eb86a5",
+       "5,0": "inline:6dd8ec773484a6ab",
+       "5,1": "inline:0f8af6ab8bf328de",
+       "5,2": "inline:fc4d602aa16170b8",
+       "5,3": "inline:d3522d0f21a2edcc",
+       "5,4": "inline:ef3c94cd8edb8e4a",
+       "5,5": "inline:725a8e00dedc3826",
+       "5,6": "inline:485138ce1907c46b",
+       "5,7": "inline:dba1552bd8bc7ebd",
+       "5,8": "inline:ed4847889f194e72"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ],
+        [
+         0,
+         3
+        ]
+       ],
+       [
+        [
+         0,
+         2
+        ],
+        [
+         3,
+         6
+        ]
+       ],
+       [
+        [
+         0,
+         2
+        ],
+        [
+         6,
+         9
+        ]
+       ],
+       [
+        [
+         2,
+         4
+        ],
+        [
+         0,
+         3
+        ]
+       ],
+       [
+        [
+         2,
+         4
+        ],
+        [
+         3,
+         6
+        ]
+       ],
+       [
+        [
+         2,
+         4
+        ],
+        [
+         6,
+         9
+        ]
+       ],
+       [
+        [
+         4,
+         6
+        ],
+        [
+         0,
+         3
+        ]
+       ],
+       [
+        [
+         4,
+         6
+        ],
+        [
+         3,
+         6
+        ]
+       ],
+       [
+        [
+         4,
+         6
+        ],
+        [
+         6,
+         9
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "464c7343657b95a4",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          1,
+          1
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": -1,
+       "node_type": "array",
+       "shape": [
+        12,
+        9
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     }
+    }
+   },
+   "c2 second half": {
+    "keys": [
+     "nosplit/grid/c/0/0",
+     "nosplit/grid/c/0/1",
+     "nosplit/grid/c/0/2",
+     "nosplit/grid/c/0/3",
+     "nosplit/grid/c/0/4",
+     "nosplit/grid/c/0/5",
+     "nosplit/grid/c/1/0",
+     "nosplit/grid/c/1/1",
+     "nosplit/grid/c/1/2",
+     "nosplit/grid/c/1/3",
+     "nosplit/grid/c/1/4",
+     "nosplit/grid/c/1/5",
+     "nosplit/grid/c/2/0",
+     "nosplit/grid/c/2/1",
+     "nosplit/grid/c/2/2",
+     "nosplit/grid/c/2/3",
+     "nosplit/grid/c/2/4",
+     "nosplit/grid/c/2/5",
+     "nosplit/grid/c/3/0",
+     "nosplit/grid/c/3/1",
+     "nosplit/grid/c/3/2",
+     "nosplit/grid/c/3/3",
+     "nosplit/grid/c/3/4",
+     "nosplit/grid/c/3/5",
+     "nosplit/grid/c/4/0",
+     "nosplit/grid/c/4/1",
+     "nosplit/grid/c/4/2",
+     "nosplit/grid/c/4/3",
+     "nosplit/grid/c/4/4",
+     "nosplit/grid/c/4/5",
+     "nosplit/grid/c/5/0",
+     "nosplit/grid/c/5/1",
+     "nosplit/grid/c/5/2",
+     "nosplit/grid/c/5/3",
+     "nosplit/grid/c/5/4",
+     "nosplit/grid/c/5/5",
+     "nosplit/grid/zarr.json",
+     "nosplit/zarr.json",
+     "small/i32_16/c/0",
+     "small/i32_16/c/1",
+     "small/i32_16/zarr.json",
+     "small/i32_17/c/0",
+     "small/i32_17/c/1",
+     "small/i32_17/zarr.json",
+     "small/zarr.json",
+     "split/grid/c/0/0",
+     "split/grid/c/0/1",
+     "split/grid/c/0/2",
+     "split/grid/c/0/3",
+     "split/grid/c/0/4",
+     "split/grid/c/0/5",
+     "split/grid/c/0/6",
+     "split/grid/c/0/7",
+     "split/grid/c/0/8",
+     "split/grid/c/1/0",
+     "split/grid/c/1/1",
+     "split/grid/c/1/2",
+     "split/grid/c/1/3",
+     "split/grid/c/1/4",
+     "split/grid/c/1/5",
+     "split/grid/c/1/6",
+     "split/grid/c/1/7",
+     "split/grid/c/1/8",
+     "split/grid/c/10/0",
+     "split/grid/c/10/1",
+     "split/grid/c/10/2",
+     "split/grid/c/10/3",
+     "split/grid/c/10/4",
+     "split/grid/c/10/5",
+     "split/grid/c/10/6",
+     "split/grid/c/10/7",
+     "split/grid/c/10/8",
+     "split/grid/c/11/0",
+     "split/grid/c/11/1",
+     "split/grid/c/11/2",
+     "split/grid/c/11/3",
+     "split/grid/c/11/4",
+     "split/grid/c/11/5",
+     "split/grid/c/11/6",
+     "split/grid/c/11/7",
+     "split/grid/c/11/8",
+     "split/grid/c/2/0",
+     "split/grid/c/2/1",
+     "split/grid/c/2/2",
+     "split/grid/c/2/3",
+     "split/grid/c/2/4",
+     "split/grid/c/2/5",
+     "split/grid/c/2/6",
+     "split/grid/c/2/7",
+     "split/grid/c/2/8",
+     "split/grid/c/3/0",
+     "split/grid/c/3/1",
+     "split/grid/c/3/2",
+     "split/grid/c/3/3",
+     "split/grid/c/3/4",
+     "split/grid/c/3/5",
+     "split/grid/c/3/6",
+     "split/grid/c/3/7",
+     "split/grid/c/3/8",
+     "split/grid/c/4/0",
+     "split/grid/c/4/1",
+     "split/grid/c/4/2",
+     "split/grid/c/4/3",
+     "split/grid/c/4/4",
+     "split/grid/c/4/5",
+     "split/grid/c/4/6",
+     "split/grid/c/4/7",
+     "split/grid/c/4/8",
+     "split/grid/c/5/0",
+     "split/grid/c/5/1",
+     "split/grid/c/5/2",
+     "split/grid/c/5/3",
+     "split/grid/c/5/4",
+     "split/grid/c/5/5",
+     "split/grid/c/5/6",
+     "split/grid/c/5/7",
+     "split/grid/c/5/8",
+     "split/grid/c/6/0",
+     "split/grid/c/6/1",
+     "split/grid/c/6/2",
+     "split/grid/c/6/3",
+     "split/grid/c/6/4",
+     "split/grid/c/6/5",
+     "split/grid/c/6/6",
+     "split/grid/c/6/7",
+     "split/grid/c/6/8",
+     "split/grid/c/7/0",
+     "split/grid/c/7/1",
+     "split/grid/c/7/2",
+     "split/grid/c/7/3",
+     "split/grid/c/7/4",
+     "split/grid/c/7/5",
+     "split/grid/c/7/6",
+     "split/grid/c/7/7",
+     "split/grid/c/7/8",
+     "split/grid/c/8/0",
+     "split/grid/c/8/1",
+     "split/grid/c/8/2",
+     "split/grid/c/8/3",
+     "split/grid/c/8/4",
+     "split/grid/c/8/5",
+     "split/grid/c/8/6",
+     "split/grid/c/8/7",
+     "split/grid/c/8/8",
+     "split/grid/c/9/0",
+     "split/grid/c/9/1",
+     "split/grid/c/9/2",
+     "split/grid/c/9/3",
+     "split/grid/c/9/4",
+     "split/grid/c/9/5",
+     "split/grid/c/9/6",
+     "split/grid/c/9/7",
+     "split/grid/c/9/8",
+     "split/grid/zarr.json",
+     "split/zarr.json",
+     "zarr.json"
+    ],
+    "nodes": {
+     "/": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/nosplit": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/nosplit/grid": {
+      "chunks": {
+       "0,0": "inline:c3c50a2f05a4e55a",
+       "0,1": "inline:b7f6e5e02b25374c",
+       "0,2": "inline:306b7f7f76f0cb7f",
+       "0,3": "inline:e378d278b8544414",
+       "0,4": "inline:c046838f32463d30",
+       "0,5": "inline:f3f17d0731920b86",
+       "1,0": "inline:e071d9a77250342c",
+       "1,1": "inline:b00be63c91c300b9",
+       "1,2": "inline:cae1efc6256f7e37",
+       "1,3": "inline:472e7d6d98447bb0",
+       "1,4": "inline:17a7f995a9be188f",
+       "1,5": "inline:3da7ee36b277b63d",
+       "2,0": "inline:b997db2b64954069",
+       "2,1": "inline:54083d9d008e2365",
+       "2,2": "inline:64bf3571bc225db8",
+       "2,3": "inline:c60ef4e2d6a4d4bb",
+       "2,4": "inline:f8fbf93b5de57131",
+       "2,5": "inline:9900f943720e49fb",
+       "3,0": "inline:19c6b3fd7cbacc4f",
+       "3,1": "inline:85c61621ebd04403",
+       "3,2": "inline:779dc59c8ea354f1",
+       "3,3": "inline:b1d6b91b67c2afa5",
+       "3,4": "inline:159fc8b2b11cb572",
+       "3,5": "inline:de6a85cd62edaba0",
+       "4,0": "inline:a426f8cebd518880",
+       "4,1": "inline:67b8efed79cc0f29",
+       "4,2": "inline:dff15f15759a92c0",
+       "4,3": "inline:cfb6f9621ccc6b91",
+       "4,4": "inline:f91de08b876ad1f2",
+       "4,5": "inline:00251fd28a3caaa8",
+       "5,0": "inline:3c357224a74c2719",
+       "5,1": "inline:e75d1509b86b903f",
+       "5,2": "inline:214668704cc34b50",
+       "5,3": "inline:04f410a64892c22a",
+       "5,4": "inline:f9ef4dfe69379d54",
+       "5,5": "inline:25fbf86579700fa5"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ],
+        [
+         0,
+         3
+        ]
+       ],
+       [
+        [
+         0,
+         2
+        ],
+        [
+         3,
+         6
+        ]
+       ],
+       [
+        [
+         2,
+         4
+        ],
+        [
+         0,
+         3
+        ]
+       ],
+       [
+        [
+         2,
+         4
+        ],
+        [
+         3,
+         6
+        ]
+       ],
+       [
+        [
+         4,
+         6
+        ],
+        [
+         0,
+         3
+        ]
+       ],
+       [
+        [
+         4,
+         6
+        ],
+        [
+         3,
+         6
+        ]
+       ]
+      ],
+      "manifests_kept": 6,
+      "type": "array",
+      "values": "36e3537805e0f7f1",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          1,
+          1
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": -1,
+       "node_type": "array",
+       "shape": [
+        6,
+        6
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/small": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/small/i32_16": {
+      "chunks": {
+       "0": "inline:1c550f2d30865e10",
+       "1": "inline:b6d0253071ba4281"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "97f93a576b8c29e3",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          16
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        32
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/small/i32_17": {
+      "chunks": {
+       "0": "native:8c10f8e3f61da13d",
+       "1": "native:61f4d091e2c62a26"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "14e115f58c58fbef",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          17
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        34
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/split": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/split/grid": {
+      "chunks": {
+       "0,0": "inline:749fce9e09fd3f2e",
+       "0,1": "inline:f188fa700eb15b4b",
+       "0,2": "inline:1ee49526209bd8d4",
+       "0,3": "inline:a01764f91818d424",
+       "0,4": "inline:a4c2f8ae99202911",
+       "0,5": "inline:fe9941fd4beab29d",
+       "0,6": "inline:c8f055db38f6fc5f",
+       "0,7": "inline:87bbd4fa2ac8fbeb",
+       "0,8": "inline:3748ea2433972b24",
+       "1,0": "inline:6c284c6e2b4497d1",
+       "1,1": "inline:0c417e5c106b715d",
+       "1,2": "inline:88415f320c8eadfe",
+       "1,3": "inline:b22dd4ce41e3f79f",
+       "1,4": "inline:c0ab38fe45d04360",
+       "1,5": "inline:d75888eb76b23a38",
+       "1,6": "inline:a76f524a04a08dbb",
+       "1,7": "inline:1a7a8192b6605f72",
+       "1,8": "inline:25b453f0dfa75c7e",
+       "10,0": "inline:9af1430f2b08c2ce",
+       "10,1": "inline:e9d292622cb10267",
+       "10,2": "inline:b0df18759bd8af0a",
+       "10,3": "inline:5999198013328e38",
+       "10,4": "inline:13d020b187667366",
+       "10,5": "inline:efcd7a61720df240",
+       "10,6": "inline:0d58af34649ab99d",
+       "10,7": "inline:651b7b4b9b9b8715",
+       "10,8": "inline:8672ffa2b6ac7028",
+       "11,0": "inline:b80b7afc989d5b02",
+       "11,1": "inline:14763669a531b95b",
+       "11,2": "inline:592940b5bbdc2c91",
+       "11,3": "inline:8510495b8f3016af",
+       "11,4": "inline:ca09beb202f3eb7c",
+       "11,5": "inline:24e1138284610811",
+       "11,6": "inline:ef7481c99881ba54",
+       "11,7": "inline:71a86fad337f5385",
+       "11,8": "inline:e894dd5d65ebc004",
+       "2,0": "inline:04b3885231c49b57",
+       "2,1": "inline:a7727dc1df811ea3",
+       "2,2": "inline:97b1761cc593e1a2",
+       "2,3": "inline:3e700e9a850b834f",
+       "2,4": "inline:ca596cbe0f2dd5bc",
+       "2,5": "inline:7cfcca3e1b323dce",
+       "2,6": "inline:2dd60108765505d6",
+       "2,7": "inline:372230c678669f72",
+       "2,8": "inline:73e95dae23635b26",
+       "3,0": "inline:a6d5ac706d15d3e4",
+       "3,1": "inline:12a0f65cb25738c3",
+       "3,2": "inline:cee35d795bab03dd",
+       "3,3": "inline:39cf8942b4f4424e",
+       "3,4": "inline:bffdf965d0697115",
+       "3,5": "inline:1e248252db3267a3",
+       "3,6": "inline:911c7cb01af452e5",
+       "3,7": "inline:774c82ef367f65a9",
+       "3,8": "inline:97ac1226a41dec46",
+       "4,0": "inline:5951c7b77dce083a",
+       "4,1": "inline:d61d8fde520b10bf",
+       "4,2": "inline:402d45b922fafa9f",
+       "4,3": "inline:61f0dc591e206875",
+       "4,4": "inline:1c126b1166680d61",
+       "4,5": "inline:921fc37a4e81c242",
+       "4,6": "inline:52994b32f8bf123a",
+       "4,7": "inline:347b044727257825",
+       "4,8": "inline:40c8e24c74eb86a5",
+       "5,0": "inline:6dd8ec773484a6ab",
+       "5,1": "inline:0f8af6ab8bf328de",
+       "5,2": "inline:fc4d602aa16170b8",
+       "5,3": "inline:d3522d0f21a2edcc",
+       "5,4": "inline:ef3c94cd8edb8e4a",
+       "5,5": "inline:725a8e00dedc3826",
+       "5,6": "inline:485138ce1907c46b",
+       "5,7": "inline:dba1552bd8bc7ebd",
+       "5,8": "inline:ed4847889f194e72",
+       "6,0": "inline:7853e8856e95cdad",
+       "6,1": "inline:d190dc4dd4043c64",
+       "6,2": "inline:ea46748e171abd2d",
+       "6,3": "inline:e3e74f502370cf7b",
+       "6,4": "inline:fc3b575e6485f16b",
+       "6,5": "inline:ac6cad11901f73d0",
+       "6,6": "inline:92e9898548ee961f",
+       "6,7": "inline:d45a4dd312c592be",
+       "6,8": "inline:ef37fd5666b6d289",
+       "7,0": "inline:b7b740067f854217",
+       "7,1": "inline:0c67d69ab11976b3",
+       "7,2": "inline:1e447cef725260dd",
+       "7,3": "inline:7f90fbdad88d5852",
+       "7,4": "inline:428e8db1a8e9cdc2",
+       "7,5": "inline:0eb853c0a0dab547",
+       "7,6": "inline:99c66b8eedd61fc4",
+       "7,7": "inline:231731630bde4fd5",
+       "7,8": "inline:c40919917c453f04",
+       "8,0": "inline:8e2fe8c50517aada",
+       "8,1": "inline:22dcd4a33cdf5b6d",
+       "8,2": "inline:4b3f9701b7646b84",
+       "8,3": "inline:5c8485275f9a42e9",
+       "8,4": "inline:a7d84d830c9819a3",
+       "8,5": "inline:0edbdc581e445921",
+       "8,6": "inline:1c9420d7b6f1838d",
+       "8,7": "inline:10413221f2bf2464",
+       "8,8": "inline:c2b9b3115afee27d",
+       "9,0": "inline:62a6460e5c83a034",
+       "9,1": "inline:28391d3bc64ec15c",
+       "9,2": "inline:a226f3d1d5921f24",
+       "9,3": "inline:b1d187a054000666",
+       "9,4": "inline:190a9bfa57f064dc",
+       "9,5": "inline:59b40fe8e13238b8",
+       "9,6": "inline:38392a8e7cab527f",
+       "9,7": "inline:c3b5bee0f464bef5",
+       "9,8": "inline:71edd461b689201e"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ],
+        [
+         0,
+         3
+        ]
+       ],
+       [
+        [
+         0,
+         2
+        ],
+        [
+         3,
+         6
+        ]
+       ],
+       [
+        [
+         0,
+         2
+        ],
+        [
+         6,
+         9
+        ]
+       ],
+       [
+        [
+         2,
+         4
+        ],
+        [
+         0,
+         3
+        ]
+       ],
+       [
+        [
+         2,
+         4
+        ],
+        [
+         3,
+         6
+        ]
+       ],
+       [
+        [
+         2,
+         4
+        ],
+        [
+         6,
+         9
+        ]
+       ],
+       [
+        [
+         4,
+         6
+        ],
+        [
+         0,
+         3
+        ]
+       ],
+       [
+        [
+         4,
+         6
+        ],
+        [
+         3,
+         6
+        ]
+       ],
+       [
+        [
+         4,
+         6
+        ],
+        [
+         6,
+         9
+        ]
+       ],
+       [
+        [
+         6,
+         8
+        ],
+        [
+         0,
+         3
+        ]
+       ],
+       [
+        [
+         6,
+         8
+        ],
+        [
+         3,
+         6
+        ]
+       ],
+       [
+        [
+         6,
+         8
+        ],
+        [
+         6,
+         9
+        ]
+       ],
+       [
+        [
+         8,
+         10
+        ],
+        [
+         0,
+         3
+        ]
+       ],
+       [
+        [
+         8,
+         10
+        ],
+        [
+         3,
+         6
+        ]
+       ],
+       [
+        [
+         8,
+         10
+        ],
+        [
+         6,
+         9
+        ]
+       ],
+       [
+        [
+         10,
+         12
+        ],
+        [
+         0,
+         3
+        ]
+       ],
+       [
+        [
+         10,
+         12
+        ],
+        [
+         3,
+         6
+        ]
+       ],
+       [
+        [
+         10,
+         12
+        ],
+        [
+         6,
+         9
+        ]
+       ]
+      ],
+      "manifests_kept": 9,
+      "type": "array",
+      "values": "0c875ed1115a7519",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          1,
+          1
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": -1,
+       "node_type": "array",
+       "shape": [
+        12,
+        9
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     }
+    }
+   },
+   "c3 some splits": {
+    "keys": [
+     "nosplit/grid/c/0/0",
+     "nosplit/grid/c/0/1",
+     "nosplit/grid/c/0/2",
+     "nosplit/grid/c/0/3",
+     "nosplit/grid/c/0/4",
+     "nosplit/grid/c/0/5",
+     "nosplit/grid/c/1/0",
+     "nosplit/grid/c/1/1",
+     "nosplit/grid/c/1/2",
+     "nosplit/grid/c/1/3",
+     "nosplit/grid/c/1/4",
+     "nosplit/grid/c/1/5",
+     "nosplit/grid/c/2/0",
+     "nosplit/grid/c/2/1",
+     "nosplit/grid/c/2/2",
+     "nosplit/grid/c/2/3",
+     "nosplit/grid/c/2/4",
+     "nosplit/grid/c/2/5",
+     "nosplit/grid/c/3/0",
+     "nosplit/grid/c/3/1",
+     "nosplit/grid/c/3/2",
+     "nosplit/grid/c/3/3",
+     "nosplit/grid/c/3/4",
+     "nosplit/grid/c/3/5",
+     "nosplit/grid/c/4/0",
+     "nosplit/grid/c/4/1",
+     "nosplit/grid/c/4/2",
+     "nosplit/grid/c/4/3",
+     "nosplit/grid/c/4/4",
+     "nosplit/grid/c/4/5",
+     "nosplit/grid/c/5/0",
+     "nosplit/grid/c/5/1",
+     "nosplit/grid/c/5/2",
+     "nosplit/grid/c/5/3",
+     "nosplit/grid/c/5/4",
+     "nosplit/grid/c/5/5",
+     "nosplit/grid/zarr.json",
+     "nosplit/zarr.json",
+     "small/i32_16/c/0",
+     "small/i32_16/c/1",
+     "small/i32_16/zarr.json",
+     "small/i32_17/c/0",
+     "small/i32_17/c/1",
+     "small/i32_17/zarr.json",
+     "small/zarr.json",
+     "split/grid/c/0/0",
+     "split/grid/c/0/1",
+     "split/grid/c/0/2",
+     "split/grid/c/0/3",
+     "split/grid/c/0/4",
+     "split/grid/c/0/5",
+     "split/grid/c/0/6",
+     "split/grid/c/0/7",
+     "split/grid/c/0/8",
+     "split/grid/c/1/0",
+     "split/grid/c/1/1",
+     "split/grid/c/1/2",
+     "split/grid/c/1/3",
+     "split/grid/c/1/4",
+     "split/grid/c/1/5",
+     "split/grid/c/1/6",
+     "split/grid/c/1/7",
+     "split/grid/c/1/8",
+     "split/grid/c/10/0",
+     "split/grid/c/10/1",
+     "split/grid/c/10/2",
+     "split/grid/c/10/3",
+     "split/grid/c/10/4",
+     "split/grid/c/10/5",
+     "split/grid/c/10/6",
+     "split/grid/c/10/7",
+     "split/grid/c/10/8",
+     "split/grid/c/11/0",
+     "split/grid/c/11/1",
+     "split/grid/c/11/2",
+     "split/grid/c/11/3",
+     "split/grid/c/11/4",
+     "split/grid/c/11/5",
+     "split/grid/c/11/6",
+     "split/grid/c/11/7",
+     "split/grid/c/11/8",
+     "split/grid/c/2/0",
+     "split/grid/c/2/1",
+     "split/grid/c/2/2",
+     "split/grid/c/2/3",
+     "split/grid/c/2/4",
+     "split/grid/c/2/5",
+     "split/grid/c/2/6",
+     "split/grid/c/2/7",
+     "split/grid/c/2/8",
+     "split/grid/c/3/0",
+     "split/grid/c/3/1",
+     "split/grid/c/3/2",
+     "split/grid/c/3/3",
+     "split/grid/c/3/4",
+     "split/grid/c/3/5",
+     "split/grid/c/3/6",
+     "split/grid/c/3/7",
+     "split/grid/c/3/8",
+     "split/grid/c/4/0",
+     "split/grid/c/4/1",
+     "split/grid/c/4/2",
+     "split/grid/c/4/3",
+     "split/grid/c/4/4",
+     "split/grid/c/4/5",
+     "split/grid/c/4/6",
+     "split/grid/c/4/7",
+     "split/grid/c/4/8",
+     "split/grid/c/5/0",
+     "split/grid/c/5/1",
+     "split/grid/c/5/2",
+     "split/grid/c/5/3",
+     "split/grid/c/5/4",
+     "split/grid/c/5/5",
+     "split/grid/c/5/6",
+     "split/grid/c/5/7",
+     "split/grid/c/5/8",
+     "split/grid/c/6/0",
+     "split/grid/c/6/1",
+     "split/grid/c/6/2",
+     "split/grid/c/6/3",
+     "split/grid/c/6/4",
+     "split/grid/c/6/5",
+     "split/grid/c/6/6",
+     "split/grid/c/6/7",
+     "split/grid/c/6/8",
+     "split/grid/c/7/0",
+     "split/grid/c/7/1",
+     "split/grid/c/7/2",
+     "split/grid/c/7/3",
+     "split/grid/c/7/4",
+     "split/grid/c/7/5",
+     "split/grid/c/7/6",
+     "split/grid/c/7/7",
+     "split/grid/c/7/8",
+     "split/grid/c/8/0",
+     "split/grid/c/8/1",
+     "split/grid/c/8/2",
+     "split/grid/c/8/3",
+     "split/grid/c/8/4",
+     "split/grid/c/8/5",
+     "split/grid/c/8/6",
+     "split/grid/c/8/7",
+     "split/grid/c/8/8",
+     "split/grid/c/9/0",
+     "split/grid/c/9/1",
+     "split/grid/c/9/2",
+     "split/grid/c/9/3",
+     "split/grid/c/9/4",
+     "split/grid/c/9/5",
+     "split/grid/c/9/6",
+     "split/grid/c/9/7",
+     "split/grid/c/9/8",
+     "split/grid/zarr.json",
+     "split/zarr.json",
+     "zarr.json"
+    ],
+    "nodes": {
+     "/": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/nosplit": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/nosplit/grid": {
+      "chunks": {
+       "0,0": "inline:c3c50a2f05a4e55a",
+       "0,1": "inline:b7f6e5e02b25374c",
+       "0,2": "inline:306b7f7f76f0cb7f",
+       "0,3": "inline:e378d278b8544414",
+       "0,4": "inline:c046838f32463d30",
+       "0,5": "inline:f3f17d0731920b86",
+       "1,0": "inline:e071d9a77250342c",
+       "1,1": "inline:b00be63c91c300b9",
+       "1,2": "inline:cae1efc6256f7e37",
+       "1,3": "inline:472e7d6d98447bb0",
+       "1,4": "inline:17a7f995a9be188f",
+       "1,5": "inline:3da7ee36b277b63d",
+       "2,0": "inline:b997db2b64954069",
+       "2,1": "inline:54083d9d008e2365",
+       "2,2": "inline:64bf3571bc225db8",
+       "2,3": "inline:c60ef4e2d6a4d4bb",
+       "2,4": "inline:f8fbf93b5de57131",
+       "2,5": "inline:9900f943720e49fb",
+       "3,0": "inline:19c6b3fd7cbacc4f",
+       "3,1": "inline:85c61621ebd04403",
+       "3,2": "inline:779dc59c8ea354f1",
+       "3,3": "inline:b1d6b91b67c2afa5",
+       "3,4": "inline:159fc8b2b11cb572",
+       "3,5": "inline:de6a85cd62edaba0",
+       "4,0": "inline:a426f8cebd518880",
+       "4,1": "inline:67b8efed79cc0f29",
+       "4,2": "inline:dff15f15759a92c0",
+       "4,3": "inline:cfb6f9621ccc6b91",
+       "4,4": "inline:f91de08b876ad1f2",
+       "4,5": "inline:00251fd28a3caaa8",
+       "5,0": "inline:3c357224a74c2719",
+       "5,1": "inline:e75d1509b86b903f",
+       "5,2": "inline:214668704cc34b50",
+       "5,3": "inline:04f410a64892c22a",
+       "5,4": "inline:f9ef4dfe69379d54",
+       "5,5": "inline:25fbf86579700fa5"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ],
+        [
+         0,
+         3
+        ]
+       ],
+       [
+        [
+         0,
+         2
+        ],
+        [
+         3,
+         6
+        ]
+       ],
+       [
+        [
+         2,
+         4
+        ],
+        [
+         0,
+         3
+        ]
+       ],
+       [
+        [
+         2,
+         4
+        ],
+        [
+         3,
+         6
+        ]
+       ],
+       [
+        [
+         4,
+         6
+        ],
+        [
+         0,
+         3
+        ]
+       ],
+       [
+        [
+         4,
+         6
+        ],
+        [
+         3,
+         6
+        ]
+       ]
+      ],
+      "manifests_kept": 6,
+      "type": "array",
+      "values": "36e3537805e0f7f1",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          1,
+          1
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": -1,
+       "node_type": "array",
+       "shape": [
+        6,
+        6
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/small": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/small/i32_16": {
+      "chunks": {
+       "0": "inline:1c550f2d30865e10",
+       "1": "inline:b6d0253071ba4281"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "97f93a576b8c29e3",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          16
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        32
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/small/i32_17": {
+      "chunks": {
+       "0": "native:8c10f8e3f61da13d",
+       "1": "native:61f4d091e2c62a26"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "14e115f58c58fbef",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          17
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        34
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/split": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/split/grid": {
+      "chunks": {
+       "0,0": "inline:749fce9e09fd3f2e",
+       "0,1": "inline:f188fa700eb15b4b",
+       "0,2": "inline:1ee49526209bd8d4",
+       "0,3": "inline:a01764f91818d424",
+       "0,4": "inline:a4c2f8ae99202911",
+       "0,5": "inline:fe9941fd4beab29d",
+       "0,6": "inline:c8f055db38f6fc5f",
+       "0,7": "inline:87bbd4fa2ac8fbeb",
+       "0,8": "inline:3748ea2433972b24",
+       "1,0": "inline:6c284c6e2b4497d1",
+       "1,1": "inline:0c417e5c106b715d",
+       "1,2": "inline:88415f320c8eadfe",
+       "1,3": "inline:b22dd4ce41e3f79f",
+       "1,4": "inline:c0ab38fe45d04360",
+       "1,5": "inline:d75888eb76b23a38",
+       "1,6": "inline:a76f524a04a08dbb",
+       "1,7": "inline:1a7a8192b6605f72",
+       "1,8": "inline:25b453f0dfa75c7e",
+       "10,0": "inline:9af1430f2b08c2ce",
+       "10,1": "inline:e9d292622cb10267",
+       "10,2": "inline:b0df18759bd8af0a",
+       "10,3": "inline:5999198013328e38",
+       "10,4": "inline:13d020b187667366",
+       "10,5": "inline:efcd7a61720df240",
+       "10,6": "inline:0d58af34649ab99d",
+       "10,7": "inline:651b7b4b9b9b8715",
+       "10,8": "inline:8672ffa2b6ac7028",
+       "11,0": "inline:b80b7afc989d5b02",
+       "11,1": "inline:14763669a531b95b",
+       "11,2": "inline:592940b5bbdc2c91",
+       "11,3": "inline:8510495b8f3016af",
+       "11,4": "inline:ca09beb202f3eb7c",
+       "11,5": "inline:24e1138284610811",
+       "11,6": "inline:ef7481c99881ba54",
+       "11,7": "inline:71a86fad337f5385",
+       "11,8": "inline:e894dd5d65ebc004",
+       "2,0": "inline:04b3885231c49b57",
+       "2,1": "inline:a7727dc1df811ea3",
+       "2,2": "inline:97b1761cc593e1a2",
+       "2,3": "inline:3e700e9a850b834f",
+       "2,4": "inline:ca596cbe0f2dd5bc",
+       "2,5": "inline:7cfcca3e1b323dce",
+       "2,6": "inline:2dd60108765505d6",
+       "2,7": "inline:372230c678669f72",
+       "2,8": "inline:73e95dae23635b26",
+       "3,0": "inline:a6d5ac706d15d3e4",
+       "3,1": "inline:12a0f65cb25738c3",
+       "3,2": "inline:cee35d795bab03dd",
+       "3,3": "inline:b5e26077ac250015",
+       "3,4": "inline:3382af3286e513b6",
+       "3,5": "inline:1e248252db3267a3",
+       "3,6": "inline:911c7cb01af452e5",
+       "3,7": "inline:774c82ef367f65a9",
+       "3,8": "inline:97ac1226a41dec46",
+       "4,0": "inline:5951c7b77dce083a",
+       "4,1": "inline:d61d8fde520b10bf",
+       "4,2": "inline:402d45b922fafa9f",
+       "4,3": "inline:0b0be3087a5ee088",
+       "4,4": "inline:d67076f40825d943",
+       "4,5": "inline:921fc37a4e81c242",
+       "4,6": "inline:52994b32f8bf123a",
+       "4,7": "inline:347b044727257825",
+       "4,8": "inline:40c8e24c74eb86a5",
+       "5,0": "inline:6dd8ec773484a6ab",
+       "5,1": "inline:0f8af6ab8bf328de",
+       "5,2": "inline:fc4d602aa16170b8",
+       "5,3": "inline:d3522d0f21a2edcc",
+       "5,4": "inline:ef3c94cd8edb8e4a",
+       "5,5": "inline:725a8e00dedc3826",
+       "5,6": "inline:485138ce1907c46b",
+       "5,7": "inline:dba1552bd8bc7ebd",
+       "5,8": "inline:ed4847889f194e72",
+       "6,0": "inline:7853e8856e95cdad",
+       "6,1": "inline:d190dc4dd4043c64",
+       "6,2": "inline:ea46748e171abd2d",
+       "6,3": "inline:e3e74f502370cf7b",
+       "6,4": "inline:fc3b575e6485f16b",
+       "6,5": "inline:ac6cad11901f73d0",
+       "6,6": "inline:92e9898548ee961f",
+       "6,7": "inline:d45a4dd312c592be",
+       "6,8": "inline:ef37fd5666b6d289",
+       "7,0": "inline:b7b740067f854217",
+       "7,1": "inline:0c67d69ab11976b3",
+       "7,2": "inline:1e447cef725260dd",
+       "7,3": "inline:7f90fbdad88d5852",
+       "7,4": "inline:428e8db1a8e9cdc2",
+       "7,5": "inline:0eb853c0a0dab547",
+       "7,6": "inline:99c66b8eedd61fc4",
+       "7,7": "inline:231731630bde4fd5",
+       "7,8": "inline:c40919917c453f04",
+       "8,0": "inline:8e2fe8c50517aada",
+       "8,1": "inline:22dcd4a33cdf5b6d",
+       "8,2": "inline:4b3f9701b7646b84",
+       "8,3": "inline:5c8485275f9a42e9",
+       "8,4": "inline:a7d84d830c9819a3",
+       "8,5": "inline:0edbdc581e445921",
+       "8,6": "inline:1c9420d7b6f1838d",
+       "8,7": "inline:10413221f2bf2464",
+       "8,8": "inline:c2b9b3115afee27d",
+       "9,0": "inline:62a6460e5c83a034",
+       "9,1": "inline:28391d3bc64ec15c",
+       "9,2": "inline:a226f3d1d5921f24",
+       "9,3": "inline:b1d187a054000666",
+       "9,4": "inline:190a9bfa57f064dc",
+       "9,5": "inline:59b40fe8e13238b8",
+       "9,6": "inline:38392a8e7cab527f",
+       "9,7": "inline:c3b5bee0f464bef5",
+       "9,8": "inline:71edd461b689201e"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ],
+        [
+         0,
+         3
+        ]
+       ],
+       [
+        [
+         0,
+         2
+        ],
+        [
+         3,
+         6
+        ]
+       ],
+       [
+        [
+         0,
+         2
+        ],
+        [
+         6,
+         9
+        ]
+       ],
+       [
+        [
+         2,
+         4
+        ],
+        [
+         0,
+         3
+        ]
+       ],
+       [
+        [
+         2,
+         4
+        ],
+        [
+         3,
+         6
+        ]
+       ],
+       [
+        [
+         2,
+         4
+        ],
+        [
+         6,
+         9
+        ]
+       ],
+       [
+        [
+         4,
+         6
+        ],
+        [
+         0,
+         3
+        ]
+       ],
+       [
+        [
+         4,
+         6
+        ],
+        [
+         3,
+         6
+        ]
+       ],
+       [
+        [
+         4,
+         6
+        ],
+        [
+         6,
+         9
+        ]
+       ],
+       [
+        [
+         6,
+         8
+        ],
+        [
+         0,
+         3
+        ]
+       ],
+       [
+        [
+         6,
+         8
+        ],
+        [
+         3,
+         6
+        ]
+       ],
+       [
+        [
+         6,
+         8
+        ],
+        [
+         6,
+         9
+        ]
+       ],
+       [
+        [
+         8,
+         10
+        ],
+        [
+         0,
+         3
+        ]
+       ],
+       [
+        [
+         8,
+         10
+        ],
+        [
+         3,
+         6
+        ]
+       ],
+       [
+        [
+         8,
+         10
+        ],
+        [
+         6,
+         9
+        ]
+       ],
+       [
+        [
+         10,
+         12
+        ],
+        [
+         0,
+         3
+        ]
+       ],
+       [
+        [
+         10,
+         12
+        ],
+        [
+         3,
+         6
+        ]
+       ],
+       [
+        [
+         10,
+         12
+        ],
+        [
+         6,
+         9
+        ]
+       ]
+      ],
+      "manifests_kept": 16,
+      "type": "array",
+      "values": "b851c482f065eab7",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          1,
+          1
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": -1,
+       "node_type": "array",
+       "shape": [
+        12,
+        9
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     }
+    }
+   },
+   "c4": {
+    "keys": [
+     "nosplit/grid/c/0/0",
+     "nosplit/grid/c/0/1",
+     "nosplit/grid/c/0/2",
+     "nosplit/grid/c/0/3",
+     "nosplit/grid/c/0/4",
+     "nosplit/grid/c/0/5",
+     "nosplit/grid/c/1/0",
+     "nosplit/grid/c/1/1",
+     "nosplit/grid/c/1/2",
+     "nosplit/grid/c/1/3",
+     "nosplit/grid/c/1/4",
+     "nosplit/grid/c/1/5",
+     "nosplit/grid/c/2/0",
+     "nosplit/grid/c/2/1",
+     "nosplit/grid/c/2/2",
+     "nosplit/grid/c/2/3",
+     "nosplit/grid/c/2/4",
+     "nosplit/grid/c/2/5",
+     "nosplit/grid/c/3/0",
+     "nosplit/grid/c/3/1",
+     "nosplit/grid/c/3/2",
+     "nosplit/grid/c/3/3",
+     "nosplit/grid/c/3/4",
+     "nosplit/grid/c/3/5",
+     "nosplit/grid/c/4/0",
+     "nosplit/grid/c/4/1",
+     "nosplit/grid/c/4/2",
+     "nosplit/grid/c/4/3",
+     "nosplit/grid/c/4/4",
+     "nosplit/grid/c/4/5",
+     "nosplit/grid/c/5/0",
+     "nosplit/grid/c/5/1",
+     "nosplit/grid/c/5/2",
+     "nosplit/grid/c/5/3",
+     "nosplit/grid/c/5/4",
+     "nosplit/grid/c/5/5",
+     "nosplit/grid/zarr.json",
+     "nosplit/zarr.json",
+     "small/i32_16/c/0",
+     "small/i32_16/c/1",
+     "small/i32_16/zarr.json",
+     "small/i32_17/c/0",
+     "small/i32_17/c/1",
+     "small/i32_17/zarr.json",
+     "small/zarr.json",
+     "split/grid/c/0/0",
+     "split/grid/c/0/1",
+     "split/grid/c/0/2",
+     "split/grid/c/0/3",
+     "split/grid/c/0/4",
+     "split/grid/c/0/5",
+     "split/grid/c/0/6",
+     "split/grid/c/0/7",
+     "split/grid/c/0/8",
+     "split/grid/c/1/0",
+     "split/grid/c/1/1",
+     "split/grid/c/1/2",
+     "split/grid/c/1/3",
+     "split/grid/c/1/4",
+     "split/grid/c/1/5",
+     "split/grid/c/1/6",
+     "split/grid/c/1/7",
+     "split/grid/c/1/8",
+     "split/grid/c/10/0",
+     "split/grid/c/10/1",
+     "split/grid/c/10/2",
+     "split/grid/c/10/3",
+     "split/grid/c/10/4",
+     "split/grid/c/10/5",
+     "split/grid/c/10/6",
+     "split/grid/c/10/7",
+     "split/grid/c/10/8",
+     "split/grid/c/11/0",
+     "split/grid/c/11/1",
+     "split/grid/c/11/2",
+     "split/grid/c/11/3",
+     "split/grid/c/11/4",
+     "split/grid/c/11/5",
+     "split/grid/c/11/6",
+     "split/grid/c/11/7",
+     "split/grid/c/11/8",
+     "split/grid/c/2/0",
+     "split/grid/c/2/1",
+     "split/grid/c/2/2",
+     "split/grid/c/2/3",
+     "split/grid/c/2/4",
+     "split/grid/c/2/5",
+     "split/grid/c/2/6",
+     "split/grid/c/2/7",
+     "split/grid/c/2/8",
+     "split/grid/c/3/0",
+     "split/grid/c/3/1",
+     "split/grid/c/3/2",
+     "split/grid/c/3/3",
+     "split/grid/c/3/4",
+     "split/grid/c/3/5",
+     "split/grid/c/3/6",
+     "split/grid/c/3/7",
+     "split/grid/c/3/8",
+     "split/grid/c/4/0",
+     "split/grid/c/4/1",
+     "split/grid/c/4/2",
+     "split/grid/c/4/3",
+     "split/grid/c/4/4",
+     "split/grid/c/4/5",
+     "split/grid/c/4/6",
+     "split/grid/c/4/7",
+     "split/grid/c/4/8",
+     "split/grid/c/5/0",
+     "split/grid/c/5/1",
+     "split/grid/c/5/2",
+     "split/grid/c/5/3",
+     "split/grid/c/5/4",
+     "split/grid/c/5/5",
+     "split/grid/c/5/6",
+     "split/grid/c/5/7",
+     "split/grid/c/5/8",
+     "split/grid/c/6/0",
+     "split/grid/c/6/1",
+     "split/grid/c/6/2",
+     "split/grid/c/6/3",
+     "split/grid/c/6/4",
+     "split/grid/c/6/5",
+     "split/grid/c/6/6",
+     "split/grid/c/6/7",
+     "split/grid/c/6/8",
+     "split/grid/c/7/0",
+     "split/grid/c/7/1",
+     "split/grid/c/7/2",
+     "split/grid/c/7/3",
+     "split/grid/c/7/4",
+     "split/grid/c/7/5",
+     "split/grid/c/7/6",
+     "split/grid/c/7/7",
+     "split/grid/c/7/8",
+     "split/grid/c/8/0",
+     "split/grid/c/8/1",
+     "split/grid/c/8/2",
+     "split/grid/c/8/3",
+     "split/grid/c/8/4",
+     "split/grid/c/8/5",
+     "split/grid/c/8/6",
+     "split/grid/c/8/7",
+     "split/grid/c/8/8",
+     "split/grid/c/9/0",
+     "split/grid/c/9/1",
+     "split/grid/c/9/2",
+     "split/grid/c/9/3",
+     "split/grid/c/9/4",
+     "split/grid/c/9/5",
+     "split/grid/c/9/6",
+     "split/grid/c/9/7",
+     "split/grid/c/9/8",
+     "split/grid/zarr.json",
+     "split/zarr.json",
+     "zarr.json"
+    ],
+    "nodes": {
+     "/": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/nosplit": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/nosplit/grid": {
+      "chunks": {
+       "0,0": "inline:c3c50a2f05a4e55a",
+       "0,1": "inline:b7f6e5e02b25374c",
+       "0,2": "inline:306b7f7f76f0cb7f",
+       "0,3": "inline:e378d278b8544414",
+       "0,4": "inline:c046838f32463d30",
+       "0,5": "inline:f3f17d0731920b86",
+       "1,0": "inline:e071d9a77250342c",
+       "1,1": "inline:b00be63c91c300b9",
+       "1,2": "inline:cae1efc6256f7e37",
+       "1,3": "inline:472e7d6d98447bb0",
+       "1,4": "inline:17a7f995a9be188f",
+       "1,5": "inline:3da7ee36b277b63d",
+       "2,0": "inline:b997db2b64954069",
+       "2,1": "inline:54083d9d008e2365",
+       "2,2": "inline:64bf3571bc225db8",
+       "2,3": "inline:c60ef4e2d6a4d4bb",
+       "2,4": "inline:f8fbf93b5de57131",
+       "2,5": "inline:9900f943720e49fb",
+       "3,0": "inline:19c6b3fd7cbacc4f",
+       "3,1": "inline:85c61621ebd04403",
+       "3,2": "inline:779dc59c8ea354f1",
+       "3,3": "inline:b1d6b91b67c2afa5",
+       "3,4": "inline:159fc8b2b11cb572",
+       "3,5": "inline:de6a85cd62edaba0",
+       "4,0": "inline:a426f8cebd518880",
+       "4,1": "inline:67b8efed79cc0f29",
+       "4,2": "inline:dff15f15759a92c0",
+       "4,3": "inline:cfb6f9621ccc6b91",
+       "4,4": "inline:f91de08b876ad1f2",
+       "4,5": "inline:00251fd28a3caaa8",
+       "5,0": "inline:3c357224a74c2719",
+       "5,1": "inline:e75d1509b86b903f",
+       "5,2": "inline:214668704cc34b50",
+       "5,3": "inline:04f410a64892c22a",
+       "5,4": "inline:f9ef4dfe69379d54",
+       "5,5": "inline:25fbf86579700fa5"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ],
+        [
+         0,
+         3
+        ]
+       ],
+       [
+        [
+         0,
+         2
+        ],
+        [
+         3,
+         6
+        ]
+       ],
+       [
+        [
+         2,
+         4
+        ],
+        [
+         0,
+         3
+        ]
+       ],
+       [
+        [
+         2,
+         4
+        ],
+        [
+         3,
+         6
+        ]
+       ],
+       [
+        [
+         4,
+         6
+        ],
+        [
+         0,
+         3
+        ]
+       ],
+       [
+        [
+         4,
+         6
+        ],
+        [
+         3,
+         6
+        ]
+       ]
+      ],
+      "manifests_kept": 6,
+      "type": "array",
+      "values": "36e3537805e0f7f1",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          1,
+          1
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": -1,
+       "node_type": "array",
+       "shape": [
+        6,
+        6
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/small": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/small/i32_16": {
+      "chunks": {
+       "0": "inline:30d464f7f65683f4",
+       "1": "inline:b6d0253071ba4281"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "1884b833c24120a8",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          16
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        32
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/small/i32_17": {
+      "chunks": {
+       "0": "native:8c10f8e3f61da13d",
+       "1": "native:61f4d091e2c62a26"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "14e115f58c58fbef",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          17
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        34
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/split": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/split/grid": {
+      "chunks": {
+       "0,0": "inline:749fce9e09fd3f2e",
+       "0,1": "inline:f188fa700eb15b4b",
+       "0,2": "inline:1ee49526209bd8d4",
+       "0,3": "inline:a01764f91818d424",
+       "0,4": "inline:a4c2f8ae99202911",
+       "0,5": "inline:fe9941fd4beab29d",
+       "0,6": "inline:c8f055db38f6fc5f",
+       "0,7": "inline:87bbd4fa2ac8fbeb",
+       "0,8": "inline:3748ea2433972b24",
+       "1,0": "inline:6c284c6e2b4497d1",
+       "1,1": "inline:0c417e5c106b715d",
+       "1,2": "inline:88415f320c8eadfe",
+       "1,3": "inline:b22dd4ce41e3f79f",
+       "1,4": "inline:c0ab38fe45d04360",
+       "1,5": "inline:d75888eb76b23a38",
+       "1,6": "inline:a76f524a04a08dbb",
+       "1,7": "inline:1a7a8192b6605f72",
+       "1,8": "inline:25b453f0dfa75c7e",
+       "10,0": "inline:9af1430f2b08c2ce",
+       "10,1": "inline:e9d292622cb10267",
+       "10,2": "inline:b0df18759bd8af0a",
+       "10,3": "inline:5999198013328e38",
+       "10,4": "inline:13d020b187667366",
+       "10,5": "inline:efcd7a61720df240",
+       "10,6": "inline:0d58af34649ab99d",
+       "10,7": "inline:651b7b4b9b9b8715",
+       "10,8": "inline:8672ffa2b6ac7028",
+       "11,0": "inline:b80b7afc989d5b02",
+       "11,1": "inline:14763669a531b95b",
+       "11,2": "inline:592940b5bbdc2c91",
+       "11,3": "inline:8510495b8f3016af",
+       "11,4": "inline:ca09beb202f3eb7c",
+       "11,5": "inline:24e1138284610811",
+       "11,6": "inline:ef7481c99881ba54",
+       "11,7": "inline:71a86fad337f5385",
+       "11,8": "inline:e894dd5d65ebc004",
+       "2,0": "inline:04b3885231c49b57",
+       "2,1": "inline:a7727dc1df811ea3",
+       "2,2": "inline:97b1761cc593e1a2",
+       "2,3": "inline:3e700e9a850b834f",
+       "2,4": "inline:ca596cbe0f2dd5bc",
+       "2,5": "inline:7cfcca3e1b323dce",
+       "2,6": "inline:2dd60108765505d6",
+       "2,7": "inline:372230c678669f72",
+       "2,8": "inline:73e95dae23635b26",
+       "3,0": "inline:a6d5ac706d15d3e4",
+       "3,1": "inline:12a0f65cb25738c3",
+       "3,2": "inline:cee35d795bab03dd",
+       "3,3": "inline:b5e26077ac250015",
+       "3,4": "inline:3382af3286e513b6",
+       "3,5": "inline:1e248252db3267a3",
+       "3,6": "inline:911c7cb01af452e5",
+       "3,7": "inline:774c82ef367f65a9",
+       "3,8": "inline:97ac1226a41dec46",
+       "4,0": "inline:5951c7b77dce083a",
+       "4,1": "inline:d61d8fde520b10bf",
+       "4,2": "inline:402d45b922fafa9f",
+       "4,3": "inline:0b0be3087a5ee088",
+       "4,4": "inline:d67076f40825d943",
+       "4,5": "inline:921fc37a4e81c242",
+       "4,6": "inline:52994b32f8bf123a",
+       "4,7": "inline:347b044727257825",
+       "4,8": "inline:40c8e24c74eb86a5",
+       "5,0": "inline:6dd8ec773484a6ab",
+       "5,1": "inline:0f8af6ab8bf328de",
+       "5,2": "inline:fc4d602aa16170b8",
+       "5,3": "inline:d3522d0f21a2edcc",
+       "5,4": "inline:ef3c94cd8edb8e4a",
+       "5,5": "inline:725a8e00dedc3826",
+       "5,6": "inline:485138ce1907c46b",
+       "5,7": "inline:dba1552bd8bc7ebd",
+       "5,8": "inline:ed4847889f194e72",
+       "6,0": "inline:7853e8856e95cdad",
+       "6,1": "inline:d190dc4dd4043c64",
+       "6,2": "inline:ea46748e171abd2d",
+       "6,3": "inline:e3e74f502370cf7b",
+       "6,4": "inline:fc3b575e6485f16b",
+       "6,5": "inline:ac6cad11901f73d0",
+       "6,6": "inline:92e9898548ee961f",
+       "6,7": "inline:d45a4dd312c592be",
+       "6,8": "inline:ef37fd5666b6d289",
+       "7,0": "inline:b7b740067f854217",
+       "7,1": "inline:0c67d69ab11976b3",
+       "7,2": "inline:1e447cef725260dd",
+       "7,3": "inline:7f90fbdad88d5852",
+       "7,4": "inline:428e8db1a8e9cdc2",
+       "7,5": "inline:0eb853c0a0dab547",
+       "7,6": "inline:99c66b8eedd61fc4",
+       "7,7": "inline:231731630bde4fd5",
+       "7,8": "inline:c40919917c453f04",
+       "8,0": "inline:8e2fe8c50517aada",
+       "8,1": "inline:22dcd4a33cdf5b6d",
+       "8,2": "inline:4b3f9701b7646b84",
+       "8,3": "inline:5c8485275f9a42e9",
+       "8,4": "inline:a7d84d830c9819a3",
+       "8,5": "inline:0edbdc581e445921",
+       "8,6": "inline:1c9420d7b6f1838d",
+       "8,7": "inline:10413221f2bf2464",
+       "8,8": "inline:c2b9b3115afee27d",
+       "9,0": "inline:62a6460e5c83a034",
+       "9,1": "inline:28391d3bc64ec15c",
+       "9,2": "inline:a226f3d1d5921f24",
+       "9,3": "inline:b1d187a054000666",
+       "9,4": "inline:190a9bfa57f064dc",
+       "9,5": "inline:59b40fe8e13238b8",
+       "9,6": "inline:38392a8e7cab527f",
+       "9,7": "inline:c3b5bee0f464bef5",
+       "9,8": "inline:71edd461b689201e"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ],
+        [
+         0,
+         3
+        ]
+       ],
+       [
+        [
+         0,
+         2
+        ],
+        [
+         3,
+         6
+        ]
+       ],
+       [
+        [
+         0,
+         2
+        ],
+        [
+         6,
+         9
+        ]
+       ],
+       [
+        [
+         2,
+         4
+        ],
+        [
+         0,
+         3
+        ]
+       ],
+       [
+        [
+         2,
+         4
+        ],
+        [
+         3,
+         6
+        ]
+       ],
+       [
+        [
+         2,
+         4
+        ],
+        [
+         6,
+         9
+        ]
+       ],
+       [
+        [
+         4,
+         6
+        ],
+        [
+         0,
+         3
+        ]
+       ],
+       [
+        [
+         4,
+         6
+        ],
+        [
+         3,
+         6
+        ]
+       ],
+       [
+        [
+         4,
+         6
+        ],
+        [
+         6,
+         9
+        ]
+       ],
+       [
+        [
+         6,
+         8
+        ],
+        [
+         0,
+         3
+        ]
+       ],
+       [
+        [
+         6,
+         8
+        ],
+        [
+         3,
+         6
+        ]
+       ],
+       [
+        [
+         6,
+         8
+        ],
+        [
+         6,
+         9
+        ]
+       ],
+       [
+        [
+         8,
+         10
+        ],
+        [
+         0,
+         3
+        ]
+       ],
+       [
+        [
+         8,
+         10
+        ],
+        [
+         3,
+         6
+        ]
+       ],
+       [
+        [
+         8,
+         10
+        ],
+        [
+         6,
+         9
+        ]
+       ],
+       [
+        [
+         10,
+         12
+        ],
+        [
+         0,
+         3
+        ]
+       ],
+       [
+        [
+         10,
+         12
+        ],
+        [
+         3,
+         6
+        ]
+       ],
+       [
+        [
+         10,
+         12
+        ],
+        [
+         6,
+         9
+        ]
+       ]
+      ],
+      "manifests_kept": 18,
+      "type": "array",
+      "values": "b851c482f065eab7",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          1,
+          1
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": -1,
+       "node_type": "array",
+       "shape": [
+        12,
+        9
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     }
+    }
+   }
+  },
+  "status": "online",
+  "tags": {
+   "t1": "c2 second half"
+  },
+  "updates": [
+   [
+    "TagDeleted",
+    "t2",
+    null,
+    "c4"
+   ],
+   [
+    "TagCreated",
+    "t2",
+    null,
+    null
+   ],
+   [
+    "NewCommit",
+    "main",
+    "c4",
+    null
+   ],
+   [
+    "BranchDeleted",
+    "b2",
+    null,
+    "c3 some splits"
+   ],
+   [
+    "BranchReset",
+    "b1",
+    null,
+    "c1"
+   ],
+   [
+    "BranchCreated",
+    "b2",
+    null,
+    null
+   ]
+  ]
+ },
+ "outcomes": [
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok"
+ ]
+}

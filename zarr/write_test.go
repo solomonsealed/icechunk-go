@@ -7,14 +7,16 @@ import (
 	"math"
 	"math/rand"
 	"reflect"
+	"slices"
 	"sync"
 	"testing"
 )
 
 // memChunks is an in-memory ChunkWriter.
 type memChunks struct {
-	mu     sync.Mutex
-	chunks map[string][]byte
+	mu      sync.Mutex
+	chunks  map[string][]byte
+	deletes []string // DeleteChunk calls, by key
 }
 
 func newMemChunks() *memChunks { return &memChunks{chunks: map[string][]byte{}} }
@@ -52,6 +54,7 @@ func (m *memChunks) DeleteChunk(_ context.Context, c []uint32) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	delete(m.chunks, m.key(c))
+	m.deletes = append(m.deletes, m.key(c))
 	return nil
 }
 
@@ -226,6 +229,15 @@ func TestWriteDeletesFillChunks(t *testing.T) {
 	doc, _ := ArraySpec{Shape: []uint64{4}, ChunkShape: []uint64{2}, DataType: "float64", FillValue: math.NaN()}.Metadata()
 	store := newMemChunks()
 	arr, _ := OpenArray(doc, store, nil)
+	// A never-written chunk left all-fill is deleted anyway, as zarr-python
+	// does (Icechunk records the deletion).
+	nan, _ := FromSlice([]uint64{2}, []float64{math.NaN(), math.NaN()})
+	if err := arr.Write(ctx, []uint64{0}, nan); err != nil {
+		t.Fatal(err)
+	}
+	if len(store.chunks) != 0 || !slices.Equal(store.deletes, []string{"[0]"}) {
+		t.Fatalf("writing fill to a new chunk: %d chunks, deletes %v", len(store.chunks), store.deletes)
+	}
 	vals, _ := FromSlice([]uint64{4}, []float64{1, 2, 3, 4})
 	if err := arr.Write(ctx, []uint64{0}, vals); err != nil {
 		t.Fatal(err)
@@ -233,7 +245,6 @@ func TestWriteDeletesFillChunks(t *testing.T) {
 	if len(store.chunks) != 2 {
 		t.Fatalf("%d chunks stored", len(store.chunks))
 	}
-	nan, _ := FromSlice([]uint64{2}, []float64{math.NaN(), math.NaN()})
 	if err := arr.Write(ctx, []uint64{2}, nan); err != nil {
 		t.Fatal(err)
 	}

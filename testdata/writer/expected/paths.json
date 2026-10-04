@@ -1,0 +1,2028 @@
+{
+ "_meta": {
+  "icechunk": "2.2.2",
+  "numpy": "2.5.3",
+  "zarr": "3.4.0"
+ },
+ "canonical": {
+  "ancestry": {
+   "branch:main": [
+    "replace a group with an array",
+    "tricky paths",
+    "Repository initialized"
+   ]
+  },
+  "branches": {
+   "main": "replace a group with an array"
+  },
+  "commits": {
+   "Repository initialized": {
+    "metadata": {
+     "__icechunk": {
+      "is_root": true
+     }
+    },
+    "parent": null
+   },
+   "replace a group with an array": {
+    "metadata": {},
+    "parent": "tricky paths"
+   },
+   "tricky paths": {
+    "metadata": {},
+    "parent": "Repository initialized"
+   }
+  },
+  "config": null,
+  "deleted_tags": [],
+  "diffs": {
+   "replace a group with an array": {
+    "deleted_arrays": [
+     "/order/a/b",
+     "/order/a/b-c/leaf",
+     "/order/a/bb"
+    ],
+    "deleted_groups": [
+     "/order/a",
+     "/order/a/b-c"
+    ],
+    "new_arrays": [
+     "/order/a"
+    ],
+    "new_groups": [],
+    "updated_arrays": [],
+    "updated_chunks": {
+     "/order/a-b": [
+      [
+       0
+      ]
+     ]
+    },
+    "updated_groups": []
+   },
+   "tricky paths": {
+    "deleted_arrays": [],
+    "deleted_groups": [],
+    "new_arrays": [
+     "/c/0",
+     "/order/A",
+     "/order/a b",
+     "/order/a-b",
+     "/order/a.b",
+     "/order/a/b",
+     "/order/a/b-c/leaf",
+     "/order/a/bb",
+     "/order/a0",
+     "/order/ab",
+     "/order/z",
+     "/order/é",
+     "/weird/c",
+     "/ユニコード/データ"
+    ],
+    "new_groups": [
+     "/",
+     "/c",
+     "/deep",
+     "/deep/1",
+     "/deep/1/2",
+     "/deep/1/2/3",
+     "/deep/1/2/3/4",
+     "/deep/1/2/3/4/5",
+     "/deep/1/2/3/4/5/6",
+     "/deep/1/2/3/4/5/6/7",
+     "/deep/1/2/3/4/5/6/7/8",
+     "/order",
+     "/order/a",
+     "/order/a/b-c",
+     "/weird",
+     "/ユニコード"
+    ],
+    "updated_arrays": [],
+    "updated_chunks": {
+     "/c/0": [
+      [
+       0
+      ],
+      [
+       1
+      ]
+     ],
+     "/order/A": [
+      [
+       0
+      ],
+      [
+       1
+      ]
+     ],
+     "/order/a b": [
+      [
+       0
+      ],
+      [
+       1
+      ]
+     ],
+     "/order/a-b": [
+      [
+       0
+      ],
+      [
+       1
+      ]
+     ],
+     "/order/a.b": [
+      [
+       0
+      ],
+      [
+       1
+      ]
+     ],
+     "/order/a/b": [
+      [
+       0
+      ],
+      [
+       1
+      ]
+     ],
+     "/order/a/b-c/leaf": [
+      [
+       0
+      ],
+      [
+       1
+      ]
+     ],
+     "/order/a/bb": [
+      [
+       0
+      ],
+      [
+       1
+      ]
+     ],
+     "/order/a0": [
+      [
+       0
+      ],
+      [
+       1
+      ]
+     ],
+     "/order/ab": [
+      [
+       0
+      ],
+      [
+       1
+      ]
+     ],
+     "/order/z": [
+      [
+       0
+      ],
+      [
+       1
+      ]
+     ],
+     "/order/é": [
+      [
+       0
+      ],
+      [
+       1
+      ]
+     ],
+     "/weird/c": [
+      [
+       0,
+       0
+      ],
+      [
+       0,
+       1
+      ],
+      [
+       1,
+       0
+      ],
+      [
+       1,
+       1
+      ]
+     ],
+     "/ユニコード/データ": [
+      [
+       0
+      ]
+     ]
+    },
+    "updated_groups": []
+   }
+  },
+  "ops_log": [
+   [
+    "NewCommit",
+    "main",
+    "replace a group with an array",
+    null
+   ],
+   [
+    "NewCommit",
+    "main",
+    "tricky paths",
+    null
+   ],
+   [
+    "RepoInitialized",
+    null,
+    null,
+    null
+   ]
+  ],
+  "snapshots": {
+   "Repository initialized": {
+    "keys": [],
+    "nodes": {}
+   },
+   "replace a group with an array": {
+    "keys": [
+     "c/0/c/0",
+     "c/0/c/1",
+     "c/0/zarr.json",
+     "c/zarr.json",
+     "deep/1/2/3/4/5/6/7/8/zarr.json",
+     "deep/1/2/3/4/5/6/7/zarr.json",
+     "deep/1/2/3/4/5/6/zarr.json",
+     "deep/1/2/3/4/5/zarr.json",
+     "deep/1/2/3/4/zarr.json",
+     "deep/1/2/3/zarr.json",
+     "deep/1/2/zarr.json",
+     "deep/1/zarr.json",
+     "deep/zarr.json",
+     "order/A/c/0",
+     "order/A/c/1",
+     "order/A/zarr.json",
+     "order/a b/c/0",
+     "order/a b/c/1",
+     "order/a b/zarr.json",
+     "order/a-b/c/0",
+     "order/a-b/c/1",
+     "order/a-b/zarr.json",
+     "order/a.b/c/0",
+     "order/a.b/c/1",
+     "order/a.b/zarr.json",
+     "order/a/zarr.json",
+     "order/a0/c/0",
+     "order/a0/c/1",
+     "order/a0/zarr.json",
+     "order/ab/c/0",
+     "order/ab/c/1",
+     "order/ab/zarr.json",
+     "order/z/c/0",
+     "order/z/c/1",
+     "order/z/zarr.json",
+     "order/zarr.json",
+     "order/é/c/0",
+     "order/é/c/1",
+     "order/é/zarr.json",
+     "weird/c/c/0/0",
+     "weird/c/c/0/1",
+     "weird/c/c/1/0",
+     "weird/c/c/1/1",
+     "weird/c/zarr.json",
+     "weird/zarr.json",
+     "zarr.json",
+     "ユニコード/zarr.json",
+     "ユニコード/データ/c/0",
+     "ユニコード/データ/zarr.json"
+    ],
+    "nodes": {
+     "/": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/c": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/c/0": {
+      "chunks": {
+       "0": "inline:ff7ec8ca7e63d6fd",
+       "1": "inline:1421d51105459aa9"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "8be88b5cf1441ece",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "bytes"
+        }
+       ],
+       "data_type": "uint8",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        3
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/deep": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/deep/1": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/deep/1/2": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/deep/1/2/3": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/deep/1/2/3/4": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/deep/1/2/3/4/5": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/deep/1/2/3/4/5/6": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/deep/1/2/3/4/5/6/7": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/deep/1/2/3/4/5/6/7/8": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {
+        "depth": 9
+       },
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/order": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/order/A": {
+      "chunks": {
+       "0": "inline:749fce9e09fd3f2e",
+       "1": "inline:f188fa700eb15b4b"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "6bb4c6974d2bbccb",
+      "zarr_json": {
+       "attributes": {
+        "name": "A"
+       },
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          1
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": -1,
+       "node_type": "array",
+       "shape": [
+        2
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/order/a": {
+      "chunks": {},
+      "manifest_extents": [],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "e77b9a9ae9e30b0d",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          1
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "checksum": false,
+          "level": 0
+         },
+         "name": "zstd"
+        }
+       ],
+       "data_type": "int8",
+       "fill_value": 5,
+       "node_type": "array",
+       "shape": [
+        1
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/order/a b": {
+      "chunks": {
+       "0": "inline:11dece647a808bcc",
+       "1": "inline:e6e0a46a09ef9cad"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "489372c9bb3185a5",
+      "zarr_json": {
+       "attributes": {
+        "name": "a b"
+       },
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          1
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": -1,
+       "node_type": "array",
+       "shape": [
+        2
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/order/a-b": {
+      "chunks": {
+       "0": "inline:9cc8c65dd24e13ab",
+       "1": "inline:dcb4ae1dabe1dee3"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "63aab4f595e0b341",
+      "zarr_json": {
+       "attributes": {
+        "name": "a-b"
+       },
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          1
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": -1,
+       "node_type": "array",
+       "shape": [
+        2
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/order/a.b": {
+      "chunks": {
+       "0": "inline:8afb0163e1d84cd9",
+       "1": "inline:2ef8a1e4704913d4"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "c7ba8965194778a5",
+      "zarr_json": {
+       "attributes": {
+        "name": "a.b"
+       },
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          1
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": -1,
+       "node_type": "array",
+       "shape": [
+        2
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/order/a0": {
+      "chunks": {
+       "0": "inline:7853e8856e95cdad",
+       "1": "inline:d190dc4dd4043c64"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "d5adc77a370d7d6f",
+      "zarr_json": {
+       "attributes": {
+        "name": "a0"
+       },
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          1
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": -1,
+       "node_type": "array",
+       "shape": [
+        2
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/order/ab": {
+      "chunks": {
+       "0": "inline:c3c50a2f05a4e55a",
+       "1": "inline:b7f6e5e02b25374c"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "c4237f518ee45f64",
+      "zarr_json": {
+       "attributes": {
+        "name": "ab"
+       },
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          1
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": -1,
+       "node_type": "array",
+       "shape": [
+        2
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/order/z": {
+      "chunks": {
+       "0": "inline:e92c94c29f88b34e",
+       "1": "inline:36dd7181b8519500"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "fc3af7abb59058d8",
+      "zarr_json": {
+       "attributes": {
+        "name": "z"
+       },
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          1
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": -1,
+       "node_type": "array",
+       "shape": [
+        2
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/order/é": {
+      "chunks": {
+       "0": "inline:b5e26077ac250015",
+       "1": "inline:3382af3286e513b6"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "2b99259353a314e3",
+      "zarr_json": {
+       "attributes": {
+        "name": "é"
+       },
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          1
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": -1,
+       "node_type": "array",
+       "shape": [
+        2
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/weird": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/weird/c": {
+      "chunks": {
+       "0,0": "inline:5ee0dd4d4840229f",
+       "0,1": "inline:4b227777d4dd1fc6",
+       "1,0": "inline:ab61ba11a38b007f",
+       "1,1": "inline:84873854dba02cf6"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ],
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "3761e7e507d6440a",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          1,
+          1
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "bytes"
+        }
+       ],
+       "data_type": "uint8",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        2,
+        2
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/ユニコード": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/ユニコード/データ": {
+      "chunks": {
+       "0": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         1
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "68b46587574aa6ac",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          3
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "checksum": false,
+          "level": 0
+         },
+         "name": "zstd"
+        }
+       ],
+       "data_type": "float32",
+       "fill_value": 0.0,
+       "node_type": "array",
+       "shape": [
+        3
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     }
+    }
+   },
+   "tricky paths": {
+    "keys": [
+     "c/0/c/0",
+     "c/0/c/1",
+     "c/0/zarr.json",
+     "c/zarr.json",
+     "deep/1/2/3/4/5/6/7/8/zarr.json",
+     "deep/1/2/3/4/5/6/7/zarr.json",
+     "deep/1/2/3/4/5/6/zarr.json",
+     "deep/1/2/3/4/5/zarr.json",
+     "deep/1/2/3/4/zarr.json",
+     "deep/1/2/3/zarr.json",
+     "deep/1/2/zarr.json",
+     "deep/1/zarr.json",
+     "deep/zarr.json",
+     "order/A/c/0",
+     "order/A/c/1",
+     "order/A/zarr.json",
+     "order/a b/c/0",
+     "order/a b/c/1",
+     "order/a b/zarr.json",
+     "order/a-b/c/0",
+     "order/a-b/c/1",
+     "order/a-b/zarr.json",
+     "order/a.b/c/0",
+     "order/a.b/c/1",
+     "order/a.b/zarr.json",
+     "order/a/b-c/leaf/c/0",
+     "order/a/b-c/leaf/c/1",
+     "order/a/b-c/leaf/zarr.json",
+     "order/a/b-c/zarr.json",
+     "order/a/b/c/0",
+     "order/a/b/c/1",
+     "order/a/b/zarr.json",
+     "order/a/bb/c/0",
+     "order/a/bb/c/1",
+     "order/a/bb/zarr.json",
+     "order/a/zarr.json",
+     "order/a0/c/0",
+     "order/a0/c/1",
+     "order/a0/zarr.json",
+     "order/ab/c/0",
+     "order/ab/c/1",
+     "order/ab/zarr.json",
+     "order/z/c/0",
+     "order/z/c/1",
+     "order/z/zarr.json",
+     "order/zarr.json",
+     "order/é/c/0",
+     "order/é/c/1",
+     "order/é/zarr.json",
+     "weird/c/c/0/0",
+     "weird/c/c/0/1",
+     "weird/c/c/1/0",
+     "weird/c/c/1/1",
+     "weird/c/zarr.json",
+     "weird/zarr.json",
+     "zarr.json",
+     "ユニコード/zarr.json",
+     "ユニコード/データ/c/0",
+     "ユニコード/データ/zarr.json"
+    ],
+    "nodes": {
+     "/": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/c": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/c/0": {
+      "chunks": {
+       "0": "inline:ff7ec8ca7e63d6fd",
+       "1": "inline:1421d51105459aa9"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "8be88b5cf1441ece",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "bytes"
+        }
+       ],
+       "data_type": "uint8",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        3
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/deep": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/deep/1": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/deep/1/2": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/deep/1/2/3": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/deep/1/2/3/4": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/deep/1/2/3/4/5": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/deep/1/2/3/4/5/6": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/deep/1/2/3/4/5/6/7": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/deep/1/2/3/4/5/6/7/8": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {
+        "depth": 9
+       },
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/order": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/order/A": {
+      "chunks": {
+       "0": "inline:749fce9e09fd3f2e",
+       "1": "inline:f188fa700eb15b4b"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "6bb4c6974d2bbccb",
+      "zarr_json": {
+       "attributes": {
+        "name": "A"
+       },
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          1
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": -1,
+       "node_type": "array",
+       "shape": [
+        2
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/order/a": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {
+        "which": "a"
+       },
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/order/a b": {
+      "chunks": {
+       "0": "inline:11dece647a808bcc",
+       "1": "inline:e6e0a46a09ef9cad"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "489372c9bb3185a5",
+      "zarr_json": {
+       "attributes": {
+        "name": "a b"
+       },
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          1
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": -1,
+       "node_type": "array",
+       "shape": [
+        2
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/order/a-b": {
+      "chunks": {
+       "0": "inline:96a296d224f285c6",
+       "1": "inline:dcb4ae1dabe1dee3"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "e0e3eed9d5490981",
+      "zarr_json": {
+       "attributes": {
+        "name": "a-b"
+       },
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          1
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": -1,
+       "node_type": "array",
+       "shape": [
+        2
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/order/a.b": {
+      "chunks": {
+       "0": "inline:8afb0163e1d84cd9",
+       "1": "inline:2ef8a1e4704913d4"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "c7ba8965194778a5",
+      "zarr_json": {
+       "attributes": {
+        "name": "a.b"
+       },
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          1
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": -1,
+       "node_type": "array",
+       "shape": [
+        2
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/order/a/b": {
+      "chunks": {
+       "0": "inline:c747dadac40f0be9",
+       "1": "inline:72a7ab318788b362"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "2cb1e63f6fa7df7a",
+      "zarr_json": {
+       "attributes": {
+        "name": "a/b"
+       },
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          1
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": -1,
+       "node_type": "array",
+       "shape": [
+        2
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/order/a/b-c": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/order/a/b-c/leaf": {
+      "chunks": {
+       "0": "inline:48f2905ee9707811",
+       "1": "inline:0aa3e342f03b7a23"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "f0ddec787979e585",
+      "zarr_json": {
+       "attributes": {
+        "name": "a/b-c/leaf"
+       },
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          1
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": -1,
+       "node_type": "array",
+       "shape": [
+        2
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/order/a/bb": {
+      "chunks": {
+       "0": "inline:fbd2607c532d366e",
+       "1": "inline:ba90ce69b1fdb700"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "058f778bf6556755",
+      "zarr_json": {
+       "attributes": {
+        "name": "a/bb"
+       },
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          1
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": -1,
+       "node_type": "array",
+       "shape": [
+        2
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/order/a0": {
+      "chunks": {
+       "0": "inline:7853e8856e95cdad",
+       "1": "inline:d190dc4dd4043c64"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "d5adc77a370d7d6f",
+      "zarr_json": {
+       "attributes": {
+        "name": "a0"
+       },
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          1
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": -1,
+       "node_type": "array",
+       "shape": [
+        2
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/order/ab": {
+      "chunks": {
+       "0": "inline:c3c50a2f05a4e55a",
+       "1": "inline:b7f6e5e02b25374c"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "c4237f518ee45f64",
+      "zarr_json": {
+       "attributes": {
+        "name": "ab"
+       },
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          1
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": -1,
+       "node_type": "array",
+       "shape": [
+        2
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/order/z": {
+      "chunks": {
+       "0": "inline:e92c94c29f88b34e",
+       "1": "inline:36dd7181b8519500"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "fc3af7abb59058d8",
+      "zarr_json": {
+       "attributes": {
+        "name": "z"
+       },
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          1
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": -1,
+       "node_type": "array",
+       "shape": [
+        2
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/order/é": {
+      "chunks": {
+       "0": "inline:b5e26077ac250015",
+       "1": "inline:3382af3286e513b6"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "2b99259353a314e3",
+      "zarr_json": {
+       "attributes": {
+        "name": "é"
+       },
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          1
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": -1,
+       "node_type": "array",
+       "shape": [
+        2
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/weird": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/weird/c": {
+      "chunks": {
+       "0,0": "inline:5ee0dd4d4840229f",
+       "0,1": "inline:4b227777d4dd1fc6",
+       "1,0": "inline:ab61ba11a38b007f",
+       "1,1": "inline:84873854dba02cf6"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ],
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "3761e7e507d6440a",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          1,
+          1
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "bytes"
+        }
+       ],
+       "data_type": "uint8",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        2,
+        2
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/ユニコード": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/ユニコード/データ": {
+      "chunks": {
+       "0": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         1
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "68b46587574aa6ac",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          3
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "checksum": false,
+          "level": 0
+         },
+         "name": "zstd"
+        }
+       ],
+       "data_type": "float32",
+       "fill_value": 0.0,
+       "node_type": "array",
+       "shape": [
+        3
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     }
+    }
+   }
+  },
+  "status": "online",
+  "tags": {},
+  "updates": [
+   [
+    "NewCommit",
+    "main",
+    "replace a group with an array",
+    null
+   ],
+   [
+    "NewCommit",
+    "main",
+    "tricky paths",
+    null
+   ],
+   [
+    "RepoInitialized",
+    null,
+    null,
+    null
+   ]
+  ]
+ },
+ "outcomes": [
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok"
+ ]
+}

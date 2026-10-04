@@ -2,12 +2,16 @@ package icechunk
 
 import (
 	"bytes"
+	"cmp"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
 	"math/rand/v2"
+	"regexp"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/solomonsealed/icechunk-go/internal/fbs"
@@ -29,6 +33,8 @@ var (
 	// ErrClockSkew means the local clock disagrees with the object store's
 	// by more than maxClockSkew; writing would record misleading timestamps.
 	ErrClockSkew = errors.New("icechunk: local clock differs too much from the object store's clock")
+	// ErrCannotDeleteMain is returned by DeleteBranch("main").
+	ErrCannotDeleteMain = errors.New("icechunk: main branch cannot be deleted")
 )
 
 // maxClockSkew mirrors upstream's limit on the difference between commit
@@ -103,6 +109,32 @@ func encodeMetadata(md map[string]any) ([]rawMetadataItem, error) {
 	return items, nil
 }
 
+// withIcechunkMetadata returns a copy of md with key set to v in its
+// "__icechunk" object, replacing "__icechunk" if it is not an object (as
+// upstream's inject_icechunk_metadata does).
+func withIcechunkMetadata(md map[string]any, key string, v any) (map[string]any, error) {
+	out := make(map[string]any, len(md)+1)
+	for k, x := range md {
+		out[k] = x
+	}
+	ic := map[string]any{}
+	if prev, ok := md["__icechunk"]; ok {
+		raw, err := json.Marshal(prev)
+		if err != nil {
+			return nil, fmt.Errorf("icechunk: metadata %q is not JSON-compatible: %w", "__icechunk", err)
+		}
+		dec := json.NewDecoder(bytes.NewReader(raw))
+		dec.UseNumber()
+		var obj map[string]any
+		if dec.Decode(&obj) == nil && obj != nil {
+			ic = obj
+		}
+	}
+	ic[key] = v
+	out["__icechunk"] = ic
+	return out, nil
+}
+
 // backupName names the copy of the repo info file kept in overwritten/:
 // "repo.<ms until 3000-01-01>.<random id>", newest sorting first.
 func backupName(now time.Time) string {
@@ -150,13 +182,13 @@ func (r *Repository) updateRepo(ctx context.Context, mutate func(doc *repoDoc, b
 		if err != nil {
 			return err
 		}
-		if _, err := w.Put(ctx, "overwritten/"+backup, raw, nil); err != nil {
+		if _, err := w.Put(ctx, overwrittenPrefix+backup, raw, nil); err != nil {
 			return fmt.Errorf("icechunk: backing up repo info: %w", err)
 		}
 		// The backup was just written: its store timestamp is the store's
 		// "now". Refuse to record our timestamps if our clock is far off.
 		if mt, ok := w.(storage.ModTimer); ok {
-			if stored, err := mt.LastModified(ctx, "overwritten/"+backup); err == nil {
+			if stored, err := mt.LastModified(ctx, overwrittenPrefix+backup); err == nil {
 				if d := now.Sub(stored); d > maxClockSkew || d < -maxClockSkew {
 					return fmt.Errorf("%w: local %s, store %s", ErrClockSkew, now.UTC().Format(time.RFC3339), stored.UTC().Format(time.RFC3339))
 				}
@@ -303,16 +335,23 @@ func (s *Session) Commit(ctx context.Context, message string, opts *CommitOption
 	if s.cs.isEmpty() && !opts.AllowEmpty {
 		return SnapshotID{}, ErrNoChanges
 	}
-	metadata, err := encodeMetadata(opts.Metadata)
-	if err != nil {
-		return SnapshotID{}, err
-	}
 	maxRebases := opts.MaxRebases
 	if maxRebases <= 0 {
 		maxRebases = defaultMaxRebases
 	}
 	base, baseID := s.snap, s.id
 	for rebases := 0; ; rebases++ {
+		md := opts.Metadata
+		if opts.Rebase {
+			// Like upstream, rebasing commits record how many rebases they took.
+			if md, err = withIcechunkMetadata(md, "rebase_attempts", rebases); err != nil {
+				return SnapshotID{}, err
+			}
+		}
+		metadata, err := encodeMetadata(md)
+		if err != nil {
+			return SnapshotID{}, err
+		}
 		plan, err := s.buildCommit(ctx, base, message, metadata)
 		if err != nil {
 			return SnapshotID{}, err
@@ -485,15 +524,16 @@ func (s *Session) buildCommit(ctx context.Context, base *Snapshot, message strin
 		}
 		a := n.Array
 		edits := cs.chunks[n.ID]
-		rewrite := len(edits) > 0
+		changed := len(edits) > 0
 		for _, mr := range a.Manifests {
 			for d, r := range mr.Extents {
 				if d < len(a.Shape) && r.To > a.Shape[d].NumChunks {
-					rewrite = true
+					changed = true // shrunk: drop refs outside the new shape
 				}
 			}
 		}
-		if !rewrite {
+		if !changed {
+			// Arrays without chunk changes keep their manifests, as upstream.
 			for _, mr := range a.Manifests {
 				fi, ok := fileInfo[mr.ID]
 				if !ok {
@@ -506,8 +546,46 @@ func (s *Session) buildCommit(ctx context.Context, base *Snapshot, message strin
 			}
 			continue
 		}
-		var entries []chunkEntry
+		splits := newManifestSplits(a, s.repo.splitSizes(n))
+		// Splits to write anew: those with chunk edits, and those overlapping
+		// a manifest that cannot be kept as is (it spans several splits, or
+		// reaches beyond a smaller new shape).
+		dirty := map[string]bool{}
+		for _, e := range edits {
+			if a.validChunkCoord(e.coords) {
+				dirty[splits.of(e.coords)] = true
+			}
+		}
+		keepable := func(mr ManifestRef) bool {
+			for d, r := range mr.Extents {
+				if d < len(a.Shape) && r.To > a.Shape[d].NumChunks {
+					return false
+				}
+			}
+			return len(splits.overlapping(mr.Extents)) == 1
+		}
 		for _, mr := range a.Manifests {
+			if !keepable(mr) {
+				for _, k := range splits.overlapping(mr.Extents) {
+					dirty[k] = true
+				}
+			}
+		}
+		var refs []ManifestRef
+		bySplit := map[string][]chunkEntry{}
+		for _, mr := range a.Manifests {
+			if keepable(mr) && !dirty[splits.overlapping(mr.Extents)[0]] {
+				fi, ok := fileInfo[mr.ID]
+				if !ok {
+					return nil, fmt.Errorf("%w: snapshot lacks info for manifest %s", ErrFormat, mr.ID)
+				}
+				if !seenFile[mr.ID] {
+					seenFile[mr.ID] = true
+					files = append(files, fi)
+				}
+				refs = append(refs, mr)
+				continue
+			}
 			m, err := s.repo.manifest(ctx, mr.ID)
 			if err != nil {
 				return nil, err
@@ -515,7 +593,8 @@ func (s *Session) buildCommit(ctx context.Context, base *Snapshot, message strin
 			err = m.forEach(n.ID, func(coords []uint32, ref *ChunkRef) error {
 				if mr.contains(coords) && a.validChunkCoord(coords) {
 					if _, edited := edits[coordsKey(coords)]; !edited {
-						entries = append(entries, chunkEntry{coords: coords, ref: ref})
+						k := splits.of(coords)
+						bySplit[k] = append(bySplit[k], chunkEntry{coords: coords, ref: ref})
 					}
 				}
 				return nil
@@ -526,22 +605,26 @@ func (s *Session) buildCommit(ctx context.Context, base *Snapshot, message strin
 		}
 		for _, e := range edits {
 			if e.ref != nil && a.validChunkCoord(e.coords) {
-				entries = append(entries, e)
+				k := splits.of(e.coords)
+				bySplit[k] = append(bySplit[k], e)
 			}
 		}
-		a.Manifests = nil
-		if len(entries) == 0 {
-			continue
+		// One manifest per split holding chunks, as upstream writes them;
+		// its extents are the bounding box of those chunks.
+		for _, k := range sortedSplitKeys(bySplit) {
+			entries := bySplit[k]
+			sort.Slice(entries, func(i, j int) bool { return compareCoords(entries[i].coords, entries[j].coords) < 0 })
+			mid := randomID12()
+			data, err := encodeManifest(mid, n.ID, entries)
+			if err != nil {
+				return nil, err
+			}
+			plan.manifests[mid] = data
+			files = append(files, ManifestFileInfo{ID: mid, SizeBytes: uint64(len(data)), NumChunkRefs: uint32(len(entries))})
+			refs = append(refs, ManifestRef{ID: mid, Extents: boundingBox(entries)})
 		}
-		sort.Slice(entries, func(i, j int) bool { return compareCoords(entries[i].coords, entries[j].coords) < 0 })
-		mid := randomID12()
-		data, err := encodeManifest(mid, n.ID, entries)
-		if err != nil {
-			return nil, err
-		}
-		plan.manifests[mid] = data
-		files = append(files, ManifestFileInfo{ID: mid, SizeBytes: uint64(len(data)), NumChunkRefs: uint32(len(entries))})
-		a.Manifests = []ManifestRef{{ID: mid, Extents: boundingBox(entries)}}
+		sort.Slice(refs, func(i, j int) bool { return compareExtents(refs[i].Extents, refs[j].Extents) < 0 })
+		a.Manifests = refs
 	}
 
 	// Snapshot timestamps must increase along the history.
@@ -595,6 +678,196 @@ func (s *Session) buildCommit(ctx context.Context, base *Snapshot, message strin
 		return nil, err
 	}
 	return plan, nil
+}
+
+// ---------------------------------------------------------------------------
+// Manifest splitting
+
+// manifestSplits divides an array's chunk grid into the regions upstream
+// writes separate manifests for: along each dimension, runs of size[d]
+// chunks (0: the dimension is not split).
+type manifestSplits struct {
+	size []uint32
+	grid []uint32
+}
+
+func newManifestSplits(a *ArrayInfo, size []uint32) manifestSplits {
+	grid := make([]uint32, len(a.Shape))
+	for d, s := range a.Shape {
+		grid[d] = s.NumChunks
+	}
+	return manifestSplits{size: size, grid: grid}
+}
+
+func (ms manifestSplits) index(d int, c uint32) uint32 {
+	if d >= len(ms.size) || ms.size[d] == 0 {
+		return 0
+	}
+	return c / ms.size[d]
+}
+
+// of returns the key of the split holding chunk coords.
+func (ms manifestSplits) of(coords []uint32) string {
+	parts := make([]string, len(coords))
+	for d, c := range coords {
+		parts[d] = fmt.Sprint(ms.index(d, c))
+	}
+	return strings.Join(parts, ",")
+}
+
+// overlapping returns the keys of the splits a manifest's extents touch
+// (empty extents cover the whole grid).
+func (ms manifestSplits) overlapping(extents []ChunkRange) []string {
+	keys := []string{""}
+	for d := range ms.grid {
+		lo, hi := uint32(0), ms.grid[d]
+		if d < len(extents) {
+			lo, hi = extents[d].From, extents[d].To
+		}
+		if hi == 0 {
+			hi = 1
+		}
+		var next []string
+		for _, k := range keys {
+			for i := ms.index(d, lo); i <= ms.index(d, hi-1); i++ {
+				if d > 0 {
+					next = append(next, k+","+fmt.Sprint(i))
+				} else {
+					next = append(next, fmt.Sprint(i))
+				}
+			}
+		}
+		keys = next
+	}
+	return keys
+}
+
+func sortedSplitKeys(m map[string][]chunkEntry) []string {
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	return keys
+}
+
+// compareExtents orders manifest refs by their extents.
+func compareExtents(a, b []ChunkRange) int {
+	for i := 0; i < min(len(a), len(b)); i++ {
+		if a[i].From != b[i].From {
+			return cmp.Compare(a[i].From, b[i].From)
+		}
+		if a[i].To != b[i].To {
+			return cmp.Compare(a[i].To, b[i].To)
+		}
+	}
+	return cmp.Compare(len(a), len(b))
+}
+
+// splitSizes returns, per dimension, how many chunks each manifest of the
+// array covers under the repository's manifest.splitting config (0: not
+// split). As upstream, the first entry of split_sizes whose array condition
+// matches applies, and within it the first condition matching each
+// dimension; regular expressions match anywhere in the path or name.
+func (r *Repository) splitSizes(n *Node) []uint32 {
+	sizes := make([]uint32, len(n.Array.Shape))
+	r.mu.Lock()
+	info := r.info
+	r.mu.Unlock()
+	if info == nil {
+		return sizes
+	}
+	cfg, _ := info.Config.(map[string]any)
+	manifest, _ := cfg["manifest"].(map[string]any)
+	splitting, _ := manifest["splitting"].(map[string]any)
+	rules, _ := splitting["split_sizes"].([]any)
+	for _, rule := range rules {
+		pair, _ := rule.([]any)
+		if len(pair) != 2 || !arrayConditionMatches(pair[0], n.Path) {
+			continue
+		}
+		dims, _ := pair[1].([]any)
+		for d := range sizes {
+			name := ""
+			if d < len(n.Array.DimensionNames) {
+				name = n.Array.DimensionNames[d]
+			}
+			for _, dc := range dims {
+				m, _ := dc.(map[string]any)
+				if dimConditionMatches(m["condition"], d, name) {
+					if k, ok := configInt(m["num_chunks"]); ok && k > 0 && k <= math.MaxUint32 {
+						sizes[d] = uint32(k)
+					}
+					break
+				}
+			}
+		}
+		return sizes
+	}
+	return sizes
+}
+
+func configInt(v any) (int64, bool) {
+	switch x := v.(type) {
+	case int64:
+		return x, true
+	case uint64:
+		return int64(min(x, math.MaxInt64)), true
+	case float64:
+		return int64(x), true
+	}
+	return 0, false
+}
+
+// arrayConditionMatches evaluates a stored ManifestSplitCondition:
+// "any_array", {"path_matches": {"regex": ...}}, {"name_matches": ...},
+// {"and": [...]} or {"or": [...]}.
+func arrayConditionMatches(c any, path string) bool {
+	if s, ok := c.(string); ok {
+		return s == "any_array"
+	}
+	m, _ := c.(map[string]any)
+	matches := func(v any, s string) bool {
+		spec, _ := v.(map[string]any)
+		pattern, _ := spec["regex"].(string)
+		re, err := regexp.Compile(pattern)
+		return err == nil && re.MatchString(s)
+	}
+	for k, v := range m {
+		switch k {
+		case "path_matches":
+			return matches(v, path)
+		case "name_matches":
+			return matches(v, path[strings.LastIndexByte(path, '/')+1:])
+		case "and", "or":
+			list, _ := v.([]any)
+			for _, sub := range list {
+				if arrayConditionMatches(sub, path) == (k == "or") {
+					return k == "or"
+				}
+			}
+			return k == "and"
+		}
+	}
+	return false
+}
+
+// dimConditionMatches evaluates a stored ManifestSplitDimCondition: "Any",
+// {"Axis": i} or {"DimensionName": name}.
+func dimConditionMatches(c any, axis int, name string) bool {
+	if s, ok := c.(string); ok {
+		return s == "Any"
+	}
+	m, _ := c.(map[string]any)
+	if v, ok := m["Axis"]; ok {
+		i, ok := configInt(v)
+		return ok && i == int64(axis)
+	}
+	if v, ok := m["DimensionName"]; ok {
+		s, _ := v.(string)
+		return name != "" && s == name
+	}
+	return false
 }
 
 // ancestors returns the proper ancestors of an absolute path, root first.
@@ -758,7 +1031,7 @@ func (r *Repository) ResetBranch(ctx context.Context, name string, id SnapshotID
 // DeleteBranch deletes a branch. The main branch cannot be deleted.
 func (r *Repository) DeleteBranch(ctx context.Context, name string) error {
 	if name == "main" {
-		return fmt.Errorf("icechunk: the main branch cannot be deleted")
+		return ErrCannotDeleteMain
 	}
 	return r.refUpdate(ctx, func(doc *repoDoc) (docUpdate, error) {
 		prev, exists := doc.branches[name]

@@ -196,37 +196,46 @@ func (st *Store) ListDir(ctx context.Context, prefix string) ([]string, error) {
 	return nil, nil
 }
 
-// ListPrefix returns every key starting with prefix ("" for all keys),
-// sorted. Listing chunk keys reads every manifest of the matching arrays.
+// ListPrefix returns, sorted, every key of the group or array that prefix
+// names (with or without a trailing slash) and of everything below it, or
+// every key for "". As upstream, a prefix that names no group or array is
+// an error (wrapping ErrNodeNotFound): "a/b" lists /a/b's keys, not those
+// of a sibling /a/bc. Listing chunk keys reads every manifest of the
+// arrays listed.
 func (st *Store) ListPrefix(ctx context.Context, prefix string) ([]string, error) {
+	root := "/"
+	if strings.Trim(prefix, "/") != "" {
+		path, err := normalizePath(prefix)
+		if err != nil {
+			return nil, fmt.Errorf("%w: invalid prefix %q", ErrNodeNotFound, prefix)
+		}
+		if _, err := st.s.node(path); err != nil {
+			return nil, fmt.Errorf("listing prefix %q: %w", prefix, err)
+		}
+		root = path
+	}
 	nodes, err := st.s.nodes()
 	if err != nil {
 		return nil, err
 	}
 	var out []string
 	for _, n := range nodes {
-		meta := strings.TrimPrefix(n.Path+"/zarr.json", "/")
-		if n.Path == "/" {
-			meta = "zarr.json"
-		}
-		if strings.HasPrefix(meta, prefix) {
-			out = append(out, meta)
-		}
-		if n.Type != ArrayNode {
+		if root != "/" && n.Path != root && !strings.HasPrefix(n.Path, root+"/") {
 			continue
 		}
-		// Skip arrays whose chunk keys cannot match the prefix.
-		cprefix := chunkKey(n.Path, nil)
-		if !strings.HasPrefix(cprefix, prefix) && !strings.HasPrefix(prefix, cprefix) {
+		if n.Path == "/" {
+			out = append(out, "zarr.json")
+		} else {
+			out = append(out, strings.TrimPrefix(n.Path, "/")+"/zarr.json")
+		}
+		if n.Type != ArrayNode {
 			continue
 		}
 		for e, err := range st.s.ChunkRefs(ctx, n.Path) {
 			if err != nil {
 				return nil, err
 			}
-			if key := chunkKey(n.Path, e.Coords); strings.HasPrefix(key, prefix) {
-				out = append(out, key)
-			}
+			out = append(out, chunkKey(n.Path, e.Coords))
 		}
 	}
 	sort.Strings(out)

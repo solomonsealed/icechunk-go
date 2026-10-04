@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"reflect"
 	"slices"
 	"sync"
 	"testing"
@@ -219,8 +220,8 @@ func TestWriteCommitRead(t *testing.T) {
 	if err := repo2.DeleteBranch(ctx, "dev"); err != nil {
 		t.Fatal(err)
 	}
-	if err := repo2.DeleteBranch(ctx, "main"); err == nil {
-		t.Error("deleting main succeeded")
+	if err := repo2.DeleteBranch(ctx, "main"); !errors.Is(err, icechunk.ErrCannotDeleteMain) {
+		t.Errorf("deleting main: %v", err)
 	}
 	info, err := repo2.RepoInfo(ctx)
 	if err != nil {
@@ -266,7 +267,8 @@ func TestCommitConflictsAndRebase(t *testing.T) {
 	if _, err := b.Commit(ctx, "b", nil); !errors.As(err, &ce) {
 		t.Fatalf("b without rebase: %v", err)
 	}
-	if _, err := b.Commit(ctx, "b", &icechunk.CommitOptions{Rebase: true}); err != nil {
+	md := map[string]any{"who": "b", "__icechunk": map[string]any{"note": "kept"}}
+	if _, err := b.Commit(ctx, "b", &icechunk.CommitOptions{Rebase: true, Metadata: md}); err != nil {
 		t.Fatalf("b with rebase: %v", err)
 	}
 	// c wrote the same chunk as a: a real conflict.
@@ -276,6 +278,18 @@ func TestCommitConflictsAndRebase(t *testing.T) {
 	r, _ := repo.ReadonlySession(ctx, icechunk.AtBranch("main"))
 	if got := readInt32s(t, r, "/x"); !slices.Equal(got, []int32{1, 1, 2, 2, -1, -1, -1, -1}) {
 		t.Errorf("after rebase = %v", got)
+	}
+	// Like upstream, rebasing commits record the rebases they took in
+	// "__icechunk", keeping the caller's entries.
+	for si, err := range repo.Ancestry(ctx, icechunk.AtBranch("main")) {
+		if err != nil {
+			t.Fatal(err)
+		}
+		want := map[string]any{"who": "b", "__icechunk": map[string]any{"note": "kept", "rebase_attempts": int64(1)}}
+		if !reflect.DeepEqual(si.Metadata, want) {
+			t.Errorf("rebased commit metadata = %#v, want %#v", si.Metadata, want)
+		}
+		break
 	}
 	if _, err := r.SnapshotID(), error(nil); err != nil {
 		t.Fatal(err)

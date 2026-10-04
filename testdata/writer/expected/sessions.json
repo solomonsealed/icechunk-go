@@ -1,0 +1,1773 @@
+{
+ "_meta": {
+  "icechunk": "2.2.2",
+  "numpy": "2.5.3",
+  "zarr": "3.4.0"
+ },
+ "canonical": {
+  "ancestry": {
+   "branch:main": [
+    "n root attrs",
+    "l deletes grp",
+    "j writes x",
+    "h updates x metadata",
+    "e adds z",
+    "f deletes y",
+    "d same chunk",
+    "a rebased",
+    "b first",
+    "base",
+    "Repository initialized"
+   ]
+  },
+  "branches": {
+   "main": "n root attrs"
+  },
+  "commits": {
+   "Repository initialized": {
+    "metadata": {
+     "__icechunk": {
+      "is_root": true
+     }
+    },
+    "parent": null
+   },
+   "a rebased": {
+    "metadata": {
+     "__icechunk": {
+      "rebase_attempts": 1
+     }
+    },
+    "parent": "b first"
+   },
+   "b first": {
+    "metadata": {},
+    "parent": "base"
+   },
+   "base": {
+    "metadata": {},
+    "parent": "Repository initialized"
+   },
+   "d same chunk": {
+    "metadata": {},
+    "parent": "a rebased"
+   },
+   "e adds z": {
+    "metadata": {
+     "__icechunk": {
+      "rebase_attempts": 1
+     }
+    },
+    "parent": "f deletes y"
+   },
+   "f deletes y": {
+    "metadata": {},
+    "parent": "d same chunk"
+   },
+   "h updates x metadata": {
+    "metadata": {},
+    "parent": "e adds z"
+   },
+   "j writes x": {
+    "metadata": {},
+    "parent": "h updates x metadata"
+   },
+   "l deletes grp": {
+    "metadata": {},
+    "parent": "j writes x"
+   },
+   "n root attrs": {
+    "metadata": {},
+    "parent": "l deletes grp"
+   }
+  },
+  "config": null,
+  "deleted_tags": [],
+  "diffs": {
+   "a rebased": {
+    "deleted_arrays": [],
+    "deleted_groups": [],
+    "new_arrays": [],
+    "new_groups": [],
+    "updated_arrays": [],
+    "updated_chunks": {
+     "/x": [
+      [
+       0
+      ]
+     ]
+    },
+    "updated_groups": []
+   },
+   "b first": {
+    "deleted_arrays": [],
+    "deleted_groups": [],
+    "new_arrays": [],
+    "new_groups": [],
+    "updated_arrays": [],
+    "updated_chunks": {
+     "/y": [
+      [
+       0
+      ]
+     ]
+    },
+    "updated_groups": []
+   },
+   "base": {
+    "deleted_arrays": [],
+    "deleted_groups": [],
+    "new_arrays": [
+     "/x",
+     "/y"
+    ],
+    "new_groups": [
+     "/",
+     "/grp"
+    ],
+    "updated_arrays": [],
+    "updated_chunks": {
+     "/x": [
+      [
+       0
+      ],
+      [
+       1
+      ],
+      [
+       2
+      ],
+      [
+       3
+      ]
+     ],
+     "/y": [
+      [
+       0
+      ],
+      [
+       1
+      ],
+      [
+       2
+      ],
+      [
+       3
+      ]
+     ]
+    },
+    "updated_groups": []
+   },
+   "d same chunk": {
+    "deleted_arrays": [],
+    "deleted_groups": [],
+    "new_arrays": [],
+    "new_groups": [],
+    "updated_arrays": [],
+    "updated_chunks": {
+     "/x": [
+      [
+       1
+      ]
+     ]
+    },
+    "updated_groups": []
+   },
+   "e adds z": {
+    "deleted_arrays": [],
+    "deleted_groups": [],
+    "new_arrays": [
+     "/z"
+    ],
+    "new_groups": [],
+    "updated_arrays": [],
+    "updated_chunks": {
+     "/z": [
+      [
+       0
+      ]
+     ]
+    },
+    "updated_groups": []
+   },
+   "f deletes y": {
+    "deleted_arrays": [
+     "/y"
+    ],
+    "deleted_groups": [],
+    "new_arrays": [],
+    "new_groups": [],
+    "updated_arrays": [],
+    "updated_chunks": {},
+    "updated_groups": []
+   },
+   "h updates x metadata": {
+    "deleted_arrays": [],
+    "deleted_groups": [],
+    "new_arrays": [],
+    "new_groups": [],
+    "updated_arrays": [
+     "/x"
+    ],
+    "updated_chunks": {},
+    "updated_groups": []
+   },
+   "j writes x": {
+    "deleted_arrays": [],
+    "deleted_groups": [],
+    "new_arrays": [],
+    "new_groups": [],
+    "updated_arrays": [],
+    "updated_chunks": {
+     "/x": [
+      [
+       3
+      ]
+     ]
+    },
+    "updated_groups": []
+   },
+   "l deletes grp": {
+    "deleted_arrays": [],
+    "deleted_groups": [
+     "/grp"
+    ],
+    "new_arrays": [],
+    "new_groups": [],
+    "updated_arrays": [],
+    "updated_chunks": {},
+    "updated_groups": []
+   },
+   "n root attrs": {
+    "deleted_arrays": [],
+    "deleted_groups": [],
+    "new_arrays": [],
+    "new_groups": [],
+    "updated_arrays": [],
+    "updated_chunks": {},
+    "updated_groups": [
+     "/"
+    ]
+   }
+  },
+  "ops_log": [
+   [
+    "NewCommit",
+    "main",
+    "n root attrs",
+    null
+   ],
+   [
+    "NewCommit",
+    "main",
+    "l deletes grp",
+    null
+   ],
+   [
+    "NewCommit",
+    "main",
+    "j writes x",
+    null
+   ],
+   [
+    "NewCommit",
+    "main",
+    "h updates x metadata",
+    null
+   ],
+   [
+    "NewCommit",
+    "main",
+    "e adds z",
+    null
+   ],
+   [
+    "NewCommit",
+    "main",
+    "f deletes y",
+    null
+   ],
+   [
+    "NewCommit",
+    "main",
+    "d same chunk",
+    null
+   ],
+   [
+    "NewCommit",
+    "main",
+    "a rebased",
+    null
+   ],
+   [
+    "NewCommit",
+    "main",
+    "b first",
+    null
+   ],
+   [
+    "NewCommit",
+    "main",
+    "base",
+    null
+   ],
+   [
+    "RepoInitialized",
+    null,
+    null,
+    null
+   ]
+  ],
+  "snapshots": {
+   "Repository initialized": {
+    "keys": [],
+    "nodes": {}
+   },
+   "a rebased": {
+    "keys": [
+     "grp/zarr.json",
+     "x/c/0",
+     "x/c/1",
+     "x/c/2",
+     "x/c/3",
+     "x/zarr.json",
+     "y/c/0",
+     "y/c/1",
+     "y/c/2",
+     "y/c/3",
+     "y/zarr.json",
+     "zarr.json"
+    ],
+    "nodes": {
+     "/": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/grp": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {
+        "k": 1
+       },
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/x": {
+      "chunks": {
+       "0": "inline:916f84e441b3fada",
+       "1": "inline:02143a7ae8357c4d",
+       "2": "inline:296d2a436d8adbbf",
+       "3": "inline:712847b38533ff41"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         4
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "d7cf06cde44342e6",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        8
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/y": {
+      "chunks": {
+       "0": "inline:7d7a47e7f9890640",
+       "1": "inline:85d6cdc731ff42fa",
+       "2": "inline:f1aaeb4f14e393f4",
+       "3": "inline:f1e9e0d9c8e3b5cc"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         4
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "b364dcb181cafbb8",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        8
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     }
+    }
+   },
+   "b first": {
+    "keys": [
+     "grp/zarr.json",
+     "x/c/0",
+     "x/c/1",
+     "x/c/2",
+     "x/c/3",
+     "x/zarr.json",
+     "y/c/0",
+     "y/c/1",
+     "y/c/2",
+     "y/c/3",
+     "y/zarr.json",
+     "zarr.json"
+    ],
+    "nodes": {
+     "/": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/grp": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {
+        "k": 1
+       },
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/x": {
+      "chunks": {
+       "0": "inline:ecaec67f921770e3",
+       "1": "inline:02143a7ae8357c4d",
+       "2": "inline:296d2a436d8adbbf",
+       "3": "inline:712847b38533ff41"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         4
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "91352342effd9e12",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        8
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/y": {
+      "chunks": {
+       "0": "inline:7d7a47e7f9890640",
+       "1": "inline:85d6cdc731ff42fa",
+       "2": "inline:f1aaeb4f14e393f4",
+       "3": "inline:f1e9e0d9c8e3b5cc"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         4
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "b364dcb181cafbb8",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        8
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     }
+    }
+   },
+   "base": {
+    "keys": [
+     "grp/zarr.json",
+     "x/c/0",
+     "x/c/1",
+     "x/c/2",
+     "x/c/3",
+     "x/zarr.json",
+     "y/c/0",
+     "y/c/1",
+     "y/c/2",
+     "y/c/3",
+     "y/zarr.json",
+     "zarr.json"
+    ],
+    "nodes": {
+     "/": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/grp": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {
+        "k": 1
+       },
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/x": {
+      "chunks": {
+       "0": "inline:ecaec67f921770e3",
+       "1": "inline:02143a7ae8357c4d",
+       "2": "inline:296d2a436d8adbbf",
+       "3": "inline:712847b38533ff41"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         4
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "91352342effd9e12",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        8
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/y": {
+      "chunks": {
+       "0": "inline:315af205e74a2409",
+       "1": "inline:85d6cdc731ff42fa",
+       "2": "inline:f1aaeb4f14e393f4",
+       "3": "inline:f1e9e0d9c8e3b5cc"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         4
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "8564118b4f602afa",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        8
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     }
+    }
+   },
+   "d same chunk": {
+    "keys": [
+     "grp/zarr.json",
+     "x/c/0",
+     "x/c/1",
+     "x/c/2",
+     "x/c/3",
+     "x/zarr.json",
+     "y/c/0",
+     "y/c/1",
+     "y/c/2",
+     "y/c/3",
+     "y/zarr.json",
+     "zarr.json"
+    ],
+    "nodes": {
+     "/": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/grp": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {
+        "k": 1
+       },
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/x": {
+      "chunks": {
+       "0": "inline:916f84e441b3fada",
+       "1": "inline:989e7a3841c38844",
+       "2": "inline:296d2a436d8adbbf",
+       "3": "inline:712847b38533ff41"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         4
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "468522b170a5a9fa",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        8
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/y": {
+      "chunks": {
+       "0": "inline:7d7a47e7f9890640",
+       "1": "inline:85d6cdc731ff42fa",
+       "2": "inline:f1aaeb4f14e393f4",
+       "3": "inline:f1e9e0d9c8e3b5cc"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         4
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "b364dcb181cafbb8",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        8
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     }
+    }
+   },
+   "e adds z": {
+    "keys": [
+     "grp/zarr.json",
+     "x/c/0",
+     "x/c/1",
+     "x/c/2",
+     "x/c/3",
+     "x/zarr.json",
+     "z/c/0",
+     "z/zarr.json",
+     "zarr.json"
+    ],
+    "nodes": {
+     "/": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/grp": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {
+        "k": 1
+       },
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/x": {
+      "chunks": {
+       "0": "inline:916f84e441b3fada",
+       "1": "inline:989e7a3841c38844",
+       "2": "inline:296d2a436d8adbbf",
+       "3": "inline:712847b38533ff41"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         4
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "468522b170a5a9fa",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        8
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/z": {
+      "chunks": {
+       "0": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         1
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "86ff616e993cf6f9",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "checksum": false,
+          "level": 0
+         },
+         "name": "zstd"
+        }
+       ],
+       "data_type": "int8",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        2
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     }
+    }
+   },
+   "f deletes y": {
+    "keys": [
+     "grp/zarr.json",
+     "x/c/0",
+     "x/c/1",
+     "x/c/2",
+     "x/c/3",
+     "x/zarr.json",
+     "zarr.json"
+    ],
+    "nodes": {
+     "/": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/grp": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {
+        "k": 1
+       },
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/x": {
+      "chunks": {
+       "0": "inline:916f84e441b3fada",
+       "1": "inline:989e7a3841c38844",
+       "2": "inline:296d2a436d8adbbf",
+       "3": "inline:712847b38533ff41"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         4
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "468522b170a5a9fa",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        8
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     }
+    }
+   },
+   "h updates x metadata": {
+    "keys": [
+     "grp/zarr.json",
+     "x/c/0",
+     "x/c/1",
+     "x/c/2",
+     "x/c/3",
+     "x/zarr.json",
+     "z/c/0",
+     "z/zarr.json",
+     "zarr.json"
+    ],
+    "nodes": {
+     "/": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/grp": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {
+        "k": 1
+       },
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/x": {
+      "chunks": {
+       "0": "inline:916f84e441b3fada",
+       "1": "inline:989e7a3841c38844",
+       "2": "inline:296d2a436d8adbbf",
+       "3": "inline:712847b38533ff41"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         4
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "468522b170a5a9fa",
+      "zarr_json": {
+       "attributes": {
+        "changed": true
+       },
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        8
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/z": {
+      "chunks": {
+       "0": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         1
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "86ff616e993cf6f9",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "checksum": false,
+          "level": 0
+         },
+         "name": "zstd"
+        }
+       ],
+       "data_type": "int8",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        2
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     }
+    }
+   },
+   "j writes x": {
+    "keys": [
+     "grp/zarr.json",
+     "x/c/0",
+     "x/c/1",
+     "x/c/2",
+     "x/c/3",
+     "x/zarr.json",
+     "z/c/0",
+     "z/zarr.json",
+     "zarr.json"
+    ],
+    "nodes": {
+     "/": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/grp": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {
+        "k": 1
+       },
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/x": {
+      "chunks": {
+       "0": "inline:916f84e441b3fada",
+       "1": "inline:989e7a3841c38844",
+       "2": "inline:296d2a436d8adbbf",
+       "3": "inline:3c02dc6940d1cb97"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         4
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "c0c6ffa4240b222a",
+      "zarr_json": {
+       "attributes": {
+        "changed": true
+       },
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        8
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/z": {
+      "chunks": {
+       "0": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         1
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "86ff616e993cf6f9",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "checksum": false,
+          "level": 0
+         },
+         "name": "zstd"
+        }
+       ],
+       "data_type": "int8",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        2
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     }
+    }
+   },
+   "l deletes grp": {
+    "keys": [
+     "x/c/0",
+     "x/c/1",
+     "x/c/2",
+     "x/c/3",
+     "x/zarr.json",
+     "z/c/0",
+     "z/zarr.json",
+     "zarr.json"
+    ],
+    "nodes": {
+     "/": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/x": {
+      "chunks": {
+       "0": "inline:916f84e441b3fada",
+       "1": "inline:989e7a3841c38844",
+       "2": "inline:296d2a436d8adbbf",
+       "3": "inline:3c02dc6940d1cb97"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         4
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "c0c6ffa4240b222a",
+      "zarr_json": {
+       "attributes": {
+        "changed": true
+       },
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        8
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/z": {
+      "chunks": {
+       "0": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         1
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "86ff616e993cf6f9",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "checksum": false,
+          "level": 0
+         },
+         "name": "zstd"
+        }
+       ],
+       "data_type": "int8",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        2
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     }
+    }
+   },
+   "n root attrs": {
+    "keys": [
+     "x/c/0",
+     "x/c/1",
+     "x/c/2",
+     "x/c/3",
+     "x/zarr.json",
+     "z/c/0",
+     "z/zarr.json",
+     "zarr.json"
+    ],
+    "nodes": {
+     "/": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {
+        "by": "N"
+       },
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/x": {
+      "chunks": {
+       "0": "inline:916f84e441b3fada",
+       "1": "inline:989e7a3841c38844",
+       "2": "inline:296d2a436d8adbbf",
+       "3": "inline:3c02dc6940d1cb97"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         4
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "c0c6ffa4240b222a",
+      "zarr_json": {
+       "attributes": {
+        "changed": true
+       },
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        8
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/z": {
+      "chunks": {
+       "0": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         1
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "86ff616e993cf6f9",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "checksum": false,
+          "level": 0
+         },
+         "name": "zstd"
+        }
+       ],
+       "data_type": "int8",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        2
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     }
+    }
+   }
+  },
+  "status": "online",
+  "tags": {},
+  "updates": [
+   [
+    "NewCommit",
+    "main",
+    "n root attrs",
+    null
+   ],
+   [
+    "NewCommit",
+    "main",
+    "l deletes grp",
+    null
+   ],
+   [
+    "NewCommit",
+    "main",
+    "j writes x",
+    null
+   ],
+   [
+    "NewCommit",
+    "main",
+    "h updates x metadata",
+    null
+   ],
+   [
+    "NewCommit",
+    "main",
+    "e adds z",
+    null
+   ],
+   [
+    "NewCommit",
+    "main",
+    "f deletes y",
+    null
+   ],
+   [
+    "NewCommit",
+    "main",
+    "d same chunk",
+    null
+   ],
+   [
+    "NewCommit",
+    "main",
+    "a rebased",
+    null
+   ],
+   [
+    "NewCommit",
+    "main",
+    "b first",
+    null
+   ],
+   [
+    "NewCommit",
+    "main",
+    "base",
+    null
+   ],
+   [
+    "RepoInitialized",
+    null,
+    null,
+    null
+   ]
+  ]
+ },
+ "outcomes": [
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "error:conflict",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "error:conflict",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "error:conflict",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "error:conflict",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "error:conflict",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "error:conflict"
+ ]
+}

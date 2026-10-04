@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"math"
+	"reflect"
 	"slices"
 	"strings"
 	"testing"
@@ -99,5 +100,22 @@ func TestPanicInChunkReadIsAnError(t *testing.T) {
 	}
 	if _, err := arr.ReadAll(context.Background()); err == nil || !strings.Contains(err.Error(), "boom") {
 		t.Errorf("err = %v, want the panic as an error", err)
+	}
+}
+
+// Attributes keep integers exact, as Python does.
+func TestAttributeNumbers(t *testing.T) {
+	attrs, err := Attributes([]byte(`{"attributes": {"big": 4611686018427387904, "neg": -5, "f": 1.5,
+		"e": 1e3, "u": 18446744073709551615, "huge": 123456789012345678901234567890, "list": [1, {"x": 2.0}]}}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := map[string]any{
+		"big": int64(4611686018427387904), "neg": int64(-5), "f": 1.5, "e": 1000.0,
+		"u": uint64(18446744073709551615), "huge": json.Number("123456789012345678901234567890"),
+		"list": []any{int64(1), map[string]any{"x": 2.0}},
+	}
+	if !reflect.DeepEqual(attrs, want) {
+		t.Errorf("attributes = %#v", attrs)
 	}
 }

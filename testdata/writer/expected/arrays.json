@@ -1,0 +1,8860 @@
+{
+ "_meta": {
+  "icechunk": "2.2.2",
+  "numpy": "2.5.3",
+  "zarr": "3.4.0"
+ },
+ "canonical": {
+  "ancestry": {
+   "branch:main": [
+    "empty commit",
+    "regrow",
+    "modify",
+    "create arrays",
+    "Repository initialized"
+   ]
+  },
+  "branches": {
+   "main": "empty commit"
+  },
+  "commits": {
+   "Repository initialized": {
+    "metadata": {
+     "__icechunk": {
+      "is_root": true
+     }
+    },
+    "parent": null
+   },
+   "create arrays": {
+    "metadata": {
+     "author": "scenario",
+     "count": 42,
+     "flag": true,
+     "nested": {
+      "empty": {},
+      "list": [
+       1,
+       "two",
+       3.5,
+       false
+      ]
+     },
+     "nothing": null,
+     "ratio": 0.25
+    },
+    "parent": "Repository initialized"
+   },
+   "empty commit": {
+    "metadata": {},
+    "parent": "regrow"
+   },
+   "modify": {
+    "metadata": {
+     "step": 2
+    },
+    "parent": "create arrays"
+   },
+   "regrow": {
+    "metadata": {},
+    "parent": "modify"
+   }
+  },
+  "config": null,
+  "deleted_tags": [],
+  "diffs": {
+   "create arrays": {
+    "deleted_arrays": [],
+    "deleted_groups": [],
+    "new_arrays": [
+     "/codecs/bitround",
+     "/codecs/blosc_lz4",
+     "/codecs/blosc_zlib",
+     "/codecs/blosc_zstd",
+     "/codecs/gzip",
+     "/codecs/numcodecs_chain",
+     "/codecs/sharded",
+     "/codecs/sharded_strings",
+     "/codecs/zstd_checksum",
+     "/plain/bool",
+     "/plain/checksums",
+     "/plain/complex128",
+     "/plain/complex64",
+     "/plain/datetime",
+     "/plain/empty",
+     "/plain/f16",
+     "/plain/f32_default",
+     "/plain/i16_bigendian",
+     "/plain/i32_inline",
+     "/plain/i32_native",
+     "/plain/i8",
+     "/plain/nullterm",
+     "/plain/raw",
+     "/plain/scalar",
+     "/plain/strings",
+     "/plain/strings_raw",
+     "/plain/timedelta_be",
+     "/plain/transpose_crc32c",
+     "/plain/u64",
+     "/plain/utf32",
+     "/plain/vbytes",
+     "/virtual/v"
+    ],
+    "new_groups": [
+     "/",
+     "/codecs",
+     "/g",
+     "/g/sub",
+     "/plain",
+     "/virtual"
+    ],
+    "updated_arrays": [],
+    "updated_chunks": {
+     "/codecs/bitround": [
+      [
+       0
+      ],
+      [
+       1
+      ]
+     ],
+     "/codecs/blosc_lz4": [
+      [
+       0,
+       0
+      ],
+      [
+       1,
+       0
+      ]
+     ],
+     "/codecs/blosc_zlib": [
+      [
+       0
+      ],
+      [
+       1
+      ]
+     ],
+     "/codecs/blosc_zstd": [
+      [
+       0
+      ],
+      [
+       1
+      ]
+     ],
+     "/codecs/gzip": [
+      [
+       0,
+       0
+      ],
+      [
+       0,
+       1
+      ],
+      [
+       0,
+       2
+      ],
+      [
+       0,
+       3
+      ],
+      [
+       1,
+       0
+      ],
+      [
+       1,
+       1
+      ],
+      [
+       1,
+       2
+      ],
+      [
+       1,
+       3
+      ],
+      [
+       2,
+       0
+      ],
+      [
+       2,
+       1
+      ],
+      [
+       2,
+       2
+      ],
+      [
+       2,
+       3
+      ],
+      [
+       3,
+       0
+      ],
+      [
+       3,
+       1
+      ],
+      [
+       3,
+       2
+      ],
+      [
+       3,
+       3
+      ]
+     ],
+     "/codecs/numcodecs_chain": [
+      [
+       0
+      ],
+      [
+       1
+      ],
+      [
+       2
+      ]
+     ],
+     "/codecs/sharded": [
+      [
+       0,
+       0
+      ],
+      [
+       0,
+       1
+      ],
+      [
+       1,
+       0
+      ],
+      [
+       1,
+       1
+      ]
+     ],
+     "/codecs/sharded_strings": [
+      [
+       0
+      ],
+      [
+       1
+      ]
+     ],
+     "/codecs/zstd_checksum": [
+      [
+       0
+      ],
+      [
+       1
+      ],
+      [
+       2
+      ]
+     ],
+     "/plain/bool": [
+      [
+       0
+      ],
+      [
+       1
+      ]
+     ],
+     "/plain/checksums": [
+      [
+       0
+      ],
+      [
+       1
+      ],
+      [
+       2
+      ]
+     ],
+     "/plain/complex128": [
+      [
+       0,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "/plain/complex64": [
+      [
+       0
+      ],
+      [
+       1
+      ]
+     ],
+     "/plain/datetime": [
+      [
+       0
+      ],
+      [
+       1
+      ]
+     ],
+     "/plain/f16": [
+      [
+       0
+      ],
+      [
+       1
+      ]
+     ],
+     "/plain/f32_default": [
+      [
+       0,
+       0
+      ],
+      [
+       0,
+       1
+      ],
+      [
+       0,
+       2
+      ],
+      [
+       0,
+       3
+      ],
+      [
+       1,
+       0
+      ],
+      [
+       1,
+       1
+      ],
+      [
+       1,
+       2
+      ],
+      [
+       1,
+       3
+      ],
+      [
+       2,
+       0
+      ],
+      [
+       2,
+       1
+      ],
+      [
+       2,
+       2
+      ],
+      [
+       2,
+       3
+      ]
+     ],
+     "/plain/i16_bigendian": [
+      [
+       0,
+       0
+      ],
+      [
+       0,
+       1
+      ],
+      [
+       0,
+       2
+      ],
+      [
+       1,
+       0
+      ],
+      [
+       1,
+       1
+      ],
+      [
+       1,
+       2
+      ],
+      [
+       2,
+       0
+      ],
+      [
+       2,
+       1
+      ],
+      [
+       2,
+       2
+      ]
+     ],
+     "/plain/i32_inline": [
+      [
+       0
+      ],
+      [
+       1
+      ],
+      [
+       2
+      ]
+     ],
+     "/plain/i32_native": [
+      [
+       0
+      ],
+      [
+       1
+      ]
+     ],
+     "/plain/i8": [
+      [
+       0
+      ],
+      [
+       1
+      ],
+      [
+       2
+      ]
+     ],
+     "/plain/nullterm": [
+      [
+       0
+      ],
+      [
+       1
+      ]
+     ],
+     "/plain/raw": [
+      [
+       0
+      ],
+      [
+       1
+      ]
+     ],
+     "/plain/scalar": [
+      []
+     ],
+     "/plain/strings": [
+      [
+       0
+      ],
+      [
+       1
+      ]
+     ],
+     "/plain/strings_raw": [
+      [
+       0
+      ],
+      [
+       1
+      ]
+     ],
+     "/plain/timedelta_be": [
+      [
+       0
+      ],
+      [
+       1
+      ]
+     ],
+     "/plain/transpose_crc32c": [
+      [
+       0,
+       0
+      ],
+      [
+       0,
+       1
+      ],
+      [
+       1,
+       0
+      ],
+      [
+       1,
+       1
+      ],
+      [
+       2,
+       0
+      ],
+      [
+       2,
+       1
+      ]
+     ],
+     "/plain/u64": [
+      [
+       0
+      ],
+      [
+       1
+      ]
+     ],
+     "/plain/utf32": [
+      [
+       0
+      ],
+      [
+       1
+      ]
+     ],
+     "/plain/vbytes": [
+      [
+       0
+      ],
+      [
+       1
+      ]
+     ]
+    },
+    "updated_groups": []
+   },
+   "empty commit": {
+    "deleted_arrays": [],
+    "deleted_groups": [],
+    "new_arrays": [],
+    "new_groups": [],
+    "updated_arrays": [],
+    "updated_chunks": {},
+    "updated_groups": []
+   },
+   "modify": {
+    "deleted_arrays": [
+     "/codecs/gzip"
+    ],
+    "deleted_groups": [
+     "/g",
+     "/g/sub"
+    ],
+    "new_arrays": [
+     "/codecs/gzip"
+    ],
+    "new_groups": [],
+    "updated_arrays": [
+     "/plain/f32_default",
+     "/plain/i32_native",
+     "/plain/strings"
+    ],
+    "updated_chunks": {
+     "/codecs/gzip": [
+      [
+       0
+      ]
+     ],
+     "/plain/f32_default": [
+      [
+       0,
+       0
+      ],
+      [
+       0,
+       1
+      ],
+      [
+       0,
+       2
+      ],
+      [
+       1,
+       0
+      ],
+      [
+       1,
+       1
+      ],
+      [
+       1,
+       2
+      ]
+     ],
+     "/plain/i32_inline": [
+      [
+       1
+      ],
+      [
+       2
+      ]
+     ],
+     "/virtual/v": [
+      [
+       0
+      ],
+      [
+       1
+      ],
+      [
+       2
+      ]
+     ]
+    },
+    "updated_groups": [
+     "/"
+    ]
+   },
+   "regrow": {
+    "deleted_arrays": [],
+    "deleted_groups": [],
+    "new_arrays": [],
+    "new_groups": [],
+    "updated_arrays": [
+     "/plain/f32_default",
+     "/plain/i32_native"
+    ],
+    "updated_chunks": {},
+    "updated_groups": []
+   }
+  },
+  "ops_log": [
+   [
+    "NewCommit",
+    "main",
+    "empty commit",
+    null
+   ],
+   [
+    "NewCommit",
+    "main",
+    "regrow",
+    null
+   ],
+   [
+    "NewCommit",
+    "main",
+    "modify",
+    null
+   ],
+   [
+    "NewCommit",
+    "main",
+    "create arrays",
+    null
+   ],
+   [
+    "RepoInitialized",
+    null,
+    null,
+    null
+   ]
+  ],
+  "snapshots": {
+   "Repository initialized": {
+    "keys": [],
+    "nodes": {}
+   },
+   "create arrays": {
+    "keys": [
+     "codecs/bitround/c/0",
+     "codecs/bitround/c/1",
+     "codecs/bitround/zarr.json",
+     "codecs/blosc_lz4/c/0/0",
+     "codecs/blosc_lz4/c/1/0",
+     "codecs/blosc_lz4/zarr.json",
+     "codecs/blosc_zlib/c/0",
+     "codecs/blosc_zlib/c/1",
+     "codecs/blosc_zlib/zarr.json",
+     "codecs/blosc_zstd/c/0",
+     "codecs/blosc_zstd/c/1",
+     "codecs/blosc_zstd/zarr.json",
+     "codecs/gzip/c/0/0",
+     "codecs/gzip/c/0/1",
+     "codecs/gzip/c/0/2",
+     "codecs/gzip/c/0/3",
+     "codecs/gzip/c/1/0",
+     "codecs/gzip/c/1/1",
+     "codecs/gzip/c/1/2",
+     "codecs/gzip/c/1/3",
+     "codecs/gzip/c/2/0",
+     "codecs/gzip/c/2/1",
+     "codecs/gzip/c/2/2",
+     "codecs/gzip/c/2/3",
+     "codecs/gzip/c/3/0",
+     "codecs/gzip/c/3/1",
+     "codecs/gzip/c/3/2",
+     "codecs/gzip/c/3/3",
+     "codecs/gzip/zarr.json",
+     "codecs/numcodecs_chain/c/0",
+     "codecs/numcodecs_chain/c/1",
+     "codecs/numcodecs_chain/c/2",
+     "codecs/numcodecs_chain/zarr.json",
+     "codecs/sharded/c/0/0",
+     "codecs/sharded/c/0/1",
+     "codecs/sharded/c/1/0",
+     "codecs/sharded/c/1/1",
+     "codecs/sharded/zarr.json",
+     "codecs/sharded_strings/c/0",
+     "codecs/sharded_strings/c/1",
+     "codecs/sharded_strings/zarr.json",
+     "codecs/zarr.json",
+     "codecs/zstd_checksum/c/0",
+     "codecs/zstd_checksum/c/1",
+     "codecs/zstd_checksum/c/2",
+     "codecs/zstd_checksum/zarr.json",
+     "g/sub/zarr.json",
+     "g/zarr.json",
+     "plain/bool/c/0",
+     "plain/bool/c/1",
+     "plain/bool/zarr.json",
+     "plain/checksums/c/0",
+     "plain/checksums/c/1",
+     "plain/checksums/c/2",
+     "plain/checksums/zarr.json",
+     "plain/complex128/c/0/0",
+     "plain/complex128/c/0/1",
+     "plain/complex128/zarr.json",
+     "plain/complex64/c/0",
+     "plain/complex64/c/1",
+     "plain/complex64/zarr.json",
+     "plain/datetime/c/0",
+     "plain/datetime/c/1",
+     "plain/datetime/zarr.json",
+     "plain/empty/zarr.json",
+     "plain/f16/c/0",
+     "plain/f16/c/1",
+     "plain/f16/zarr.json",
+     "plain/f32_default/c/0/0",
+     "plain/f32_default/c/0/1",
+     "plain/f32_default/c/0/2",
+     "plain/f32_default/c/0/3",
+     "plain/f32_default/c/1/0",
+     "plain/f32_default/c/1/1",
+     "plain/f32_default/c/1/2",
+     "plain/f32_default/c/1/3",
+     "plain/f32_default/c/2/0",
+     "plain/f32_default/c/2/1",
+     "plain/f32_default/c/2/2",
+     "plain/f32_default/c/2/3",
+     "plain/f32_default/zarr.json",
+     "plain/i16_bigendian/c/0/1",
+     "plain/i16_bigendian/c/0/2",
+     "plain/i16_bigendian/c/1/0",
+     "plain/i16_bigendian/c/1/1",
+     "plain/i16_bigendian/c/1/2",
+     "plain/i16_bigendian/c/2/0",
+     "plain/i16_bigendian/c/2/1",
+     "plain/i16_bigendian/c/2/2",
+     "plain/i16_bigendian/zarr.json",
+     "plain/i32_inline/c/0",
+     "plain/i32_inline/c/1",
+     "plain/i32_inline/c/2",
+     "plain/i32_inline/zarr.json",
+     "plain/i32_native/c/0",
+     "plain/i32_native/c/1",
+     "plain/i32_native/zarr.json",
+     "plain/i8/c/0",
+     "plain/i8/c/1",
+     "plain/i8/c/2",
+     "plain/i8/zarr.json",
+     "plain/nullterm/c/0",
+     "plain/nullterm/c/1",
+     "plain/nullterm/zarr.json",
+     "plain/raw/c/0",
+     "plain/raw/c/1",
+     "plain/raw/zarr.json",
+     "plain/scalar/c",
+     "plain/scalar/zarr.json",
+     "plain/strings/c/0",
+     "plain/strings/c/1",
+     "plain/strings/zarr.json",
+     "plain/strings_raw/c/0",
+     "plain/strings_raw/c/1",
+     "plain/strings_raw/zarr.json",
+     "plain/timedelta_be/c/0",
+     "plain/timedelta_be/c/1",
+     "plain/timedelta_be/zarr.json",
+     "plain/transpose_crc32c/c/0/0",
+     "plain/transpose_crc32c/c/0/1",
+     "plain/transpose_crc32c/c/1/0",
+     "plain/transpose_crc32c/c/1/1",
+     "plain/transpose_crc32c/c/2/0",
+     "plain/transpose_crc32c/c/2/1",
+     "plain/transpose_crc32c/zarr.json",
+     "plain/u64/c/0",
+     "plain/u64/c/1",
+     "plain/u64/zarr.json",
+     "plain/utf32/c/0",
+     "plain/utf32/c/1",
+     "plain/utf32/zarr.json",
+     "plain/vbytes/c/0",
+     "plain/vbytes/c/1",
+     "plain/vbytes/zarr.json",
+     "plain/zarr.json",
+     "virtual/v/zarr.json",
+     "virtual/zarr.json",
+     "zarr.json"
+    ],
+    "nodes": {
+     "/": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {
+        "n": 7,
+        "nested": {
+         "empty": {},
+         "list": [
+          1,
+          2.5,
+          null,
+          true,
+          "x"
+         ]
+        },
+        "title": "writer scenario"
+       },
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/codecs": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/codecs/bitround": {
+      "chunks": {
+       "0": "stored",
+       "1": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "11d7dd25e1a10eb1",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          8
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "keepbits": 3
+         },
+         "name": "numcodecs.bitround"
+        },
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "checksum": false,
+          "level": 0
+         },
+         "name": "zstd"
+        }
+       ],
+       "data_type": "float32",
+       "fill_value": 0.0,
+       "node_type": "array",
+       "shape": [
+        16
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/codecs/blosc_lz4": {
+      "chunks": {
+       "0,0": "stored",
+       "1,0": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ],
+        [
+         0,
+         1
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "a36eecb54aef7df3",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          20,
+          30
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "blocksize": 0,
+          "clevel": 5,
+          "cname": "lz4",
+          "shuffle": "shuffle",
+          "typesize": 4
+         },
+         "name": "blosc"
+        }
+       ],
+       "data_type": "float32",
+       "fill_value": 0.0,
+       "node_type": "array",
+       "shape": [
+        40,
+        30
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/codecs/blosc_zlib": {
+      "chunks": {
+       "0": "stored",
+       "1": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "a8a26fea7a31d89f",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          16
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "blocksize": 0,
+          "clevel": 3,
+          "cname": "zlib",
+          "shuffle": "noshuffle",
+          "typesize": 2
+         },
+         "name": "blosc"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        30
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/codecs/blosc_zstd": {
+      "chunks": {
+       "0": "stored",
+       "1": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "f788fa30050533ec",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          16
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "blocksize": 0,
+          "clevel": 3,
+          "cname": "zstd",
+          "shuffle": "bitshuffle",
+          "typesize": 8
+         },
+         "name": "blosc"
+        }
+       ],
+       "data_type": "float64",
+       "fill_value": 0.0,
+       "node_type": "array",
+       "shape": [
+        30
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/codecs/gzip": {
+      "chunks": {
+       "0,0": "stored",
+       "0,1": "stored",
+       "0,2": "stored",
+       "0,3": "stored",
+       "1,0": "stored",
+       "1,1": "stored",
+       "1,2": "stored",
+       "1,3": "stored",
+       "2,0": "stored",
+       "2,1": "stored",
+       "2,2": "stored",
+       "2,3": "stored",
+       "3,0": "stored",
+       "3,1": "stored",
+       "3,2": "stored",
+       "3,3": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         4
+        ],
+        [
+         0,
+         4
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "ac9bcb7a96d14fcf",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          4,
+          3
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "level": 5
+         },
+         "name": "gzip"
+        }
+       ],
+       "data_type": "float64",
+       "fill_value": -1.0,
+       "node_type": "array",
+       "shape": [
+        13,
+        11
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/codecs/numcodecs_chain": {
+      "chunks": {
+       "0": "stored",
+       "1": "stored",
+       "2": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         3
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "895b639c297a4d5a",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          10
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "level": 3
+         },
+         "name": "numcodecs.zlib"
+        },
+        {
+         "name": "numcodecs.lz4"
+        },
+        {
+         "configuration": {
+          "level": 1
+         },
+         "name": "numcodecs.zstd"
+        },
+        {
+         "configuration": {
+          "level": 2
+         },
+         "name": "numcodecs.gzip"
+        }
+       ],
+       "data_type": "float64",
+       "fill_value": 0.0,
+       "node_type": "array",
+       "shape": [
+        24
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/codecs/sharded": {
+      "chunks": {
+       "0,0": "stored",
+       "0,1": "stored",
+       "1,0": "stored",
+       "1,1": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ],
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "ad489f5095d0d870",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          8,
+          8
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "chunk_shape": [
+           4,
+           4
+          ],
+          "codecs": [
+           {
+            "configuration": {
+             "endian": "little"
+            },
+            "name": "bytes"
+           },
+           {
+            "configuration": {
+             "checksum": false,
+             "level": 0
+            },
+            "name": "zstd"
+           }
+          ],
+          "index_codecs": [
+           {
+            "configuration": {
+             "endian": "little"
+            },
+            "name": "bytes"
+           },
+           {
+            "name": "crc32c"
+           }
+          ],
+          "index_location": "end"
+         },
+         "name": "sharding_indexed"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": -1,
+       "node_type": "array",
+       "shape": [
+        16,
+        16
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/codecs/sharded_strings": {
+      "chunks": {
+       "0": "stored",
+       "1": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "437363863dbec08f",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          4
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "chunk_shape": [
+           2
+          ],
+          "codecs": [
+           {
+            "name": "vlen-utf8"
+           },
+           {
+            "configuration": {
+             "level": 1
+            },
+            "name": "gzip"
+           }
+          ],
+          "index_codecs": [
+           {
+            "configuration": {
+             "endian": "little"
+            },
+            "name": "bytes"
+           },
+           {
+            "name": "crc32c"
+           }
+          ],
+          "index_location": "end"
+         },
+         "name": "sharding_indexed"
+        }
+       ],
+       "data_type": "string",
+       "fill_value": "-",
+       "node_type": "array",
+       "shape": [
+        9
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/codecs/zstd_checksum": {
+      "chunks": {
+       "0": "stored",
+       "1": "stored",
+       "2": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         3
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "2869194d9cbfd6eb",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          7
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "checksum": true,
+          "level": 3
+         },
+         "name": "zstd"
+        }
+       ],
+       "data_type": "int64",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        20
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/g": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/g/sub": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {
+        "depth": 2,
+        "unicode": "ünïcødé"
+       },
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/plain": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/plain/bool": {
+      "chunks": {
+       "0": "inline:47dc540c94ceb704",
+       "1": "inline:b413f47d13ee2fe6"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "858e18a704717ff8",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "bytes"
+        }
+       ],
+       "data_type": "bool",
+       "fill_value": true,
+       "node_type": "array",
+       "shape": [
+        5
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/checksums": {
+      "chunks": {
+       "0": "inline:a4453fc8cb505110",
+       "1": "inline:b9a0949e6882d9ee",
+       "2": "inline:ff3edf2fb7cde019"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         3
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "c3377a243e1c310b",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          4
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "elementsize": 8
+         },
+         "name": "numcodecs.shuffle"
+        },
+        {
+         "name": "numcodecs.crc32"
+        },
+        {
+         "configuration": {
+          "location": "end"
+         },
+         "name": "numcodecs.adler32"
+        },
+        {
+         "name": "numcodecs.fletcher32"
+        },
+        {
+         "name": "numcodecs.crc32c"
+        }
+       ],
+       "data_type": "float64",
+       "fill_value": 0.0,
+       "node_type": "array",
+       "shape": [
+        10
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/complex128": {
+      "chunks": {
+       "0,0": "inline:5b8f6ccfd47f57e3",
+       "0,1": "inline:d5e95e689f55dd94"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         1
+        ],
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "53b6082fc686391b",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2,
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "complex128",
+       "fill_value": [
+        1.0,
+        -2.0
+       ],
+       "node_type": "array",
+       "shape": [
+        3,
+        4
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/complex64": {
+      "chunks": {
+       "0": "stored",
+       "1": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "c335c4108879f58b",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          3
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "checksum": false,
+          "level": 0
+         },
+         "name": "zstd"
+        }
+       ],
+       "data_type": "complex64",
+       "fill_value": [
+        0.5,
+        0.25
+       ],
+       "node_type": "array",
+       "shape": [
+        4
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/datetime": {
+      "chunks": {
+       "0": "inline:13ec2a3018100946",
+       "1": "inline:d4df438d38b8982f"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "66a20e0a1781e31d",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": {
+        "configuration": {
+         "scale_factor": 1,
+         "unit": "s"
+        },
+        "name": "numpy.datetime64"
+       },
+       "fill_value": "NaT",
+       "node_type": "array",
+       "shape": [
+        5
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/empty": {
+      "chunks": {},
+      "manifest_extents": [],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "e3b0c44298fc1c14",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2,
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "checksum": false,
+          "level": 0
+         },
+         "name": "zstd"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        0,
+        4
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/f16": {
+      "chunks": {
+       "0": "inline:615ae6103b55aa8a",
+       "1": "inline:b5c867f4f729df46"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "7af95e0f0520e369",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "float16",
+       "fill_value": 1.5,
+       "node_type": "array",
+       "shape": [
+        5
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/f32_default": {
+      "chunks": {
+       "0,0": "stored",
+       "0,1": "stored",
+       "0,2": "stored",
+       "0,3": "stored",
+       "1,0": "stored",
+       "1,1": "stored",
+       "1,2": "stored",
+       "1,3": "stored",
+       "2,0": "stored",
+       "2,1": "stored",
+       "2,2": "stored",
+       "2,3": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         3
+        ],
+        [
+         0,
+         4
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "557e32386a5cf497",
+      "zarr_json": {
+       "attributes": {
+        "units": "m"
+       },
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          4,
+          3
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "checksum": false,
+          "level": 0
+         },
+         "name": "zstd"
+        }
+       ],
+       "data_type": "float32",
+       "dimension_names": [
+        "y",
+        null
+       ],
+       "fill_value": "NaN",
+       "node_type": "array",
+       "shape": [
+        13,
+        11
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/i16_bigendian": {
+      "chunks": {
+       "0,1": "inline:7464f269ea5b91f9",
+       "0,2": "inline:791cbfed46e88559",
+       "1,0": "inline:3c12e9121d622f9b",
+       "1,1": "inline:f9a04e779dfa7a85",
+       "1,2": "inline:92d8d57d7d053aaf",
+       "2,0": "inline:6553394f45dffae9",
+       "2,1": "inline:05f204b52e4d54eb",
+       "2,2": "inline:1d213a1014b1c1cd"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         3
+        ],
+        [
+         0,
+         3
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "1340998d7f377b80",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          3,
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "big"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": 7,
+       "node_type": "array",
+       "shape": [
+        7,
+        5
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/i32_inline": {
+      "chunks": {
+       "0": "inline:3a4cceead1918653",
+       "1": "inline:cce15093dc11099a",
+       "2": "inline:16ae7072e174d295"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         3
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "8dbaccfa94e872a4",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          128
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        300
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/i32_native": {
+      "chunks": {
+       "0": "native:ae88232d2db389f9",
+       "1": "native:954394ca4f034f27"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "cf03a2980f3bb0ed",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          129
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        258
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/i8": {
+      "chunks": {
+       "0": "inline:f91e0ba0574d6f26",
+       "1": "inline:20644d23899ac8a8",
+       "2": "inline:14dafeadd1635bb4"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         3
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "4830d1b7dec8cf63",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          4
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int8",
+       "fill_value": -3,
+       "node_type": "array",
+       "shape": [
+        9
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/nullterm": {
+      "chunks": {
+       "0": "inline:c7d3e056c9c31fea",
+       "1": "inline:81e85fe9fe87f309"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "f84e2d3abe9bfd4e",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          3
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "bytes"
+        }
+       ],
+       "data_type": {
+        "configuration": {
+         "length_bytes": 5
+        },
+        "name": "null_terminated_bytes"
+       },
+       "fill_value": "",
+       "node_type": "array",
+       "shape": [
+        4
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/raw": {
+      "chunks": {
+       "0": "inline:dfc1d3b523f2fa61",
+       "1": "inline:a80c68ccc5f5a27e"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "d11a28e282c92b13",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "bytes"
+        }
+       ],
+       "data_type": {
+        "configuration": {
+         "length_bytes": 3
+        },
+        "name": "raw_bytes"
+       },
+       "fill_value": "AAAA",
+       "node_type": "array",
+       "shape": [
+        3
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/scalar": {
+      "chunks": {
+       "": "inline:903685afce35a69d"
+      },
+      "manifest_extents": [
+       []
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "903685afce35a69d",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": []
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "float64",
+       "fill_value": 0.0,
+       "node_type": "array",
+       "shape": [],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/strings": {
+      "chunks": {
+       "0": "stored",
+       "1": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "2f160ad9c26a1980",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          4
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "vlen-utf8"
+        },
+        {
+         "configuration": {
+          "checksum": false,
+          "level": 0
+         },
+         "name": "zstd"
+        }
+       ],
+       "data_type": "string",
+       "fill_value": "",
+       "node_type": "array",
+       "shape": [
+        6
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/strings_raw": {
+      "chunks": {
+       "0": "inline:81dbfce0cbe16cdd",
+       "1": "inline:a53b3d6694c6dc7b"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "f83b4f7116a8e7a6",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "vlen-utf8"
+        }
+       ],
+       "data_type": "string",
+       "fill_value": "-",
+       "node_type": "array",
+       "shape": [
+        5
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/timedelta_be": {
+      "chunks": {
+       "0": "inline:9d027cac4b140516",
+       "1": "inline:7befbd318f3e934a"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "620ba0d9749999ea",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          3
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "big"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": {
+        "configuration": {
+         "scale_factor": 1,
+         "unit": "ms"
+        },
+        "name": "numpy.timedelta64"
+       },
+       "fill_value": "NaT",
+       "node_type": "array",
+       "shape": [
+        4
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/transpose_crc32c": {
+      "chunks": {
+       "0,0": "inline:7376ab455be3040f",
+       "0,1": "inline:bfb80fae28080c33",
+       "1,0": "inline:8f051bfd9b04db30",
+       "1,1": "inline:0ddafec3c30bd0e8",
+       "2,0": "inline:0bbac37331c52106",
+       "2,1": "inline:cc461dd22f766e18"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         3
+        ],
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "7ba28068407d4535",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2,
+          4
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "order": [
+           1,
+           0
+          ]
+         },
+         "name": "transpose"
+        },
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "name": "crc32c"
+        }
+       ],
+       "data_type": "uint16",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        5,
+        6
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/u64": {
+      "chunks": {
+       "0": "inline:0fe2af42166c6da4",
+       "1": "inline:411ee52ebc1009af"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "dcf601c2d036800b",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          4
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "uint64",
+       "fill_value": 9223372036854775813,
+       "node_type": "array",
+       "shape": [
+        6
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/utf32": {
+      "chunks": {
+       "0": "inline:8f7812c93c635164",
+       "1": "inline:931f70d087d95c9e"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "d130e4fdb34c01a6",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": {
+        "configuration": {
+         "length_bytes": 16
+        },
+        "name": "fixed_length_utf32"
+       },
+       "fill_value": "",
+       "node_type": "array",
+       "shape": [
+        5
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/vbytes": {
+      "chunks": {
+       "0": "inline:aa05b8a60db19abf",
+       "1": "inline:2926c2f165f18b45"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "a7f2fb9a16751b35",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "vlen-bytes"
+        }
+       ],
+       "data_type": "variable_length_bytes",
+       "fill_value": "",
+       "node_type": "array",
+       "shape": [
+        5
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/virtual": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/virtual/v": {
+      "chunks": {},
+      "manifest_extents": [],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "374708fff7719dd5",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          1
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        4
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     }
+    }
+   },
+   "empty commit": {
+    "keys": [
+     "codecs/bitround/c/0",
+     "codecs/bitround/c/1",
+     "codecs/bitround/zarr.json",
+     "codecs/blosc_lz4/c/0/0",
+     "codecs/blosc_lz4/c/1/0",
+     "codecs/blosc_lz4/zarr.json",
+     "codecs/blosc_zlib/c/0",
+     "codecs/blosc_zlib/c/1",
+     "codecs/blosc_zlib/zarr.json",
+     "codecs/blosc_zstd/c/0",
+     "codecs/blosc_zstd/c/1",
+     "codecs/blosc_zstd/zarr.json",
+     "codecs/gzip/c/0",
+     "codecs/gzip/zarr.json",
+     "codecs/numcodecs_chain/c/0",
+     "codecs/numcodecs_chain/c/1",
+     "codecs/numcodecs_chain/c/2",
+     "codecs/numcodecs_chain/zarr.json",
+     "codecs/sharded/c/0/0",
+     "codecs/sharded/c/0/1",
+     "codecs/sharded/c/1/0",
+     "codecs/sharded/c/1/1",
+     "codecs/sharded/zarr.json",
+     "codecs/sharded_strings/c/0",
+     "codecs/sharded_strings/c/1",
+     "codecs/sharded_strings/zarr.json",
+     "codecs/zarr.json",
+     "codecs/zstd_checksum/c/0",
+     "codecs/zstd_checksum/c/1",
+     "codecs/zstd_checksum/c/2",
+     "codecs/zstd_checksum/zarr.json",
+     "plain/bool/c/0",
+     "plain/bool/c/1",
+     "plain/bool/zarr.json",
+     "plain/checksums/c/0",
+     "plain/checksums/c/1",
+     "plain/checksums/c/2",
+     "plain/checksums/zarr.json",
+     "plain/complex128/c/0/0",
+     "plain/complex128/c/0/1",
+     "plain/complex128/zarr.json",
+     "plain/complex64/c/0",
+     "plain/complex64/c/1",
+     "plain/complex64/zarr.json",
+     "plain/datetime/c/0",
+     "plain/datetime/c/1",
+     "plain/datetime/zarr.json",
+     "plain/empty/zarr.json",
+     "plain/f16/c/0",
+     "plain/f16/c/1",
+     "plain/f16/zarr.json",
+     "plain/f32_default/c/0/1",
+     "plain/f32_default/c/1/0",
+     "plain/f32_default/c/1/1",
+     "plain/f32_default/zarr.json",
+     "plain/i16_bigendian/c/0/1",
+     "plain/i16_bigendian/c/0/2",
+     "plain/i16_bigendian/c/1/0",
+     "plain/i16_bigendian/c/1/1",
+     "plain/i16_bigendian/c/1/2",
+     "plain/i16_bigendian/c/2/0",
+     "plain/i16_bigendian/c/2/1",
+     "plain/i16_bigendian/c/2/2",
+     "plain/i16_bigendian/zarr.json",
+     "plain/i32_inline/c/0",
+     "plain/i32_inline/c/2",
+     "plain/i32_inline/zarr.json",
+     "plain/i32_native/c/0",
+     "plain/i32_native/c/1",
+     "plain/i32_native/zarr.json",
+     "plain/i8/c/0",
+     "plain/i8/c/1",
+     "plain/i8/c/2",
+     "plain/i8/zarr.json",
+     "plain/nullterm/c/0",
+     "plain/nullterm/c/1",
+     "plain/nullterm/zarr.json",
+     "plain/raw/c/0",
+     "plain/raw/c/1",
+     "plain/raw/zarr.json",
+     "plain/scalar/c",
+     "plain/scalar/zarr.json",
+     "plain/strings/c/0",
+     "plain/strings/c/1",
+     "plain/strings/zarr.json",
+     "plain/strings_raw/c/0",
+     "plain/strings_raw/c/1",
+     "plain/strings_raw/zarr.json",
+     "plain/timedelta_be/c/0",
+     "plain/timedelta_be/c/1",
+     "plain/timedelta_be/zarr.json",
+     "plain/transpose_crc32c/c/0/0",
+     "plain/transpose_crc32c/c/0/1",
+     "plain/transpose_crc32c/c/1/0",
+     "plain/transpose_crc32c/c/1/1",
+     "plain/transpose_crc32c/c/2/0",
+     "plain/transpose_crc32c/c/2/1",
+     "plain/transpose_crc32c/zarr.json",
+     "plain/u64/c/0",
+     "plain/u64/c/1",
+     "plain/u64/zarr.json",
+     "plain/utf32/c/0",
+     "plain/utf32/c/1",
+     "plain/utf32/zarr.json",
+     "plain/vbytes/c/0",
+     "plain/vbytes/c/1",
+     "plain/vbytes/zarr.json",
+     "plain/zarr.json",
+     "virtual/v/c/0",
+     "virtual/v/c/1",
+     "virtual/v/c/2",
+     "virtual/v/zarr.json",
+     "virtual/zarr.json",
+     "zarr.json"
+    ],
+    "nodes": {
+     "/": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {
+        "added": [
+         1,
+         2
+        ],
+        "title": "updated"
+       },
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/codecs": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/codecs/bitround": {
+      "chunks": {
+       "0": "stored",
+       "1": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "11d7dd25e1a10eb1",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          8
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "keepbits": 3
+         },
+         "name": "numcodecs.bitround"
+        },
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "checksum": false,
+          "level": 0
+         },
+         "name": "zstd"
+        }
+       ],
+       "data_type": "float32",
+       "fill_value": 0.0,
+       "node_type": "array",
+       "shape": [
+        16
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/codecs/blosc_lz4": {
+      "chunks": {
+       "0,0": "stored",
+       "1,0": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ],
+        [
+         0,
+         1
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "a36eecb54aef7df3",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          20,
+          30
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "blocksize": 0,
+          "clevel": 5,
+          "cname": "lz4",
+          "shuffle": "shuffle",
+          "typesize": 4
+         },
+         "name": "blosc"
+        }
+       ],
+       "data_type": "float32",
+       "fill_value": 0.0,
+       "node_type": "array",
+       "shape": [
+        40,
+        30
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/codecs/blosc_zlib": {
+      "chunks": {
+       "0": "stored",
+       "1": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "a8a26fea7a31d89f",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          16
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "blocksize": 0,
+          "clevel": 3,
+          "cname": "zlib",
+          "shuffle": "noshuffle",
+          "typesize": 2
+         },
+         "name": "blosc"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        30
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/codecs/blosc_zstd": {
+      "chunks": {
+       "0": "stored",
+       "1": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "f788fa30050533ec",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          16
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "blocksize": 0,
+          "clevel": 3,
+          "cname": "zstd",
+          "shuffle": "bitshuffle",
+          "typesize": 8
+         },
+         "name": "blosc"
+        }
+       ],
+       "data_type": "float64",
+       "fill_value": 0.0,
+       "node_type": "array",
+       "shape": [
+        30
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/codecs/gzip": {
+      "chunks": {
+       "0": "inline:ceced5f3ac13512a"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         1
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "fd67e5824ae1113a",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int8",
+       "fill_value": 9,
+       "node_type": "array",
+       "shape": [
+        3
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/codecs/numcodecs_chain": {
+      "chunks": {
+       "0": "stored",
+       "1": "stored",
+       "2": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         3
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "895b639c297a4d5a",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          10
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "level": 3
+         },
+         "name": "numcodecs.zlib"
+        },
+        {
+         "name": "numcodecs.lz4"
+        },
+        {
+         "configuration": {
+          "level": 1
+         },
+         "name": "numcodecs.zstd"
+        },
+        {
+         "configuration": {
+          "level": 2
+         },
+         "name": "numcodecs.gzip"
+        }
+       ],
+       "data_type": "float64",
+       "fill_value": 0.0,
+       "node_type": "array",
+       "shape": [
+        24
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/codecs/sharded": {
+      "chunks": {
+       "0,0": "stored",
+       "0,1": "stored",
+       "1,0": "stored",
+       "1,1": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ],
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "ad489f5095d0d870",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          8,
+          8
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "chunk_shape": [
+           4,
+           4
+          ],
+          "codecs": [
+           {
+            "configuration": {
+             "endian": "little"
+            },
+            "name": "bytes"
+           },
+           {
+            "configuration": {
+             "checksum": false,
+             "level": 0
+            },
+            "name": "zstd"
+           }
+          ],
+          "index_codecs": [
+           {
+            "configuration": {
+             "endian": "little"
+            },
+            "name": "bytes"
+           },
+           {
+            "name": "crc32c"
+           }
+          ],
+          "index_location": "end"
+         },
+         "name": "sharding_indexed"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": -1,
+       "node_type": "array",
+       "shape": [
+        16,
+        16
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/codecs/sharded_strings": {
+      "chunks": {
+       "0": "stored",
+       "1": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "437363863dbec08f",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          4
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "chunk_shape": [
+           2
+          ],
+          "codecs": [
+           {
+            "name": "vlen-utf8"
+           },
+           {
+            "configuration": {
+             "level": 1
+            },
+            "name": "gzip"
+           }
+          ],
+          "index_codecs": [
+           {
+            "configuration": {
+             "endian": "little"
+            },
+            "name": "bytes"
+           },
+           {
+            "name": "crc32c"
+           }
+          ],
+          "index_location": "end"
+         },
+         "name": "sharding_indexed"
+        }
+       ],
+       "data_type": "string",
+       "fill_value": "-",
+       "node_type": "array",
+       "shape": [
+        9
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/codecs/zstd_checksum": {
+      "chunks": {
+       "0": "stored",
+       "1": "stored",
+       "2": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         3
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "2869194d9cbfd6eb",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          7
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "checksum": true,
+          "level": 3
+         },
+         "name": "zstd"
+        }
+       ],
+       "data_type": "int64",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        20
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/plain/bool": {
+      "chunks": {
+       "0": "inline:47dc540c94ceb704",
+       "1": "inline:b413f47d13ee2fe6"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "858e18a704717ff8",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "bytes"
+        }
+       ],
+       "data_type": "bool",
+       "fill_value": true,
+       "node_type": "array",
+       "shape": [
+        5
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/checksums": {
+      "chunks": {
+       "0": "inline:a4453fc8cb505110",
+       "1": "inline:b9a0949e6882d9ee",
+       "2": "inline:ff3edf2fb7cde019"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         3
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "c3377a243e1c310b",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          4
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "elementsize": 8
+         },
+         "name": "numcodecs.shuffle"
+        },
+        {
+         "name": "numcodecs.crc32"
+        },
+        {
+         "configuration": {
+          "location": "end"
+         },
+         "name": "numcodecs.adler32"
+        },
+        {
+         "name": "numcodecs.fletcher32"
+        },
+        {
+         "name": "numcodecs.crc32c"
+        }
+       ],
+       "data_type": "float64",
+       "fill_value": 0.0,
+       "node_type": "array",
+       "shape": [
+        10
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/complex128": {
+      "chunks": {
+       "0,0": "inline:5b8f6ccfd47f57e3",
+       "0,1": "inline:d5e95e689f55dd94"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         1
+        ],
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "53b6082fc686391b",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2,
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "complex128",
+       "fill_value": [
+        1.0,
+        -2.0
+       ],
+       "node_type": "array",
+       "shape": [
+        3,
+        4
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/complex64": {
+      "chunks": {
+       "0": "stored",
+       "1": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "c335c4108879f58b",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          3
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "checksum": false,
+          "level": 0
+         },
+         "name": "zstd"
+        }
+       ],
+       "data_type": "complex64",
+       "fill_value": [
+        0.5,
+        0.25
+       ],
+       "node_type": "array",
+       "shape": [
+        4
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/datetime": {
+      "chunks": {
+       "0": "inline:13ec2a3018100946",
+       "1": "inline:d4df438d38b8982f"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "66a20e0a1781e31d",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": {
+        "configuration": {
+         "scale_factor": 1,
+         "unit": "s"
+        },
+        "name": "numpy.datetime64"
+       },
+       "fill_value": "NaT",
+       "node_type": "array",
+       "shape": [
+        5
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/empty": {
+      "chunks": {},
+      "manifest_extents": [],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "e3b0c44298fc1c14",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2,
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "checksum": false,
+          "level": 0
+         },
+         "name": "zstd"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        0,
+        4
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/f16": {
+      "chunks": {
+       "0": "inline:615ae6103b55aa8a",
+       "1": "inline:b5c867f4f729df46"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "7af95e0f0520e369",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "float16",
+       "fill_value": 1.5,
+       "node_type": "array",
+       "shape": [
+        5
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/f32_default": {
+      "chunks": {
+       "0,1": "stored",
+       "1,0": "stored",
+       "1,1": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ],
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "dc4fcfaf6dcccf0e",
+      "zarr_json": {
+       "attributes": {
+        "units": "m"
+       },
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          4,
+          3
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "checksum": false,
+          "level": 0
+         },
+         "name": "zstd"
+        }
+       ],
+       "data_type": "float32",
+       "dimension_names": [
+        "y",
+        null
+       ],
+       "fill_value": "NaN",
+       "node_type": "array",
+       "shape": [
+        13,
+        11
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/i16_bigendian": {
+      "chunks": {
+       "0,1": "inline:7464f269ea5b91f9",
+       "0,2": "inline:791cbfed46e88559",
+       "1,0": "inline:3c12e9121d622f9b",
+       "1,1": "inline:f9a04e779dfa7a85",
+       "1,2": "inline:92d8d57d7d053aaf",
+       "2,0": "inline:6553394f45dffae9",
+       "2,1": "inline:05f204b52e4d54eb",
+       "2,2": "inline:1d213a1014b1c1cd"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         3
+        ],
+        [
+         0,
+         3
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "1340998d7f377b80",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          3,
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "big"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": 7,
+       "node_type": "array",
+       "shape": [
+        7,
+        5
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/i32_inline": {
+      "chunks": {
+       "0": "inline:3a4cceead1918653",
+       "2": "inline:9628f927de06112b"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         3
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "74e734b889bc109b",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          128
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        300
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/i32_native": {
+      "chunks": {
+       "0": "native:ae88232d2db389f9",
+       "1": "native:954394ca4f034f27"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "cf03a2980f3bb0ed",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          129
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        258
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/i8": {
+      "chunks": {
+       "0": "inline:f91e0ba0574d6f26",
+       "1": "inline:20644d23899ac8a8",
+       "2": "inline:14dafeadd1635bb4"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         3
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "4830d1b7dec8cf63",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          4
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int8",
+       "fill_value": -3,
+       "node_type": "array",
+       "shape": [
+        9
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/nullterm": {
+      "chunks": {
+       "0": "inline:c7d3e056c9c31fea",
+       "1": "inline:81e85fe9fe87f309"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "f84e2d3abe9bfd4e",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          3
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "bytes"
+        }
+       ],
+       "data_type": {
+        "configuration": {
+         "length_bytes": 5
+        },
+        "name": "null_terminated_bytes"
+       },
+       "fill_value": "",
+       "node_type": "array",
+       "shape": [
+        4
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/raw": {
+      "chunks": {
+       "0": "inline:dfc1d3b523f2fa61",
+       "1": "inline:a80c68ccc5f5a27e"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "d11a28e282c92b13",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "bytes"
+        }
+       ],
+       "data_type": {
+        "configuration": {
+         "length_bytes": 3
+        },
+        "name": "raw_bytes"
+       },
+       "fill_value": "AAAA",
+       "node_type": "array",
+       "shape": [
+        3
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/scalar": {
+      "chunks": {
+       "": "inline:903685afce35a69d"
+      },
+      "manifest_extents": [
+       []
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "903685afce35a69d",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": []
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "float64",
+       "fill_value": 0.0,
+       "node_type": "array",
+       "shape": [],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/strings": {
+      "chunks": {
+       "0": "stored",
+       "1": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "2f160ad9c26a1980",
+      "zarr_json": {
+       "attributes": {
+        "note": "ünïcode"
+       },
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          4
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "vlen-utf8"
+        },
+        {
+         "configuration": {
+          "checksum": false,
+          "level": 0
+         },
+         "name": "zstd"
+        }
+       ],
+       "data_type": "string",
+       "fill_value": "",
+       "node_type": "array",
+       "shape": [
+        6
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/strings_raw": {
+      "chunks": {
+       "0": "inline:81dbfce0cbe16cdd",
+       "1": "inline:a53b3d6694c6dc7b"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "f83b4f7116a8e7a6",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "vlen-utf8"
+        }
+       ],
+       "data_type": "string",
+       "fill_value": "-",
+       "node_type": "array",
+       "shape": [
+        5
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/timedelta_be": {
+      "chunks": {
+       "0": "inline:9d027cac4b140516",
+       "1": "inline:7befbd318f3e934a"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "620ba0d9749999ea",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          3
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "big"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": {
+        "configuration": {
+         "scale_factor": 1,
+         "unit": "ms"
+        },
+        "name": "numpy.timedelta64"
+       },
+       "fill_value": "NaT",
+       "node_type": "array",
+       "shape": [
+        4
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/transpose_crc32c": {
+      "chunks": {
+       "0,0": "inline:7376ab455be3040f",
+       "0,1": "inline:bfb80fae28080c33",
+       "1,0": "inline:8f051bfd9b04db30",
+       "1,1": "inline:0ddafec3c30bd0e8",
+       "2,0": "inline:0bbac37331c52106",
+       "2,1": "inline:cc461dd22f766e18"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         3
+        ],
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "7ba28068407d4535",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2,
+          4
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "order": [
+           1,
+           0
+          ]
+         },
+         "name": "transpose"
+        },
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "name": "crc32c"
+        }
+       ],
+       "data_type": "uint16",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        5,
+        6
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/u64": {
+      "chunks": {
+       "0": "inline:0fe2af42166c6da4",
+       "1": "inline:411ee52ebc1009af"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "dcf601c2d036800b",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          4
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "uint64",
+       "fill_value": 9223372036854775813,
+       "node_type": "array",
+       "shape": [
+        6
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/utf32": {
+      "chunks": {
+       "0": "inline:8f7812c93c635164",
+       "1": "inline:931f70d087d95c9e"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "d130e4fdb34c01a6",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": {
+        "configuration": {
+         "length_bytes": 16
+        },
+        "name": "fixed_length_utf32"
+       },
+       "fill_value": "",
+       "node_type": "array",
+       "shape": [
+        5
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/vbytes": {
+      "chunks": {
+       "0": "inline:aa05b8a60db19abf",
+       "1": "inline:2926c2f165f18b45"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "a7f2fb9a16751b35",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "vlen-bytes"
+        }
+       ],
+       "data_type": "variable_length_bytes",
+       "fill_value": "",
+       "node_type": "array",
+       "shape": [
+        5
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/virtual": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/virtual/v": {
+      "chunks": {
+       "0": "virtual:s3://some-bucket/data/file.bin:8:4",
+       "1": "virtual:s3://some-bucket/data/file.bin:12:4",
+       "2": "virtual:https://example.com/other%20file.bin:0:4"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         3
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "error:invalid",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          1
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        4
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     }
+    }
+   },
+   "modify": {
+    "keys": [
+     "codecs/bitround/c/0",
+     "codecs/bitround/c/1",
+     "codecs/bitround/zarr.json",
+     "codecs/blosc_lz4/c/0/0",
+     "codecs/blosc_lz4/c/1/0",
+     "codecs/blosc_lz4/zarr.json",
+     "codecs/blosc_zlib/c/0",
+     "codecs/blosc_zlib/c/1",
+     "codecs/blosc_zlib/zarr.json",
+     "codecs/blosc_zstd/c/0",
+     "codecs/blosc_zstd/c/1",
+     "codecs/blosc_zstd/zarr.json",
+     "codecs/gzip/c/0",
+     "codecs/gzip/zarr.json",
+     "codecs/numcodecs_chain/c/0",
+     "codecs/numcodecs_chain/c/1",
+     "codecs/numcodecs_chain/c/2",
+     "codecs/numcodecs_chain/zarr.json",
+     "codecs/sharded/c/0/0",
+     "codecs/sharded/c/0/1",
+     "codecs/sharded/c/1/0",
+     "codecs/sharded/c/1/1",
+     "codecs/sharded/zarr.json",
+     "codecs/sharded_strings/c/0",
+     "codecs/sharded_strings/c/1",
+     "codecs/sharded_strings/zarr.json",
+     "codecs/zarr.json",
+     "codecs/zstd_checksum/c/0",
+     "codecs/zstd_checksum/c/1",
+     "codecs/zstd_checksum/c/2",
+     "codecs/zstd_checksum/zarr.json",
+     "plain/bool/c/0",
+     "plain/bool/c/1",
+     "plain/bool/zarr.json",
+     "plain/checksums/c/0",
+     "plain/checksums/c/1",
+     "plain/checksums/c/2",
+     "plain/checksums/zarr.json",
+     "plain/complex128/c/0/0",
+     "plain/complex128/c/0/1",
+     "plain/complex128/zarr.json",
+     "plain/complex64/c/0",
+     "plain/complex64/c/1",
+     "plain/complex64/zarr.json",
+     "plain/datetime/c/0",
+     "plain/datetime/c/1",
+     "plain/datetime/zarr.json",
+     "plain/empty/zarr.json",
+     "plain/f16/c/0",
+     "plain/f16/c/1",
+     "plain/f16/zarr.json",
+     "plain/f32_default/c/0/1",
+     "plain/f32_default/c/1/0",
+     "plain/f32_default/c/1/1",
+     "plain/f32_default/zarr.json",
+     "plain/i16_bigendian/c/0/1",
+     "plain/i16_bigendian/c/0/2",
+     "plain/i16_bigendian/c/1/0",
+     "plain/i16_bigendian/c/1/1",
+     "plain/i16_bigendian/c/1/2",
+     "plain/i16_bigendian/c/2/0",
+     "plain/i16_bigendian/c/2/1",
+     "plain/i16_bigendian/c/2/2",
+     "plain/i16_bigendian/zarr.json",
+     "plain/i32_inline/c/0",
+     "plain/i32_inline/c/2",
+     "plain/i32_inline/zarr.json",
+     "plain/i32_native/c/0",
+     "plain/i32_native/c/1",
+     "plain/i32_native/zarr.json",
+     "plain/i8/c/0",
+     "plain/i8/c/1",
+     "plain/i8/c/2",
+     "plain/i8/zarr.json",
+     "plain/nullterm/c/0",
+     "plain/nullterm/c/1",
+     "plain/nullterm/zarr.json",
+     "plain/raw/c/0",
+     "plain/raw/c/1",
+     "plain/raw/zarr.json",
+     "plain/scalar/c",
+     "plain/scalar/zarr.json",
+     "plain/strings/c/0",
+     "plain/strings/c/1",
+     "plain/strings/zarr.json",
+     "plain/strings_raw/c/0",
+     "plain/strings_raw/c/1",
+     "plain/strings_raw/zarr.json",
+     "plain/timedelta_be/c/0",
+     "plain/timedelta_be/c/1",
+     "plain/timedelta_be/zarr.json",
+     "plain/transpose_crc32c/c/0/0",
+     "plain/transpose_crc32c/c/0/1",
+     "plain/transpose_crc32c/c/1/0",
+     "plain/transpose_crc32c/c/1/1",
+     "plain/transpose_crc32c/c/2/0",
+     "plain/transpose_crc32c/c/2/1",
+     "plain/transpose_crc32c/zarr.json",
+     "plain/u64/c/0",
+     "plain/u64/c/1",
+     "plain/u64/zarr.json",
+     "plain/utf32/c/0",
+     "plain/utf32/c/1",
+     "plain/utf32/zarr.json",
+     "plain/vbytes/c/0",
+     "plain/vbytes/c/1",
+     "plain/vbytes/zarr.json",
+     "plain/zarr.json",
+     "virtual/v/c/0",
+     "virtual/v/c/1",
+     "virtual/v/c/2",
+     "virtual/v/zarr.json",
+     "virtual/zarr.json",
+     "zarr.json"
+    ],
+    "nodes": {
+     "/": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {
+        "added": [
+         1,
+         2
+        ],
+        "title": "updated"
+       },
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/codecs": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/codecs/bitround": {
+      "chunks": {
+       "0": "stored",
+       "1": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "11d7dd25e1a10eb1",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          8
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "keepbits": 3
+         },
+         "name": "numcodecs.bitround"
+        },
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "checksum": false,
+          "level": 0
+         },
+         "name": "zstd"
+        }
+       ],
+       "data_type": "float32",
+       "fill_value": 0.0,
+       "node_type": "array",
+       "shape": [
+        16
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/codecs/blosc_lz4": {
+      "chunks": {
+       "0,0": "stored",
+       "1,0": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ],
+        [
+         0,
+         1
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "a36eecb54aef7df3",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          20,
+          30
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "blocksize": 0,
+          "clevel": 5,
+          "cname": "lz4",
+          "shuffle": "shuffle",
+          "typesize": 4
+         },
+         "name": "blosc"
+        }
+       ],
+       "data_type": "float32",
+       "fill_value": 0.0,
+       "node_type": "array",
+       "shape": [
+        40,
+        30
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/codecs/blosc_zlib": {
+      "chunks": {
+       "0": "stored",
+       "1": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "a8a26fea7a31d89f",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          16
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "blocksize": 0,
+          "clevel": 3,
+          "cname": "zlib",
+          "shuffle": "noshuffle",
+          "typesize": 2
+         },
+         "name": "blosc"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        30
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/codecs/blosc_zstd": {
+      "chunks": {
+       "0": "stored",
+       "1": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "f788fa30050533ec",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          16
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "blocksize": 0,
+          "clevel": 3,
+          "cname": "zstd",
+          "shuffle": "bitshuffle",
+          "typesize": 8
+         },
+         "name": "blosc"
+        }
+       ],
+       "data_type": "float64",
+       "fill_value": 0.0,
+       "node_type": "array",
+       "shape": [
+        30
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/codecs/gzip": {
+      "chunks": {
+       "0": "inline:ceced5f3ac13512a"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         1
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "fd67e5824ae1113a",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int8",
+       "fill_value": 9,
+       "node_type": "array",
+       "shape": [
+        3
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/codecs/numcodecs_chain": {
+      "chunks": {
+       "0": "stored",
+       "1": "stored",
+       "2": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         3
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "895b639c297a4d5a",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          10
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "level": 3
+         },
+         "name": "numcodecs.zlib"
+        },
+        {
+         "name": "numcodecs.lz4"
+        },
+        {
+         "configuration": {
+          "level": 1
+         },
+         "name": "numcodecs.zstd"
+        },
+        {
+         "configuration": {
+          "level": 2
+         },
+         "name": "numcodecs.gzip"
+        }
+       ],
+       "data_type": "float64",
+       "fill_value": 0.0,
+       "node_type": "array",
+       "shape": [
+        24
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/codecs/sharded": {
+      "chunks": {
+       "0,0": "stored",
+       "0,1": "stored",
+       "1,0": "stored",
+       "1,1": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ],
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "ad489f5095d0d870",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          8,
+          8
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "chunk_shape": [
+           4,
+           4
+          ],
+          "codecs": [
+           {
+            "configuration": {
+             "endian": "little"
+            },
+            "name": "bytes"
+           },
+           {
+            "configuration": {
+             "checksum": false,
+             "level": 0
+            },
+            "name": "zstd"
+           }
+          ],
+          "index_codecs": [
+           {
+            "configuration": {
+             "endian": "little"
+            },
+            "name": "bytes"
+           },
+           {
+            "name": "crc32c"
+           }
+          ],
+          "index_location": "end"
+         },
+         "name": "sharding_indexed"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": -1,
+       "node_type": "array",
+       "shape": [
+        16,
+        16
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/codecs/sharded_strings": {
+      "chunks": {
+       "0": "stored",
+       "1": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "437363863dbec08f",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          4
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "chunk_shape": [
+           2
+          ],
+          "codecs": [
+           {
+            "name": "vlen-utf8"
+           },
+           {
+            "configuration": {
+             "level": 1
+            },
+            "name": "gzip"
+           }
+          ],
+          "index_codecs": [
+           {
+            "configuration": {
+             "endian": "little"
+            },
+            "name": "bytes"
+           },
+           {
+            "name": "crc32c"
+           }
+          ],
+          "index_location": "end"
+         },
+         "name": "sharding_indexed"
+        }
+       ],
+       "data_type": "string",
+       "fill_value": "-",
+       "node_type": "array",
+       "shape": [
+        9
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/codecs/zstd_checksum": {
+      "chunks": {
+       "0": "stored",
+       "1": "stored",
+       "2": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         3
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "2869194d9cbfd6eb",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          7
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "checksum": true,
+          "level": 3
+         },
+         "name": "zstd"
+        }
+       ],
+       "data_type": "int64",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        20
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/plain/bool": {
+      "chunks": {
+       "0": "inline:47dc540c94ceb704",
+       "1": "inline:b413f47d13ee2fe6"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "858e18a704717ff8",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "bytes"
+        }
+       ],
+       "data_type": "bool",
+       "fill_value": true,
+       "node_type": "array",
+       "shape": [
+        5
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/checksums": {
+      "chunks": {
+       "0": "inline:a4453fc8cb505110",
+       "1": "inline:b9a0949e6882d9ee",
+       "2": "inline:ff3edf2fb7cde019"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         3
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "c3377a243e1c310b",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          4
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "elementsize": 8
+         },
+         "name": "numcodecs.shuffle"
+        },
+        {
+         "name": "numcodecs.crc32"
+        },
+        {
+         "configuration": {
+          "location": "end"
+         },
+         "name": "numcodecs.adler32"
+        },
+        {
+         "name": "numcodecs.fletcher32"
+        },
+        {
+         "name": "numcodecs.crc32c"
+        }
+       ],
+       "data_type": "float64",
+       "fill_value": 0.0,
+       "node_type": "array",
+       "shape": [
+        10
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/complex128": {
+      "chunks": {
+       "0,0": "inline:5b8f6ccfd47f57e3",
+       "0,1": "inline:d5e95e689f55dd94"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         1
+        ],
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "53b6082fc686391b",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2,
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "complex128",
+       "fill_value": [
+        1.0,
+        -2.0
+       ],
+       "node_type": "array",
+       "shape": [
+        3,
+        4
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/complex64": {
+      "chunks": {
+       "0": "stored",
+       "1": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "c335c4108879f58b",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          3
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "checksum": false,
+          "level": 0
+         },
+         "name": "zstd"
+        }
+       ],
+       "data_type": "complex64",
+       "fill_value": [
+        0.5,
+        0.25
+       ],
+       "node_type": "array",
+       "shape": [
+        4
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/datetime": {
+      "chunks": {
+       "0": "inline:13ec2a3018100946",
+       "1": "inline:d4df438d38b8982f"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "66a20e0a1781e31d",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": {
+        "configuration": {
+         "scale_factor": 1,
+         "unit": "s"
+        },
+        "name": "numpy.datetime64"
+       },
+       "fill_value": "NaT",
+       "node_type": "array",
+       "shape": [
+        5
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/empty": {
+      "chunks": {},
+      "manifest_extents": [],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "e3b0c44298fc1c14",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2,
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "checksum": false,
+          "level": 0
+         },
+         "name": "zstd"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        0,
+        4
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/f16": {
+      "chunks": {
+       "0": "inline:615ae6103b55aa8a",
+       "1": "inline:b5c867f4f729df46"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "7af95e0f0520e369",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "float16",
+       "fill_value": 1.5,
+       "node_type": "array",
+       "shape": [
+        5
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/f32_default": {
+      "chunks": {
+       "0,1": "stored",
+       "1,0": "stored",
+       "1,1": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ],
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "c88b202d2588a511",
+      "zarr_json": {
+       "attributes": {
+        "units": "m"
+       },
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          4,
+          3
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "checksum": false,
+          "level": 0
+         },
+         "name": "zstd"
+        }
+       ],
+       "data_type": "float32",
+       "dimension_names": [
+        "y",
+        null
+       ],
+       "fill_value": "NaN",
+       "node_type": "array",
+       "shape": [
+        6,
+        5
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/i16_bigendian": {
+      "chunks": {
+       "0,1": "inline:7464f269ea5b91f9",
+       "0,2": "inline:791cbfed46e88559",
+       "1,0": "inline:3c12e9121d622f9b",
+       "1,1": "inline:f9a04e779dfa7a85",
+       "1,2": "inline:92d8d57d7d053aaf",
+       "2,0": "inline:6553394f45dffae9",
+       "2,1": "inline:05f204b52e4d54eb",
+       "2,2": "inline:1d213a1014b1c1cd"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         3
+        ],
+        [
+         0,
+         3
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "1340998d7f377b80",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          3,
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "big"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": 7,
+       "node_type": "array",
+       "shape": [
+        7,
+        5
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/i32_inline": {
+      "chunks": {
+       "0": "inline:3a4cceead1918653",
+       "2": "inline:9628f927de06112b"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         3
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "74e734b889bc109b",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          128
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        300
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/i32_native": {
+      "chunks": {
+       "0": "native:ae88232d2db389f9",
+       "1": "native:954394ca4f034f27"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "5c709d61bee7e5af",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          129
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        200
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/i8": {
+      "chunks": {
+       "0": "inline:f91e0ba0574d6f26",
+       "1": "inline:20644d23899ac8a8",
+       "2": "inline:14dafeadd1635bb4"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         3
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "4830d1b7dec8cf63",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          4
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int8",
+       "fill_value": -3,
+       "node_type": "array",
+       "shape": [
+        9
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/nullterm": {
+      "chunks": {
+       "0": "inline:c7d3e056c9c31fea",
+       "1": "inline:81e85fe9fe87f309"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "f84e2d3abe9bfd4e",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          3
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "bytes"
+        }
+       ],
+       "data_type": {
+        "configuration": {
+         "length_bytes": 5
+        },
+        "name": "null_terminated_bytes"
+       },
+       "fill_value": "",
+       "node_type": "array",
+       "shape": [
+        4
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/raw": {
+      "chunks": {
+       "0": "inline:dfc1d3b523f2fa61",
+       "1": "inline:a80c68ccc5f5a27e"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "d11a28e282c92b13",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "bytes"
+        }
+       ],
+       "data_type": {
+        "configuration": {
+         "length_bytes": 3
+        },
+        "name": "raw_bytes"
+       },
+       "fill_value": "AAAA",
+       "node_type": "array",
+       "shape": [
+        3
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/scalar": {
+      "chunks": {
+       "": "inline:903685afce35a69d"
+      },
+      "manifest_extents": [
+       []
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "903685afce35a69d",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": []
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "float64",
+       "fill_value": 0.0,
+       "node_type": "array",
+       "shape": [],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/strings": {
+      "chunks": {
+       "0": "stored",
+       "1": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "2f160ad9c26a1980",
+      "zarr_json": {
+       "attributes": {
+        "note": "ünïcode"
+       },
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          4
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "vlen-utf8"
+        },
+        {
+         "configuration": {
+          "checksum": false,
+          "level": 0
+         },
+         "name": "zstd"
+        }
+       ],
+       "data_type": "string",
+       "fill_value": "",
+       "node_type": "array",
+       "shape": [
+        6
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/strings_raw": {
+      "chunks": {
+       "0": "inline:81dbfce0cbe16cdd",
+       "1": "inline:a53b3d6694c6dc7b"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "f83b4f7116a8e7a6",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "vlen-utf8"
+        }
+       ],
+       "data_type": "string",
+       "fill_value": "-",
+       "node_type": "array",
+       "shape": [
+        5
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/timedelta_be": {
+      "chunks": {
+       "0": "inline:9d027cac4b140516",
+       "1": "inline:7befbd318f3e934a"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "620ba0d9749999ea",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          3
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "big"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": {
+        "configuration": {
+         "scale_factor": 1,
+         "unit": "ms"
+        },
+        "name": "numpy.timedelta64"
+       },
+       "fill_value": "NaT",
+       "node_type": "array",
+       "shape": [
+        4
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/transpose_crc32c": {
+      "chunks": {
+       "0,0": "inline:7376ab455be3040f",
+       "0,1": "inline:bfb80fae28080c33",
+       "1,0": "inline:8f051bfd9b04db30",
+       "1,1": "inline:0ddafec3c30bd0e8",
+       "2,0": "inline:0bbac37331c52106",
+       "2,1": "inline:cc461dd22f766e18"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         3
+        ],
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "7ba28068407d4535",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2,
+          4
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "order": [
+           1,
+           0
+          ]
+         },
+         "name": "transpose"
+        },
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "name": "crc32c"
+        }
+       ],
+       "data_type": "uint16",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        5,
+        6
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/u64": {
+      "chunks": {
+       "0": "inline:0fe2af42166c6da4",
+       "1": "inline:411ee52ebc1009af"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "dcf601c2d036800b",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          4
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "uint64",
+       "fill_value": 9223372036854775813,
+       "node_type": "array",
+       "shape": [
+        6
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/utf32": {
+      "chunks": {
+       "0": "inline:8f7812c93c635164",
+       "1": "inline:931f70d087d95c9e"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "d130e4fdb34c01a6",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": {
+        "configuration": {
+         "length_bytes": 16
+        },
+        "name": "fixed_length_utf32"
+       },
+       "fill_value": "",
+       "node_type": "array",
+       "shape": [
+        5
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/vbytes": {
+      "chunks": {
+       "0": "inline:aa05b8a60db19abf",
+       "1": "inline:2926c2f165f18b45"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "a7f2fb9a16751b35",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "vlen-bytes"
+        }
+       ],
+       "data_type": "variable_length_bytes",
+       "fill_value": "",
+       "node_type": "array",
+       "shape": [
+        5
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/virtual": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/virtual/v": {
+      "chunks": {
+       "0": "virtual:s3://some-bucket/data/file.bin:8:4",
+       "1": "virtual:s3://some-bucket/data/file.bin:12:4",
+       "2": "virtual:https://example.com/other%20file.bin:0:4"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         3
+        ]
+       ]
+      ],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "error:invalid",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          1
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        4
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     }
+    }
+   },
+   "regrow": {
+    "keys": [
+     "codecs/bitround/c/0",
+     "codecs/bitround/c/1",
+     "codecs/bitround/zarr.json",
+     "codecs/blosc_lz4/c/0/0",
+     "codecs/blosc_lz4/c/1/0",
+     "codecs/blosc_lz4/zarr.json",
+     "codecs/blosc_zlib/c/0",
+     "codecs/blosc_zlib/c/1",
+     "codecs/blosc_zlib/zarr.json",
+     "codecs/blosc_zstd/c/0",
+     "codecs/blosc_zstd/c/1",
+     "codecs/blosc_zstd/zarr.json",
+     "codecs/gzip/c/0",
+     "codecs/gzip/zarr.json",
+     "codecs/numcodecs_chain/c/0",
+     "codecs/numcodecs_chain/c/1",
+     "codecs/numcodecs_chain/c/2",
+     "codecs/numcodecs_chain/zarr.json",
+     "codecs/sharded/c/0/0",
+     "codecs/sharded/c/0/1",
+     "codecs/sharded/c/1/0",
+     "codecs/sharded/c/1/1",
+     "codecs/sharded/zarr.json",
+     "codecs/sharded_strings/c/0",
+     "codecs/sharded_strings/c/1",
+     "codecs/sharded_strings/zarr.json",
+     "codecs/zarr.json",
+     "codecs/zstd_checksum/c/0",
+     "codecs/zstd_checksum/c/1",
+     "codecs/zstd_checksum/c/2",
+     "codecs/zstd_checksum/zarr.json",
+     "plain/bool/c/0",
+     "plain/bool/c/1",
+     "plain/bool/zarr.json",
+     "plain/checksums/c/0",
+     "plain/checksums/c/1",
+     "plain/checksums/c/2",
+     "plain/checksums/zarr.json",
+     "plain/complex128/c/0/0",
+     "plain/complex128/c/0/1",
+     "plain/complex128/zarr.json",
+     "plain/complex64/c/0",
+     "plain/complex64/c/1",
+     "plain/complex64/zarr.json",
+     "plain/datetime/c/0",
+     "plain/datetime/c/1",
+     "plain/datetime/zarr.json",
+     "plain/empty/zarr.json",
+     "plain/f16/c/0",
+     "plain/f16/c/1",
+     "plain/f16/zarr.json",
+     "plain/f32_default/c/0/1",
+     "plain/f32_default/c/1/0",
+     "plain/f32_default/c/1/1",
+     "plain/f32_default/zarr.json",
+     "plain/i16_bigendian/c/0/1",
+     "plain/i16_bigendian/c/0/2",
+     "plain/i16_bigendian/c/1/0",
+     "plain/i16_bigendian/c/1/1",
+     "plain/i16_bigendian/c/1/2",
+     "plain/i16_bigendian/c/2/0",
+     "plain/i16_bigendian/c/2/1",
+     "plain/i16_bigendian/c/2/2",
+     "plain/i16_bigendian/zarr.json",
+     "plain/i32_inline/c/0",
+     "plain/i32_inline/c/2",
+     "plain/i32_inline/zarr.json",
+     "plain/i32_native/c/0",
+     "plain/i32_native/c/1",
+     "plain/i32_native/zarr.json",
+     "plain/i8/c/0",
+     "plain/i8/c/1",
+     "plain/i8/c/2",
+     "plain/i8/zarr.json",
+     "plain/nullterm/c/0",
+     "plain/nullterm/c/1",
+     "plain/nullterm/zarr.json",
+     "plain/raw/c/0",
+     "plain/raw/c/1",
+     "plain/raw/zarr.json",
+     "plain/scalar/c",
+     "plain/scalar/zarr.json",
+     "plain/strings/c/0",
+     "plain/strings/c/1",
+     "plain/strings/zarr.json",
+     "plain/strings_raw/c/0",
+     "plain/strings_raw/c/1",
+     "plain/strings_raw/zarr.json",
+     "plain/timedelta_be/c/0",
+     "plain/timedelta_be/c/1",
+     "plain/timedelta_be/zarr.json",
+     "plain/transpose_crc32c/c/0/0",
+     "plain/transpose_crc32c/c/0/1",
+     "plain/transpose_crc32c/c/1/0",
+     "plain/transpose_crc32c/c/1/1",
+     "plain/transpose_crc32c/c/2/0",
+     "plain/transpose_crc32c/c/2/1",
+     "plain/transpose_crc32c/zarr.json",
+     "plain/u64/c/0",
+     "plain/u64/c/1",
+     "plain/u64/zarr.json",
+     "plain/utf32/c/0",
+     "plain/utf32/c/1",
+     "plain/utf32/zarr.json",
+     "plain/vbytes/c/0",
+     "plain/vbytes/c/1",
+     "plain/vbytes/zarr.json",
+     "plain/zarr.json",
+     "virtual/v/c/0",
+     "virtual/v/c/1",
+     "virtual/v/c/2",
+     "virtual/v/zarr.json",
+     "virtual/zarr.json",
+     "zarr.json"
+    ],
+    "nodes": {
+     "/": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {
+        "added": [
+         1,
+         2
+        ],
+        "title": "updated"
+       },
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/codecs": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/codecs/bitround": {
+      "chunks": {
+       "0": "stored",
+       "1": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "11d7dd25e1a10eb1",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          8
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "keepbits": 3
+         },
+         "name": "numcodecs.bitround"
+        },
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "checksum": false,
+          "level": 0
+         },
+         "name": "zstd"
+        }
+       ],
+       "data_type": "float32",
+       "fill_value": 0.0,
+       "node_type": "array",
+       "shape": [
+        16
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/codecs/blosc_lz4": {
+      "chunks": {
+       "0,0": "stored",
+       "1,0": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ],
+        [
+         0,
+         1
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "a36eecb54aef7df3",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          20,
+          30
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "blocksize": 0,
+          "clevel": 5,
+          "cname": "lz4",
+          "shuffle": "shuffle",
+          "typesize": 4
+         },
+         "name": "blosc"
+        }
+       ],
+       "data_type": "float32",
+       "fill_value": 0.0,
+       "node_type": "array",
+       "shape": [
+        40,
+        30
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/codecs/blosc_zlib": {
+      "chunks": {
+       "0": "stored",
+       "1": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "a8a26fea7a31d89f",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          16
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "blocksize": 0,
+          "clevel": 3,
+          "cname": "zlib",
+          "shuffle": "noshuffle",
+          "typesize": 2
+         },
+         "name": "blosc"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        30
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/codecs/blosc_zstd": {
+      "chunks": {
+       "0": "stored",
+       "1": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "f788fa30050533ec",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          16
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "blocksize": 0,
+          "clevel": 3,
+          "cname": "zstd",
+          "shuffle": "bitshuffle",
+          "typesize": 8
+         },
+         "name": "blosc"
+        }
+       ],
+       "data_type": "float64",
+       "fill_value": 0.0,
+       "node_type": "array",
+       "shape": [
+        30
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/codecs/gzip": {
+      "chunks": {
+       "0": "inline:ceced5f3ac13512a"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         1
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "fd67e5824ae1113a",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int8",
+       "fill_value": 9,
+       "node_type": "array",
+       "shape": [
+        3
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/codecs/numcodecs_chain": {
+      "chunks": {
+       "0": "stored",
+       "1": "stored",
+       "2": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         3
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "895b639c297a4d5a",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          10
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "level": 3
+         },
+         "name": "numcodecs.zlib"
+        },
+        {
+         "name": "numcodecs.lz4"
+        },
+        {
+         "configuration": {
+          "level": 1
+         },
+         "name": "numcodecs.zstd"
+        },
+        {
+         "configuration": {
+          "level": 2
+         },
+         "name": "numcodecs.gzip"
+        }
+       ],
+       "data_type": "float64",
+       "fill_value": 0.0,
+       "node_type": "array",
+       "shape": [
+        24
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/codecs/sharded": {
+      "chunks": {
+       "0,0": "stored",
+       "0,1": "stored",
+       "1,0": "stored",
+       "1,1": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ],
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "ad489f5095d0d870",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          8,
+          8
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "chunk_shape": [
+           4,
+           4
+          ],
+          "codecs": [
+           {
+            "configuration": {
+             "endian": "little"
+            },
+            "name": "bytes"
+           },
+           {
+            "configuration": {
+             "checksum": false,
+             "level": 0
+            },
+            "name": "zstd"
+           }
+          ],
+          "index_codecs": [
+           {
+            "configuration": {
+             "endian": "little"
+            },
+            "name": "bytes"
+           },
+           {
+            "name": "crc32c"
+           }
+          ],
+          "index_location": "end"
+         },
+         "name": "sharding_indexed"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": -1,
+       "node_type": "array",
+       "shape": [
+        16,
+        16
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/codecs/sharded_strings": {
+      "chunks": {
+       "0": "stored",
+       "1": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "437363863dbec08f",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          4
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "chunk_shape": [
+           2
+          ],
+          "codecs": [
+           {
+            "name": "vlen-utf8"
+           },
+           {
+            "configuration": {
+             "level": 1
+            },
+            "name": "gzip"
+           }
+          ],
+          "index_codecs": [
+           {
+            "configuration": {
+             "endian": "little"
+            },
+            "name": "bytes"
+           },
+           {
+            "name": "crc32c"
+           }
+          ],
+          "index_location": "end"
+         },
+         "name": "sharding_indexed"
+        }
+       ],
+       "data_type": "string",
+       "fill_value": "-",
+       "node_type": "array",
+       "shape": [
+        9
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/codecs/zstd_checksum": {
+      "chunks": {
+       "0": "stored",
+       "1": "stored",
+       "2": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         3
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "2869194d9cbfd6eb",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          7
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "checksum": true,
+          "level": 3
+         },
+         "name": "zstd"
+        }
+       ],
+       "data_type": "int64",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        20
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/plain/bool": {
+      "chunks": {
+       "0": "inline:47dc540c94ceb704",
+       "1": "inline:b413f47d13ee2fe6"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "858e18a704717ff8",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "bytes"
+        }
+       ],
+       "data_type": "bool",
+       "fill_value": true,
+       "node_type": "array",
+       "shape": [
+        5
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/checksums": {
+      "chunks": {
+       "0": "inline:a4453fc8cb505110",
+       "1": "inline:b9a0949e6882d9ee",
+       "2": "inline:ff3edf2fb7cde019"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         3
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "c3377a243e1c310b",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          4
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "elementsize": 8
+         },
+         "name": "numcodecs.shuffle"
+        },
+        {
+         "name": "numcodecs.crc32"
+        },
+        {
+         "configuration": {
+          "location": "end"
+         },
+         "name": "numcodecs.adler32"
+        },
+        {
+         "name": "numcodecs.fletcher32"
+        },
+        {
+         "name": "numcodecs.crc32c"
+        }
+       ],
+       "data_type": "float64",
+       "fill_value": 0.0,
+       "node_type": "array",
+       "shape": [
+        10
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/complex128": {
+      "chunks": {
+       "0,0": "inline:5b8f6ccfd47f57e3",
+       "0,1": "inline:d5e95e689f55dd94"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         1
+        ],
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "53b6082fc686391b",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2,
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "complex128",
+       "fill_value": [
+        1.0,
+        -2.0
+       ],
+       "node_type": "array",
+       "shape": [
+        3,
+        4
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/complex64": {
+      "chunks": {
+       "0": "stored",
+       "1": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "c335c4108879f58b",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          3
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "checksum": false,
+          "level": 0
+         },
+         "name": "zstd"
+        }
+       ],
+       "data_type": "complex64",
+       "fill_value": [
+        0.5,
+        0.25
+       ],
+       "node_type": "array",
+       "shape": [
+        4
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/datetime": {
+      "chunks": {
+       "0": "inline:13ec2a3018100946",
+       "1": "inline:d4df438d38b8982f"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "66a20e0a1781e31d",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": {
+        "configuration": {
+         "scale_factor": 1,
+         "unit": "s"
+        },
+        "name": "numpy.datetime64"
+       },
+       "fill_value": "NaT",
+       "node_type": "array",
+       "shape": [
+        5
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/empty": {
+      "chunks": {},
+      "manifest_extents": [],
+      "manifests_kept": 0,
+      "type": "array",
+      "values": "e3b0c44298fc1c14",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2,
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "checksum": false,
+          "level": 0
+         },
+         "name": "zstd"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        0,
+        4
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/f16": {
+      "chunks": {
+       "0": "inline:615ae6103b55aa8a",
+       "1": "inline:b5c867f4f729df46"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "7af95e0f0520e369",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "float16",
+       "fill_value": 1.5,
+       "node_type": "array",
+       "shape": [
+        5
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/f32_default": {
+      "chunks": {
+       "0,1": "stored",
+       "1,0": "stored",
+       "1,1": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ],
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "dc4fcfaf6dcccf0e",
+      "zarr_json": {
+       "attributes": {
+        "units": "m"
+       },
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          4,
+          3
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "configuration": {
+          "checksum": false,
+          "level": 0
+         },
+         "name": "zstd"
+        }
+       ],
+       "data_type": "float32",
+       "dimension_names": [
+        "y",
+        null
+       ],
+       "fill_value": "NaN",
+       "node_type": "array",
+       "shape": [
+        13,
+        11
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/i16_bigendian": {
+      "chunks": {
+       "0,1": "inline:7464f269ea5b91f9",
+       "0,2": "inline:791cbfed46e88559",
+       "1,0": "inline:3c12e9121d622f9b",
+       "1,1": "inline:f9a04e779dfa7a85",
+       "1,2": "inline:92d8d57d7d053aaf",
+       "2,0": "inline:6553394f45dffae9",
+       "2,1": "inline:05f204b52e4d54eb",
+       "2,2": "inline:1d213a1014b1c1cd"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         3
+        ],
+        [
+         0,
+         3
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "1340998d7f377b80",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          3,
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "big"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int16",
+       "fill_value": 7,
+       "node_type": "array",
+       "shape": [
+        7,
+        5
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/i32_inline": {
+      "chunks": {
+       "0": "inline:3a4cceead1918653",
+       "2": "inline:9628f927de06112b"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         3
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "74e734b889bc109b",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          128
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        300
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/i32_native": {
+      "chunks": {
+       "0": "native:ae88232d2db389f9",
+       "1": "native:954394ca4f034f27"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "cf03a2980f3bb0ed",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          129
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        258
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/i8": {
+      "chunks": {
+       "0": "inline:f91e0ba0574d6f26",
+       "1": "inline:20644d23899ac8a8",
+       "2": "inline:14dafeadd1635bb4"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         3
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "4830d1b7dec8cf63",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          4
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int8",
+       "fill_value": -3,
+       "node_type": "array",
+       "shape": [
+        9
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/nullterm": {
+      "chunks": {
+       "0": "inline:c7d3e056c9c31fea",
+       "1": "inline:81e85fe9fe87f309"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "f84e2d3abe9bfd4e",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          3
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "bytes"
+        }
+       ],
+       "data_type": {
+        "configuration": {
+         "length_bytes": 5
+        },
+        "name": "null_terminated_bytes"
+       },
+       "fill_value": "",
+       "node_type": "array",
+       "shape": [
+        4
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/raw": {
+      "chunks": {
+       "0": "inline:dfc1d3b523f2fa61",
+       "1": "inline:a80c68ccc5f5a27e"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "d11a28e282c92b13",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "bytes"
+        }
+       ],
+       "data_type": {
+        "configuration": {
+         "length_bytes": 3
+        },
+        "name": "raw_bytes"
+       },
+       "fill_value": "AAAA",
+       "node_type": "array",
+       "shape": [
+        3
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/scalar": {
+      "chunks": {
+       "": "inline:903685afce35a69d"
+      },
+      "manifest_extents": [
+       []
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "903685afce35a69d",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": []
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "float64",
+       "fill_value": 0.0,
+       "node_type": "array",
+       "shape": [],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/strings": {
+      "chunks": {
+       "0": "stored",
+       "1": "stored"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "2f160ad9c26a1980",
+      "zarr_json": {
+       "attributes": {
+        "note": "ünïcode"
+       },
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          4
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "vlen-utf8"
+        },
+        {
+         "configuration": {
+          "checksum": false,
+          "level": 0
+         },
+         "name": "zstd"
+        }
+       ],
+       "data_type": "string",
+       "fill_value": "",
+       "node_type": "array",
+       "shape": [
+        6
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/strings_raw": {
+      "chunks": {
+       "0": "inline:81dbfce0cbe16cdd",
+       "1": "inline:a53b3d6694c6dc7b"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "f83b4f7116a8e7a6",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "vlen-utf8"
+        }
+       ],
+       "data_type": "string",
+       "fill_value": "-",
+       "node_type": "array",
+       "shape": [
+        5
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/timedelta_be": {
+      "chunks": {
+       "0": "inline:9d027cac4b140516",
+       "1": "inline:7befbd318f3e934a"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "620ba0d9749999ea",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          3
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "big"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": {
+        "configuration": {
+         "scale_factor": 1,
+         "unit": "ms"
+        },
+        "name": "numpy.timedelta64"
+       },
+       "fill_value": "NaT",
+       "node_type": "array",
+       "shape": [
+        4
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/transpose_crc32c": {
+      "chunks": {
+       "0,0": "inline:7376ab455be3040f",
+       "0,1": "inline:bfb80fae28080c33",
+       "1,0": "inline:8f051bfd9b04db30",
+       "1,1": "inline:0ddafec3c30bd0e8",
+       "2,0": "inline:0bbac37331c52106",
+       "2,1": "inline:cc461dd22f766e18"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         3
+        ],
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "7ba28068407d4535",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2,
+          4
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "order": [
+           1,
+           0
+          ]
+         },
+         "name": "transpose"
+        },
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        },
+        {
+         "name": "crc32c"
+        }
+       ],
+       "data_type": "uint16",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        5,
+        6
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/u64": {
+      "chunks": {
+       "0": "inline:0fe2af42166c6da4",
+       "1": "inline:411ee52ebc1009af"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "dcf601c2d036800b",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          4
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "uint64",
+       "fill_value": 9223372036854775813,
+       "node_type": "array",
+       "shape": [
+        6
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/utf32": {
+      "chunks": {
+       "0": "inline:8f7812c93c635164",
+       "1": "inline:931f70d087d95c9e"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "d130e4fdb34c01a6",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": {
+        "configuration": {
+         "length_bytes": 16
+        },
+        "name": "fixed_length_utf32"
+       },
+       "fill_value": "",
+       "node_type": "array",
+       "shape": [
+        5
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/plain/vbytes": {
+      "chunks": {
+       "0": "inline:aa05b8a60db19abf",
+       "1": "inline:2926c2f165f18b45"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         2
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "a7f2fb9a16751b35",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          2
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "name": "vlen-bytes"
+        }
+       ],
+       "data_type": "variable_length_bytes",
+       "fill_value": "",
+       "node_type": "array",
+       "shape": [
+        5
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     },
+     "/virtual": {
+      "type": "group",
+      "zarr_json": {
+       "attributes": {},
+       "node_type": "group",
+       "zarr_format": 3
+      }
+     },
+     "/virtual/v": {
+      "chunks": {
+       "0": "virtual:s3://some-bucket/data/file.bin:8:4",
+       "1": "virtual:s3://some-bucket/data/file.bin:12:4",
+       "2": "virtual:https://example.com/other%20file.bin:0:4"
+      },
+      "manifest_extents": [
+       [
+        [
+         0,
+         3
+        ]
+       ]
+      ],
+      "manifests_kept": 1,
+      "type": "array",
+      "values": "error:invalid",
+      "zarr_json": {
+       "attributes": {},
+       "chunk_grid": {
+        "configuration": {
+         "chunk_shape": [
+          1
+         ]
+        },
+        "name": "regular"
+       },
+       "chunk_key_encoding": {
+        "configuration": {
+         "separator": "/"
+        },
+        "name": "default"
+       },
+       "codecs": [
+        {
+         "configuration": {
+          "endian": "little"
+         },
+         "name": "bytes"
+        }
+       ],
+       "data_type": "int32",
+       "fill_value": 0,
+       "node_type": "array",
+       "shape": [
+        4
+       ],
+       "storage_transformers": [],
+       "zarr_format": 3
+      }
+     }
+    }
+   }
+  },
+  "status": "online",
+  "tags": {},
+  "updates": [
+   [
+    "NewCommit",
+    "main",
+    "empty commit",
+    null
+   ],
+   [
+    "NewCommit",
+    "main",
+    "regrow",
+    null
+   ],
+   [
+    "NewCommit",
+    "main",
+    "modify",
+    null
+   ],
+   [
+    "NewCommit",
+    "main",
+    "create arrays",
+    null
+   ],
+   [
+    "RepoInitialized",
+    null,
+    null,
+    null
+   ]
+  ]
+ },
+ "outcomes": [
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "error:session",
+  "ok",
+  "error:session",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "error:invalid",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "error:not_found",
+  "ok",
+  "ok",
+  "ok",
+  "error:exists",
+  "error:exists",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok",
+  "ok"
+ ]
+}

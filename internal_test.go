@@ -2,11 +2,13 @@ package icechunk
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math/rand"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 
@@ -242,5 +244,115 @@ func TestOpsLogLimitFromConfig(t *testing.T) {
 	}
 	if (&repoDoc{}).updatesLimit() != 1000 {
 		t.Error("default limit")
+	}
+}
+
+// Spec v1 ref keys are object_store paths: upstream percent-encodes them.
+func TestV1RefKeys(t *testing.T) {
+	for name, want := range map[string]string{
+		"main":       "refs/branch.main/ref.json",
+		"ünïcode":    "refs/branch.%C3%BCn%C3%AFcode/ref.json",
+		"with space": "refs/branch.with space/ref.json",
+		"a%b*?#":     "refs/branch.a%25b%2A%3F%23/ref.json",
+		"tab\t":      "refs/branch.tab%09/ref.json",
+		"":           "refs/branch./ref.json",
+	} {
+		if got := v1BranchKey(name); got != want {
+			t.Errorf("v1BranchKey(%q) = %q, want %q", name, got, want)
+		}
+	}
+	if got := objectStorePart(".."); got != "%2E%2E" {
+		t.Errorf("objectStorePart(..) = %q", got)
+	}
+	repo, err := Open(context.Background(), storage.NewLocal("testdata/generated/features-v1"), nil)
+	if err != nil {
+		t.Skip(err)
+	}
+	if _, err := repo.LookupBranch(context.Background(), "ünïcode"); err != nil {
+		t.Errorf("branch ünïcode: %v", err)
+	}
+}
+
+// OpsLog follows repo_before_updates through older repo info files.
+func TestOpsLogFollowsOlderFiles(t *testing.T) {
+	ctx := context.Background()
+	repo, err := Open(ctx, storage.NewLocal("testdata/generated/features-v2"), nil)
+	if err != nil {
+		t.Skip(err)
+	}
+	info, err := repo.RepoInfo(ctx)
+	if err != nil || info.RepoBeforeUpdates == "" {
+		t.Fatalf("fixture should have older repo info files: %v", err)
+	}
+	var kinds []string
+	for u, err := range repo.OpsLog(ctx) {
+		if err != nil {
+			t.Fatal(err)
+		}
+		kinds = append(kinds, u.Kind)
+	}
+	if len(kinds) <= len(info.Updates) || kinds[len(kinds)-1] != "RepoInitialized" {
+		t.Errorf("ops log has %d updates (latest file %d), last %q", len(kinds), len(info.Updates), kinds[len(kinds)-1])
+	}
+}
+
+// ListPrefix lists the subtree of the node a prefix names, as upstream does.
+func TestListPrefixNamesANode(t *testing.T) {
+	ctx := context.Background()
+	repo, err := Open(ctx, storage.NewLocal("testdata/generated/features-v2"), nil)
+	if err != nil {
+		t.Skip(err)
+	}
+	s, err := repo.ReadonlySession(ctx, AtTag("v-c2"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	keys, err := s.Store().ListPrefix(ctx, "order/a")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, k := range keys {
+		if k != "order/a/zarr.json" && !strings.HasPrefix(k, "order/a/") {
+			t.Errorf("ListPrefix(order/a) lists %q", k)
+		}
+	}
+	if _, err := s.Store().ListPrefix(ctx, "ord"); !errors.Is(err, ErrNodeNotFound) {
+		t.Errorf("ListPrefix(ord): %v, want ErrNodeNotFound", err)
+	}
+}
+
+// splitSizes reads upstream's manifest.splitting config: the first matching
+// array condition applies, and in it the first condition matching each
+// dimension. The config is the one upstream stored for these rules (checked
+// against icechunk-python: /first splits by 2 chunks, /second by 4).
+func TestSplitSizes(t *testing.T) {
+	var cfg map[string]any
+	raw := `{"manifest": {"splitting": {"split_sizes": [
+		[{"or": [{"name_matches": {"regex": "^zz$"}}, {"and": [{"path_matches": {"regex": "first"}}, "any_array"]}]},
+		 [{"condition": "Any", "num_chunks": 2}, {"condition": {"Axis": 0}, "num_chunks": 3}]],
+		[{"path_matches": {"regex": ".*"}},
+		 [{"condition": {"Axis": 0}, "num_chunks": 4}, {"condition": {"DimensionName": "x"}, "num_chunks": 5}]]]}}}`
+	if err := json.Unmarshal([]byte(raw), &cfg); err != nil {
+		t.Fatal(err)
+	}
+	r := &Repository{info: &RepoInfo{Config: cfg}}
+	node := func(path string, dims ...string) *Node {
+		a := &ArrayInfo{DimensionNames: dims}
+		for range dims {
+			a.Shape = append(a.Shape, DimensionShape{ArrayLength: 9, NumChunks: 9})
+		}
+		return &Node{Path: path, Type: ArrayNode, Array: a}
+	}
+	for _, c := range []struct {
+		n    *Node
+		want []uint32
+	}{
+		{node("/first", ""), []uint32{2}},
+		{node("/second", "", "x", "y"), []uint32{4, 5, 0}},
+		{node("/zz", "", ""), []uint32{2, 2}},
+	} {
+		if got := r.splitSizes(c.n); !slices.Equal(got, c.want) {
+			t.Errorf("splitSizes(%s) = %v, want %v", c.n.Path, got, c.want)
+		}
 	}
 }

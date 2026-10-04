@@ -347,9 +347,9 @@ func (a *Array) writeChunk(ctx context.Context, w ChunkWriter, start []uint64, d
 	}
 	copyChunk(chunk, dstOff, &chunkData{shape: data.Shape, dtype: data.DataType, data: data.Data, strs: data.Strings}, srcOff, box)
 	if isFill(chunk, a.meta.fill, a.meta.fillStr) {
-		if _, exists, err := w.ChunkSize(ctx, c32); err != nil || !exists {
-			return err
-		}
+		// Delete even a chunk that was never written, as zarr-python does:
+		// Icechunk records the deletion, so diffs and conflict detection
+		// see the write.
 		return w.DeleteChunk(ctx, c32)
 	}
 	enc, err := a.pipe.encode(ctx, &chunkData{shape: chunk.Shape, dtype: chunk.DataType, data: chunk.Data, strs: chunk.Strings})

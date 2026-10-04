@@ -7,6 +7,7 @@
 package zarr
 
 import (
+	"bytes"
 	"encoding/base64"
 	"encoding/binary"
 	"encoding/json"
@@ -605,7 +606,7 @@ type rawMetadata struct {
 	} `json:"chunk_key_encoding"`
 	FillValue           json.RawMessage `json:"fill_value"`
 	Codecs              []CodecSpec     `json:"codecs"`
-	Attributes          map[string]any  `json:"attributes"`
+	Attributes          json.RawMessage `json:"attributes"`
 	DimensionNames      []*string       `json:"dimension_names"`
 	StorageTransformers []CodecSpec     `json:"storage_transformers"`
 }
@@ -631,18 +632,17 @@ func ParseMetadata(doc []byte) (*Metadata, error) {
 		Shape:          raw.Shape,
 		FillValue:      raw.FillValue,
 		Codecs:         raw.Codecs,
-		Attributes:     raw.Attributes,
 		DimensionNames: raw.DimensionNames,
 		separator:      raw.ChunkKeyEncoding.Configuration.Separator,
 		v2Keys:         raw.ChunkKeyEncoding.Name == "v2",
 	}
-	if m.Attributes == nil {
-		m.Attributes = map[string]any{}
+	var err error
+	if m.Attributes, err = decodeAttributes(raw.Attributes); err != nil {
+		return nil, err
 	}
 	if m.Shape == nil {
 		m.Shape = []uint64{}
 	}
-	var err error
 	if m.DataType, err = parseDataType(raw.DataType); err != nil {
 		return nil, err
 	}
@@ -677,16 +677,60 @@ func (m *Metadata) ChunkKey(coords []uint64) string {
 	return strings.Join(append([]string{"c"}, parts...), m.separator)
 }
 
-// Attributes extracts the attributes of any zarr.json document (array or group).
+// Attributes extracts the attributes of any zarr.json document (array or
+// group), with numbers decoded as decodeAttributes does.
 func Attributes(doc []byte) (map[string]any, error) {
 	var raw struct {
-		Attributes map[string]any `json:"attributes"`
+		Attributes json.RawMessage `json:"attributes"`
 	}
 	if err := json.Unmarshal(doc, &raw); err != nil {
 		return nil, fmt.Errorf("zarr: invalid zarr.json: %w", err)
 	}
-	if raw.Attributes == nil {
-		raw.Attributes = map[string]any{}
+	return decodeAttributes(raw.Attributes)
+}
+
+// decodeAttributes decodes user attributes keeping integers exact, as
+// zarr-python (Python's json) does: integers become int64, or uint64 above
+// int64's range, or json.Number beyond 64 bits; other numbers float64.
+func decodeAttributes(raw json.RawMessage) (map[string]any, error) {
+	if len(raw) == 0 || string(raw) == "null" {
+		return map[string]any{}, nil
 	}
-	return raw.Attributes, nil
+	dec := json.NewDecoder(bytes.NewReader(raw))
+	dec.UseNumber()
+	var attrs map[string]any
+	if err := dec.Decode(&attrs); err != nil {
+		return nil, fmt.Errorf("zarr: invalid attributes: %w", err)
+	}
+	if attrs == nil {
+		return map[string]any{}, nil
+	}
+	return exactNumbers(attrs).(map[string]any), nil
+}
+
+func exactNumbers(v any) any {
+	switch x := v.(type) {
+	case map[string]any:
+		for k, e := range x {
+			x[k] = exactNumbers(e)
+		}
+	case []any:
+		for i, e := range x {
+			x[i] = exactNumbers(e)
+		}
+	case json.Number:
+		s := x.String()
+		if !strings.ContainsAny(s, ".eE") {
+			if i, err := strconv.ParseInt(s, 10, 64); err == nil {
+				return i
+			}
+			if u, err := strconv.ParseUint(s, 10, 64); err == nil {
+				return u
+			}
+			return x
+		}
+		f, _ := x.Float64()
+		return f
+	}
+	return v
 }

@@ -72,7 +72,6 @@ func TestPythonServe(t *testing.T) {
 	forEachFixture(t, func(t *testing.T, fx *fixture) {
 		svc := &serve.Service{Repo: fx.repo}
 		r := fx.o.Repo
-		v1 := fx.repo.SpecVersion() == 1
 
 		// Summary: refs as icechunk-python resolves them.
 		resp := serveGet(t, svc, "/", nil)
@@ -99,10 +98,6 @@ func TestPythonServe(t *testing.T) {
 			}
 			got := map[string]string{}
 			for name, id := range refs.got {
-				if _, ok := want[name]; !ok && v1 && percentEncoded(name) {
-					knownIssue(t, "v1-ref-encoding", "GET /: %s %q = %s, which icechunk-python cannot look up", refs.kind, name, id)
-					continue
-				}
 				got[name] = id
 			}
 			expectSame(t, "GET / "+refs.kind, want, got)

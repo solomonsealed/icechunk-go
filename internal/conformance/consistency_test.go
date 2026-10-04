@@ -462,8 +462,8 @@ func getOutcome(data []byte, err error) string {
 //     them as missing (ErrKeyNotFound, Exists false).
 //  2. Store.Size of a missing chunk: upstream returns 0; Go returns
 //     ErrKeyNotFound, as Get does.
-//  3. list_dir and list_prefix of strings that are not node paths:
-//     upstream raises InvalidInputError; Go lists by string prefix.
+//  3. (none: Store.ListPrefix now refuses prefixes naming no node, as
+//     upstream does)
 //  4. A zero-length byte range ending at the end of a chunk: upstream
 //     raises; Go returns no bytes.
 //  5. Keys and prefixes with a leading or doubled slash ("//zarr.json",
@@ -483,20 +483,10 @@ func nonCanonical(key string) bool {
 }
 
 // knownInconsistencies are differences from icechunk-python that these tests
-// found in the Go reader and that are not fixed yet. Matching failures are
-// logged; set ICECHUNK_STRICT=1 to make them fail. Delete an entry once the
-// reader is fixed.
-var knownInconsistencies = map[string]string{
-	"v1-ref-encoding": "spec v1 stores refs as storage keys, and upstream (object_store) percent-encodes " +
-		"non-ASCII and some ASCII characters in keys: branch \"ünïcode\" lives at " +
-		"refs/branch.%C3%BCn%C3%AFcode/ref.json. Go reads ref keys verbatim, so it cannot look such refs up " +
-		"by name; it finds them only under the encoded name (which upstream lists but cannot look up).",
-	"attribute-int-precision": "zarr.json attributes are decoded into float64, so integers beyond 2^53 " +
-		"lose precision (2**62 reads as 4611686018427388000).",
-	"list-prefix-node-path": "upstream's list_prefix takes a prefix naming a node as that node's subtree; " +
-		"Go's ListPrefix matches the raw string, so \"a/b\" also lists \"a/b-c/...\" and \"a/bc/...\" " +
-		"(with a trailing slash both agree).",
-}
+// found in the Go reader or writer and that are not fixed yet, by id with an
+// explanation. Matching failures are logged; set ICECHUNK_STRICT=1 to make
+// them fail. Delete an entry once fixed. (All found so far are fixed.)
+var knownInconsistencies = map[string]string{}
 
 func knownIssue(t *testing.T, id, format string, args ...any) {
 	t.Helper()
@@ -619,27 +609,12 @@ func diffJSON(path string, want, got any, out *[]jsonDiff) {
 		g, ok := got.(json.Number)
 		if !ok || !sameNumber(w, g) {
 			add("%s: python %s, go %s", path, short(want), short(got))
-			if ok && roundedInteger(w, g) {
-				(*out)[len(*out)-1].issue = "attribute-int-precision"
-			}
 		}
 	default:
 		if !reflect.DeepEqual(want, got) {
 			add("%s: python %s, go %s", path, short(want), short(got))
 		}
 	}
-}
-
-// roundedInteger reports whether got is the float64 nearest to the integer
-// want, which lies beyond float64's exact integer range.
-func roundedInteger(want, got json.Number) bool {
-	w, ok := new(big.Int).SetString(string(want), 10)
-	if !ok || w.CmpAbs(big.NewInt(1<<53)) <= 0 {
-		return false
-	}
-	g, err := got.Float64()
-	f, _ := new(big.Float).SetInt(w).Float64()
-	return err == nil && g == f
 }
 
 func sameNumber(a, b json.Number) bool {
@@ -774,25 +749,9 @@ func checkLookup(t *testing.T, fx *fixture, what, name, want string, got icechun
 	case !isError(want) && got.String() != want:
 		msg = fmt.Sprintf("%s = %s, icechunk-python %s", what, got, want)
 	}
-	switch {
-	case msg == "":
-	case fx.repo.SpecVersion() == 1 && percentEncoded(name):
-		knownIssue(t, "v1-ref-encoding", "%s", msg)
-	default:
+	if msg != "" {
 		t.Error(msg)
 	}
-}
-
-// percentEncoded reports whether upstream's object store percent-encodes
-// name in storage keys: non-ASCII, control and some punctuation characters,
-// and "%" itself.
-func percentEncoded(name string) bool {
-	for _, r := range name {
-		if r >= 0x80 || r < 0x20 || strings.ContainsRune("%\\{}^`[]\"<>~#|*?", r) {
-			return true
-		}
-	}
-	return false
 }
 
 // TestPythonRefs: spec version, branch and tag listings and lookups, lookups
@@ -928,20 +887,20 @@ func TestPythonRepoInfo(t *testing.T) {
 			before = *want.RepoBeforeUpdates
 		}
 		expectSame(t, "repo_before_updates", before, optString(info.RepoBeforeUpdates))
-		// icechunk-python's ops_log follows repo_before_updates into older
-		// repo info files; the Go reader returns the current file's updates.
+		// The whole ops log, following repo_before_updates into older repo
+		// info files.
 		var ops []updateEntry
 		if err := json.Unmarshal(want.OpsLog, &ops); err != nil {
 			t.Fatal(err)
 		}
-		if info.RepoBeforeUpdates == "" {
-			expectSame(t, "ops log", ops, updates)
-		} else if len(ops) >= len(updates) {
-			expectSame(t, "ops log (current repo info file)", ops[:len(updates)], updates)
-			t.Logf("ops log: go reads the latest %d of %d updates (older ones are in %s)", len(updates), len(ops), info.RepoBeforeUpdates)
-		} else {
-			t.Errorf("ops log has %d updates, go %d", len(ops), len(updates))
+		all := []updateEntry{}
+		for u, err := range fx.repo.OpsLog(ctx) {
+			if err != nil {
+				t.Fatalf("ops log: %v", err)
+			}
+			all = append(all, goUpdate(u))
 		}
+		expectSame(t, "ops log", ops, all)
 
 		expectSame(t, "repo metadata", want.Metadata, info.Metadata)
 		expectSame(t, "repo status", want.Status, map[string]any{
@@ -968,12 +927,30 @@ func TestPythonRepoInfo(t *testing.T) {
 	})
 }
 
+// namedUpdates are the update kinds that name a branch or tag (possibly
+// the empty name, which upstream allows).
+var namedUpdates = map[string]bool{
+	"TagCreated": true, "TagDeleted": true, "BranchCreated": true, "BranchDeleted": true,
+	"BranchReset": true, "NewCommit": true, "CommitAmended": true,
+}
+
+func updateName(u icechunk.Update) any {
+	if namedUpdates[u.Kind] {
+		return u.Name
+	}
+	return nil
+}
+
 func goUpdate(u icechunk.Update) updateEntry {
 	opt := func(s string) *string {
 		if s == "" {
 			return nil
 		}
 		return &s
+	}
+	var name *string
+	if namedUpdates[u.Kind] {
+		name = &u.Name
 	}
 	optid := func(id icechunk.SnapshotID) *string {
 		if id.IsZero() {
@@ -983,7 +960,7 @@ func goUpdate(u icechunk.Update) updateEntry {
 	}
 	return updateEntry{
 		Kind:               u.Kind,
-		Name:               opt(u.Name),
+		Name:               name,
 		SnapshotID:         optid(u.SnapshotID),
 		PreviousSnapshotID: optid(u.PreviousSnapshotID),
 		UpdatedAt:          ts(u.UpdatedAt),
@@ -1205,7 +1182,10 @@ func listingMismatch(t *testing.T, what, prefix string, want json.RawMessage, go
 		if !isError(e) {
 			t.Fatalf("%s: unexpected oracle value %s", what, want)
 		}
-		return "" // accepted divergence 3: go lists by prefix where python refuses
+		if err != nil {
+			return "" // both refuse
+		}
+		return fmt.Sprintf("%s = %d entries, icechunk-python refuses (%s)", what, len(got), e)
 	}
 	if err != nil {
 		return fmt.Sprintf("%s: %v, icechunk-python %s", what, err, tail(string(want), 300))
@@ -1288,12 +1268,7 @@ func TestPythonStore(t *testing.T) {
 			}
 			for _, p := range sortedKeys(want.Store.ListPrefix) {
 				got, err := st.ListPrefix(ctx, p)
-				msg := listingMismatch(t, fmt.Sprintf("%s: ListPrefix(%q)", what, p), p, want.Store.ListPrefix[p], got, err)
-				switch {
-				case msg == "":
-				case err == nil && p != "" && !strings.HasSuffix(p, "/"):
-					knownIssue(t, "list-prefix-node-path", "%s", msg)
-				default:
+				if msg := listingMismatch(t, fmt.Sprintf("%s: ListPrefix(%q)", what, p), p, want.Store.ListPrefix[p], got, err); msg != "" {
 					t.Error(msg)
 				}
 			}
