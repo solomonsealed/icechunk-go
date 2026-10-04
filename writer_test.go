@@ -20,11 +20,11 @@ import (
 // int32Array is a zarr.json for an uncompressed little-endian int32 array,
 // so chunk bytes can be written without the zarr package.
 func int32Array(shape, chunks []uint64) []byte {
-	return []byte(fmt.Sprintf(`{"zarr_format":3,"node_type":"array","shape":%s,"data_type":"int32",
+	return fmt.Appendf(nil, `{"zarr_format":3,"node_type":"array","shape":%s,"data_type":"int32",
 		"chunk_grid":{"name":"regular","configuration":{"chunk_shape":%s}},
 		"chunk_key_encoding":{"name":"default","configuration":{"separator":"/"}},
 		"fill_value":-1,"codecs":[{"name":"bytes","configuration":{"endian":"little"}}],
-		"attributes":{},"dimension_names":["x"]}`, jsonInts(shape), jsonInts(chunks)))
+		"attributes":{},"dimension_names":["x"]}`, jsonInts(shape), jsonInts(chunks))
 }
 
 func jsonInts(v []uint64) string {
@@ -290,9 +290,6 @@ func TestCommitConflictsAndRebase(t *testing.T) {
 			t.Errorf("rebased commit metadata = %#v, want %#v", si.Metadata, want)
 		}
 		break
-	}
-	if _, err := r.SnapshotID(), error(nil); err != nil {
-		t.Fatal(err)
 	}
 	empty, _ := repo.WritableSession(ctx, "main")
 	if _, err := empty.Commit(ctx, "nothing", nil); !errors.Is(err, icechunk.ErrNoChanges) {
