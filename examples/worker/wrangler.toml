@@ -1,0 +1,30 @@
+name = "icechunk-go-worker"
+main = "worker.mjs"
+compatibility_date = "2025-09-01"
+
+# Repository stored in R2 under REPO_PREFIX. Create the bucket and upload a
+# repository with e.g. `wrangler r2 object put` or `rclone`.
+[[r2_buckets]]
+binding = "REPO_BUCKET"
+bucket_name = "icechunk-repos"
+
+[vars]
+REPO_PREFIX = "test-repo-v2"
+REPO_INFO_TTL = "10s"
+# DEFAULT_REF = "main"
+# REPO_URL = "https://example.com/my-repo"   # instead of REPO_BUCKET
+# VIRTUAL_CONTAINERS = '{"s3://my-bucket/": "https://my-bucket.s3.amazonaws.com/"}'
+
+# `wrangler dev --env http` / `wrangler deploy --env http`: read the
+# repository over HTTP(S) with fetch instead of an R2 binding (bindings are
+# not inherited by environments).
+[env.http.vars]
+REPO_URL = "http://localhost:18090"
+REPO_INFO_TTL = "10s"
+
+# S3-compatible APIs (AWS S3, GCS interop, MinIO, R2's S3 API...) with SigV4.
+# Put credentials in secrets: `wrangler secret put AWS_ACCESS_KEY_ID --env s3`.
+[env.s3.vars]
+REPO_URL = "s3://my-bucket/repos/weather"
+S3_REGION = "us-east-1"
+# S3_ENDPOINT = "https://storage.googleapis.com"
