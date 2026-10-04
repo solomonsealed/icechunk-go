@@ -12,6 +12,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/solomonsealed/icechunk-go/internal/cache"
 	"github.com/solomonsealed/icechunk-go/storage"
 )
 
@@ -63,12 +64,18 @@ type Repository struct {
 	storage    storage.Storage
 	opts       Options
 	spec       int
-	cache      *assetCache
+	cache      *cache.Cache[cacheKey]
 	containers []virtualContainer
 
 	mu     sync.Mutex
 	info   *RepoInfo
 	infoAt time.Time
+}
+
+// cacheKey names a snapshot or manifest in Repository.cache.
+type cacheKey struct {
+	kind byte // 's' snapshot, 'm' manifest
+	id   ObjectID12
 }
 
 // Open opens the repository rooted at st, detecting its spec version.
@@ -84,7 +91,7 @@ func Open(ctx context.Context, st storage.Storage, opts *Options) (*Repository, 
 	case budget < 0:
 		budget = 0
 	}
-	r.cache = newAssetCache(budget)
+	r.cache = cache.New[cacheKey](budget)
 	for prefix, s := range r.opts.VirtualChunkContainers {
 		r.containers = append(r.containers, virtualContainer{prefix: prefix, store: s})
 	}
@@ -355,7 +362,7 @@ func (r *Repository) Resolve(ctx context.Context, v Version) (SnapshotID, error)
 
 // Snapshot fetches (or returns cached) snapshot id.
 func (r *Repository) Snapshot(ctx context.Context, id SnapshotID) (*Snapshot, error) {
-	v, err := r.cache.get(ctx, cacheKey{kind: 's', id: id}, func() (any, int64, error) {
+	v, err := r.cache.Get(ctx, cacheKey{kind: 's', id: id}, func() (any, int64, error) {
 		raw, err := r.storage.Get(ctx, snapshotsPrefix+id.String(), nil)
 		if err != nil {
 			if isNotFound(err) {
@@ -376,7 +383,7 @@ func (r *Repository) Snapshot(ctx context.Context, id SnapshotID) (*Snapshot, er
 }
 
 func (r *Repository) manifest(ctx context.Context, id ManifestID) (*Manifest, error) {
-	v, err := r.cache.get(ctx, cacheKey{kind: 'm', id: id}, func() (any, int64, error) {
+	v, err := r.cache.Get(ctx, cacheKey{kind: 'm', id: id}, func() (any, int64, error) {
 		raw, err := r.storage.Get(ctx, manifestsPrefix+id.String(), nil)
 		if err != nil {
 			return nil, 0, fmt.Errorf("icechunk: reading manifest %s: %w", id, err)

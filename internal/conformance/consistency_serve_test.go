@@ -1,4 +1,4 @@
-package icechunk_test
+package conformance
 
 // The HTTP service (package serve, as run by `icechunk-go serve` and the
 // Cloudflare Worker) checked against icechunk-python, using the same oracle

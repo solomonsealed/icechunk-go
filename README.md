@@ -188,6 +188,9 @@ open an issue, which is worth doing for anything long-lived.
   from verbatim copies of upstream's `.fbs` schemas. flatc's Go backend cannot
   emit fixed-size arrays, so `gen.sh` rewrites the two object-id structs into a
   layout-identical form first.
+- The tests that compare Go with upstream and icechunk-python, described
+  below, live in `internal/conformance`; the rest sit next to the code they
+  test.
 - `testdata/upstream`: upstream's own on-disk compatibility fixtures. The tests
   assert the same facts as upstream's `test_can_read_old.py`.
 - `testdata/generated`: repositories written by icechunk-python 2.2.2 via
@@ -223,8 +226,8 @@ open an issue, which is worth doing for anything long-lived.
 go test ./...
 python testdata/generate.py                    # regenerate fixtures (icechunk, zarr, numpy)
 python testdata/oracle/oracle.py               # re-record icechunk-python's answers for TestPython*
-ICECHUNK_PYTHON=.venv/bin/python go test -run Python .   # compare with a live icechunk-python
+ICECHUNK_PYTHON=.venv/bin/python go test -run Python ./internal/conformance   # compare with a live icechunk-python
 python testdata/check_http.py testdata/generated/codecs-v2 http://localhost:8787
-ICECHUNK_GO_WRITE_DIR=/tmp/gw go test -run 'TestWriteForPython|TestWriteOnPythonRepos' .
+ICECHUNK_GO_WRITE_DIR=/tmp/gw go test -run 'TestWriteForPython|TestWriteOnPythonRepos' ./internal/conformance
 python testdata/check_go_writer.py /tmp/gw && python testdata/check_go_on_python.py /tmp/gw
 ```

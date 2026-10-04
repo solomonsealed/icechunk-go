@@ -1,4 +1,4 @@
-package icechunk_test
+package conformance
 
 // These tests read the repositories that upstream Icechunk keeps as
 // on-disk compatibility fixtures (icechunk-python/tests/data), and assert
@@ -18,7 +18,7 @@ import (
 
 func openFixture(t *testing.T, name string, opts *icechunk.Options) *icechunk.Repository {
 	t.Helper()
-	repo, err := icechunk.Open(context.Background(), storage.NewLocal("testdata/upstream/"+name), opts)
+	repo, err := icechunk.Open(context.Background(), storage.NewLocal(testdata+"/upstream/"+name), opts)
 	if err != nil {
 		t.Fatalf("open %s: %v", name, err)
 	}

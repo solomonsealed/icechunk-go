@@ -1,8 +1,7 @@
-package icechunk_test
+package conformance
 
 import (
 	"context"
-	"io/fs"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -13,28 +12,6 @@ import (
 	"github.com/solomonsealed/icechunk-go/storage"
 	"github.com/solomonsealed/icechunk-go/zarr"
 )
-
-func copyDir(t *testing.T, src, dst string) {
-	t.Helper()
-	err := filepath.WalkDir(src, func(p string, d fs.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		rel, _ := filepath.Rel(src, p)
-		target := filepath.Join(dst, rel)
-		if d.IsDir() {
-			return os.MkdirAll(target, 0o755)
-		}
-		data, err := os.ReadFile(p)
-		if err != nil {
-			return err
-		}
-		return os.WriteFile(target, data, 0o644)
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-}
 
 func readAllArrays(t *testing.T, s *icechunk.Session) map[string]*zarr.NDArray {
 	t.Helper()
@@ -91,7 +68,9 @@ func TestWriteOnPythonRepos(t *testing.T) {
 				dir = filepath.Join(keep, "onpython", filepath.Base(tc.fixture))
 				os.RemoveAll(dir)
 			}
-			copyDir(t, "testdata/"+tc.fixture, dir)
+			if err := os.CopyFS(dir, os.DirFS(testdata+"/"+tc.fixture)); err != nil {
+				t.Fatal(err)
+			}
 			st := storage.NewLocal(dir)
 			repo, err := icechunk.Open(ctx, st, nil)
 			if err != nil {

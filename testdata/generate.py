@@ -313,7 +313,7 @@ def write_features_repo(name: str, spec_version: int) -> None:
 
     These repositories have no entries in expected.json: they are checked
     against icechunk-python by testdata/oracle/oracle.py and
-    consistency_test.go. Spec v1 lacks some of these features (moves,
+    internal/conformance. Spec v1 lacks some of these features (moves,
     amends, detached snapshots, repo metadata, status, flags, "/" in refs).
     """
     v2 = spec_version >= 2

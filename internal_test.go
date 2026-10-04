@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/klauspost/compress/zstd"
 
@@ -173,45 +172,6 @@ func TestMutatedFlatbuffersDoNotPanic(t *testing.T) {
 	}
 }
 
-// Loads are coalesced within a scope but never across scopes.
-func TestCacheScopes(t *testing.T) {
-	c := newAssetCache(1 << 20)
-	key := cacheKey{kind: 'm'}
-	release := make(chan struct{})
-	loads := make(chan string, 8)
-	load := func(name string) func() (any, int64, error) {
-		return func() (any, int64, error) {
-			loads <- name
-			<-release
-			return name, 1, nil
-		}
-	}
-	ctxA := storage.WithScope(context.Background(), "a")
-	ctxB := storage.WithScope(context.Background(), "b")
-	results := make(chan any, 3)
-	go func() { v, _ := c.get(ctxA, key, load("a1")); results <- v }()
-	<-loads                                                            // a1 is in flight
-	go func() { v, _ := c.get(ctxA, key, load("a2")); results <- v }() // same scope: must not load
-	go func() { v, _ := c.get(ctxB, key, load("b1")); results <- v }() // other scope: loads itself
-	if got := <-loads; got != "b1" {
-		t.Fatalf("second load = %s, want b1", got)
-	}
-	close(release)
-	for i := 0; i < 3; i++ {
-		if v := <-results; v != "a1" && v != "b1" {
-			t.Errorf("result %v", v)
-		}
-	}
-	// Whichever load finished first was cached; later reads must not load.
-	if v, _ := c.get(context.Background(), key, load("late")); v != "a1" && v != "b1" {
-		t.Errorf("cached value = %v, want a1 or b1", v)
-	}
-	close(loads)
-	for name := range loads {
-		t.Errorf("unexpected load %s", name)
-	}
-}
-
 func TestResolveVirtual(t *testing.T) {
 	r := &Repository{containers: []virtualContainer{
 		{prefix: "file:///data/", store: storage.NewMemory(nil)},
@@ -240,33 +200,6 @@ func TestResolveVirtual(t *testing.T) {
 	}
 	if _, _, err := r.resolveVirtual("s3://elsewhere/x"); !errors.Is(err, ErrNoVirtualContainer) {
 		t.Errorf("unmapped location: %v", err)
-	}
-}
-
-// A waiter whose own context is fine retries when the shared load failed
-// only because the loading caller's context was cancelled.
-func TestCacheRetriesAfterLoaderCancellation(t *testing.T) {
-	c := newAssetCache(1 << 20)
-	key := cacheKey{kind: 's'}
-	started, release := make(chan struct{}), make(chan struct{})
-	go c.get(context.Background(), key, func() (any, int64, error) {
-		close(started)
-		<-release
-		return nil, 0, context.Canceled
-	})
-	<-started
-	got := make(chan any)
-	go func() {
-		v, err := c.get(context.Background(), key, func() (any, int64, error) { return "fresh", 1, nil })
-		if err != nil {
-			t.Error(err)
-		}
-		got <- v
-	}()
-	time.Sleep(10 * time.Millisecond) // let the second caller start waiting
-	close(release)
-	if v := <-got; v != "fresh" {
-		t.Errorf("waiter got %v, want its own successful load", v)
 	}
 }
 

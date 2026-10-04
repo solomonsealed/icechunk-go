@@ -1,7 +1,7 @@
 """Verify a repository written by the Go writer with icechunk-python, then
 extend it with a Python commit for the Go side to read back.
 
-    ICECHUNK_GO_WRITE_DIR=/tmp/gw go test -run TestWriteForPython .
+    ICECHUNK_GO_WRITE_DIR=/tmp/gw go test -run TestWriteForPython ./internal/conformance
     python testdata/check_go_writer.py /tmp/gw
 """
 

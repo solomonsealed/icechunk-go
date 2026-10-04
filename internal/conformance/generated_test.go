@@ -1,4 +1,4 @@
-package icechunk_test
+package conformance
 
 // Tests against repositories written by icechunk-python (see
 // testdata/generate.py), covering every data type and codec the zarr
@@ -40,7 +40,7 @@ type expectations struct {
 
 func loadExpected(t *testing.T) expectations {
 	t.Helper()
-	raw, err := os.ReadFile("testdata/generated/expected.json")
+	raw, err := os.ReadFile(testdata + "/generated/expected.json")
 	if err != nil {
 		t.Skipf("generated fixtures missing (run testdata/generate.py): %v", err)
 	}
@@ -68,7 +68,7 @@ func loadExpected(t *testing.T) expectations {
 
 func openGenerated(t *testing.T, name string, opts *icechunk.Options) *icechunk.Repository {
 	t.Helper()
-	repo, err := icechunk.Open(context.Background(), storage.NewLocal("testdata/generated/"+name), opts)
+	repo, err := icechunk.Open(context.Background(), storage.NewLocal(testdata+"/generated/"+name), opts)
 	if err != nil {
 		t.Fatalf("open %s: %v", name, err)
 	}
@@ -331,7 +331,7 @@ func TestShardedPartialReads(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	cs := &countingStorage{Storage: storage.NewLocal("testdata/generated/codecs-v2")}
+	cs := &countingStorage{Storage: storage.NewLocal(testdata + "/generated/codecs-v2")}
 	repo, err := icechunk.Open(ctx, cs, &icechunk.Options{CacheBytes: -1})
 	if err != nil {
 		t.Fatal(err)
@@ -372,7 +372,7 @@ func TestGeneratedVirtualChunks(t *testing.T) {
 			var e expectedArray
 			json.Unmarshal(exp.Repos[name]["main"]["virtual"], &e)
 
-			local := storage.NewLocal("testdata/generated/virtual-data")
+			local := storage.NewLocal(testdata + "/generated/virtual-data")
 			repo := openGenerated(t, name, &icechunk.Options{
 				VirtualChunkContainers: map[string]storage.Storage{prefix: local},
 			})

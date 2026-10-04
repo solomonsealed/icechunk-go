@@ -1,4 +1,6 @@
-package icechunk
+// Package cache provides the cache a Repository keeps its decoded immutable
+// objects (snapshots and manifests) in.
+package cache
 
 import (
 	"container/list"
@@ -9,31 +11,26 @@ import (
 	"github.com/solomonsealed/icechunk-go/storage"
 )
 
-// assetCache is a byte-budgeted LRU for immutable metadata objects
-// (snapshots and manifests) that also collapses concurrent loads of the same
-// key into one fetch. Loads are only shared within one storage.Scope (see
-// storage.WithScope); completed entries are shared by everyone.
-type assetCache struct {
+// Cache is a byte-budgeted LRU for immutable values that also collapses
+// concurrent loads of the same key into one fetch. Loads are only shared
+// within one storage.Scope (see storage.WithScope); completed entries are
+// shared by everyone.
+type Cache[K comparable] struct {
 	mu       sync.Mutex
 	budget   int64
 	used     int64
 	order    *list.List // front = most recently used
-	entries  map[cacheKey]*list.Element
-	inflight map[inflightKey]*inflightLoad
+	entries  map[K]*list.Element
+	inflight map[inflightKey[K]]*inflightLoad
 }
 
-type inflightKey struct {
-	key   cacheKey
+type inflightKey[K comparable] struct {
+	key   K
 	scope any
 }
 
-type cacheKey struct {
-	kind byte // 's' snapshot, 'm' manifest
-	id   ObjectID12
-}
-
-type cacheEntry struct {
-	key  cacheKey
+type entry[K comparable] struct {
+	key  K
 	val  any
 	size int64
 }
@@ -44,18 +41,19 @@ type inflightLoad struct {
 	err  error
 }
 
-func newAssetCache(budget int64) *assetCache {
-	return &assetCache{
+// New returns a cache that holds values of at most budget bytes in total.
+func New[K comparable](budget int64) *Cache[K] {
+	return &Cache[K]{
 		budget:   budget,
 		order:    list.New(),
-		entries:  map[cacheKey]*list.Element{},
-		inflight: map[inflightKey]*inflightLoad{},
+		entries:  map[K]*list.Element{},
+		inflight: map[inflightKey[K]]*inflightLoad{},
 	}
 }
 
-// get returns the cached value for key, calling load at most once across
+// Get returns the cached value for key, calling load at most once across
 // concurrent callers when it is missing. load returns the value and its size.
-func (c *assetCache) get(ctx context.Context, key cacheKey, load func() (any, int64, error)) (any, error) {
+func (c *Cache[K]) Get(ctx context.Context, key K, load func() (any, int64, error)) (any, error) {
 	for {
 		v, err, retry := c.tryGet(ctx, key, load)
 		if !retry {
@@ -66,15 +64,15 @@ func (c *assetCache) get(ctx context.Context, key cacheKey, load func() (any, in
 
 // tryGet does one attempt. retry is set when this caller waited on a load
 // that failed only because the loading caller's context ended.
-func (c *assetCache) tryGet(ctx context.Context, key cacheKey, load func() (any, int64, error)) (v any, err error, retry bool) {
+func (c *Cache[K]) tryGet(ctx context.Context, key K, load func() (any, int64, error)) (v any, err error, retry bool) {
 	c.mu.Lock()
 	if el, ok := c.entries[key]; ok {
 		c.order.MoveToFront(el)
-		v := el.Value.(*cacheEntry).val
+		v := el.Value.(*entry[K]).val
 		c.mu.Unlock()
 		return v, nil, false
 	}
-	ik := inflightKey{key: key, scope: storage.Scope(ctx)}
+	ik := inflightKey[K]{key: key, scope: storage.Scope(ctx)}
 	if fl, ok := c.inflight[ik]; ok {
 		c.mu.Unlock()
 		select {
@@ -99,11 +97,11 @@ func (c *assetCache) tryGet(ctx context.Context, key cacheKey, load func() (any,
 	delete(c.inflight, ik)
 	_, cached := c.entries[key] // another scope may have stored it meanwhile
 	if err == nil && size <= c.budget && !cached {
-		c.entries[key] = c.order.PushFront(&cacheEntry{key: key, val: val, size: size})
+		c.entries[key] = c.order.PushFront(&entry[K]{key: key, val: val, size: size})
 		c.used += size
 		for c.used > c.budget {
 			last := c.order.Back()
-			e := last.Value.(*cacheEntry)
+			e := last.Value.(*entry[K])
 			c.order.Remove(last)
 			delete(c.entries, e.key)
 			c.used -= e.size

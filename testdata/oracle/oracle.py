@@ -1,7 +1,7 @@
 """Record what icechunk-python reads from the fixture repositories.
 
-consistency_test.go reads the same repositories with the Go reader and
-requires the same answers. Run with icechunk, zarr and numpy installed (the
+internal/conformance/consistency_test.go reads the same repositories with the
+Go reader and requires the same answers. Run with icechunk, zarr and numpy installed (the
 versions recorded in each file's "_meta" reproduce the checked-in files):
 
     python testdata/oracle/oracle.py                     # every fixture
@@ -199,7 +199,8 @@ class ObjectServer:
     /<bucket>/<key> with Range, If-Match and If-Unmodified-Since. ETags are
     quoted MD5s of the object; Last-Modified is the backing file's mtime
     (OBJECT_MTIME for objects without a file). Precondition failures answer
-    412. consistency_test.go implements the same server in Go."""
+    412. internal/conformance/consistency_test.go implements the same server
+    in Go."""
 
     def __init__(self, containers: dict):
         # prefix "s3://bucket/sub/" -> (bucket, "sub/", source)

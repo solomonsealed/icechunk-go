@@ -361,7 +361,7 @@ func (s *Session) Commit(ctx context.Context, message string, opts *CommitOption
 		if err != nil {
 			return SnapshotID{}, err
 		}
-		s.repo.cache.get(ctx, cacheKey{kind: 's', id: plan.id}, func() (any, int64, error) {
+		s.repo.cache.Get(ctx, cacheKey{kind: 's', id: plan.id}, func() (any, int64, error) {
 			return plan.parsed, int64(len(plan.parsed.buf)), nil
 		})
 		s.snap, s.id, s.cs = plan.parsed, plan.id, nil

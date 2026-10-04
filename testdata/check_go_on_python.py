@@ -1,7 +1,7 @@
 """Verify, with icechunk-python, Python-written repositories that the Go
 writer committed on top of (see TestWriteOnPythonRepos).
 
-    ICECHUNK_GO_WRITE_DIR=/tmp/gw go test -run TestWriteOnPythonRepos .
+    ICECHUNK_GO_WRITE_DIR=/tmp/gw go test -run TestWriteOnPythonRepos ./internal/conformance
     python testdata/check_go_on_python.py /tmp/gw
 """
 

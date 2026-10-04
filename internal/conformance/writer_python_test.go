@@ -1,8 +1,9 @@
-package icechunk_test
+package conformance
 
 import (
 	"context"
 	"crypto/sha256"
+	"encoding/binary"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -17,6 +18,35 @@ import (
 	"github.com/solomonsealed/icechunk-go/storage"
 	"github.com/solomonsealed/icechunk-go/zarr"
 )
+
+// int32Array is a zarr.json for an uncompressed little-endian int32 array,
+// so chunk bytes can be written without the zarr package.
+func int32Array(shape, chunks []uint64) []byte {
+	return []byte(fmt.Sprintf(`{"zarr_format":3,"node_type":"array","shape":%s,"data_type":"int32",
+		"chunk_grid":{"name":"regular","configuration":{"chunk_shape":%s}},
+		"chunk_key_encoding":{"name":"default","configuration":{"separator":"/"}},
+		"fill_value":-1,"codecs":[{"name":"bytes","configuration":{"endian":"little"}}],
+		"attributes":{},"dimension_names":["x"]}`, jsonInts(shape), jsonInts(chunks)))
+}
+
+func jsonInts(v []uint64) string {
+	s := "["
+	for i, x := range v {
+		if i > 0 {
+			s += ","
+		}
+		s += fmt.Sprint(x)
+	}
+	return s + "]"
+}
+
+func int32Bytes(vals ...int32) []byte {
+	b := make([]byte, 4*len(vals))
+	for i, v := range vals {
+		binary.LittleEndian.PutUint32(b[4*i:], uint32(v))
+	}
+	return b
+}
 
 // testData builds deterministic data of a Zarr data type.
 func testData(t *testing.T, dt string, shape []uint64, seed int64) *zarr.NDArray {

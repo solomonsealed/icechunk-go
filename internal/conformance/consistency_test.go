@@ -1,4 +1,4 @@
-package icechunk_test
+package conformance
 
 // Consistency tests against icechunk-python.
 //
@@ -10,13 +10,14 @@ package icechunk_test
 // same answers. Differences the Go reader makes on purpose are listed in
 // acceptedDivergence. Differences these tests found that are not fixed yet
 // are listed in knownInconsistencies: they are logged, and fail with
-// ICECHUNK_STRICT=1. Anything else fails.
+// ICECHUNK_STRICT=1. Anything else fails. Manifest contents are compared by
+// TestPythonManifests in package icechunk, which needs its internals.
 //
 // The recorded answers live in testdata/oracle/*.json.gz. To compare against
 // a live icechunk-python instead, point ICECHUNK_PYTHON at an interpreter
 // that has icechunk, zarr and numpy installed:
 //
-//	ICECHUNK_PYTHON=.venv/bin/python go test -run Python .
+//	ICECHUNK_PYTHON=.venv/bin/python go test -run Python ./internal/conformance
 //
 // Virtual chunks are served on both sides by a local, anonymous, path-style
 // S3 endpoint with the same ETag and Last-Modified semantics (objectServer
@@ -239,13 +240,14 @@ func pythonFixtures(t *testing.T) []*fixture {
 }
 
 func loadPythonFixtures() ([]*fixture, string, error) {
-	dir := "testdata/oracle"
+	dir := testdata + "/oracle"
 	if py := os.Getenv("ICECHUNK_PYTHON"); py != "" {
 		tmp, err := os.MkdirTemp("", "icechunk-oracle-")
 		if err != nil {
 			return nil, "", err
 		}
 		cmd := exec.Command(py, "testdata/oracle/oracle.py", "--out", tmp)
+		cmd.Dir = repoRoot // so a relative ICECHUNK_PYTHON resolves from the module root
 		var stderr bytes.Buffer
 		cmd.Stderr = &stderr
 		if err := cmd.Run(); err != nil {
@@ -282,7 +284,7 @@ func loadPythonFixtures() ([]*fixture, string, error) {
 				}, &httpstore.Options{Client: client})
 			}
 		}
-		fx.repo, err = icechunk.Open(context.Background(), storage.NewLocal(o.Meta.Path), &icechunk.Options{
+		fx.repo, err = icechunk.Open(context.Background(), storage.NewLocal(filepath.Join(repoRoot, o.Meta.Path)), &icechunk.Options{
 			VirtualChunkContainers: containers,
 		})
 		if err != nil {
@@ -358,7 +360,7 @@ func objectServer(sources map[string]virtualSource) http.Handler {
 				continue
 			}
 			if src.Dir != "" {
-				p := filepath.Join(src.Dir, filepath.FromSlash(rest))
+				p := filepath.Join(repoRoot, src.Dir, filepath.FromSlash(rest))
 				if st, err := os.Stat(p); err == nil && !st.IsDir() {
 					data, _ = os.ReadFile(p)
 					mtime, found = st.ModTime().Unix(), true
@@ -1131,34 +1133,6 @@ func TestPythonSnapshots(t *testing.T) {
 				}
 				expectSame(t, fmt.Sprintf("%s: attributes of group %s", what, path), raw, attrs)
 			}
-		}
-	})
-}
-
-// TestPythonManifests: every manifest file's chunk refs, counted per array
-// and kind as Repository.inspect_manifest counts them.
-func TestPythonManifests(t *testing.T) {
-	forEachFixture(t, func(t *testing.T, fx *fixture) {
-		for _, mid := range sortedKeys(fx.o.Manifests) {
-			id, err := icechunk.ParseObjectID12(mid)
-			if err != nil {
-				t.Fatal(err)
-			}
-			sum, err := icechunk.SummarizeManifest(context.Background(), fx.repo, id)
-			if err != nil {
-				t.Errorf("manifest %s: %v", mid, err)
-				continue
-			}
-			var want icechunk.ManifestSummary
-			if err := json.Unmarshal(fx.o.Manifests[mid], &want); err != nil {
-				t.Fatal(err)
-			}
-			// inspect_manifest reports location compression for some manifests
-			// written before it existed; it only matters for compressed refs.
-			if want.NumCompressedRefs == 0 && sum.NumCompressedRefs == 0 {
-				want.UsesLocationCompression = sum.UsesLocationCompression
-			}
-			expectSame(t, "manifest "+mid, want, sum)
 		}
 	})
 }
