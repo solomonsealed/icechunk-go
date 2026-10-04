@@ -16,7 +16,7 @@ import (
 
 	icechunk "github.com/solomonsealed/icechunk-go"
 	"github.com/solomonsealed/icechunk-go/storage"
-	"github.com/solomonsealed/icechunk-go/zarr"
+	zarr "github.com/solomonsealed/zarr-go"
 )
 
 // int32Array is a zarr.json for an uncompressed little-endian int32 array,

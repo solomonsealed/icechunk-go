@@ -44,7 +44,7 @@ import (
 	icechunk "github.com/solomonsealed/icechunk-go"
 	"github.com/solomonsealed/icechunk-go/serve"
 	"github.com/solomonsealed/icechunk-go/storage"
-	"github.com/solomonsealed/icechunk-go/zarr"
+	zarr "github.com/solomonsealed/zarr-go"
 )
 
 const writerTestdata = testdata + "/writer"
@@ -601,13 +601,12 @@ func nanND(dt zarr.DataType, shape []uint64) (*zarr.NDArray, error) {
 // emptySource has no chunks, so reads through it give the fill value.
 type emptySource struct{}
 
-func (emptySource) GetChunk(context.Context, []uint32, int64, int64) ([]byte, bool, error) {
+func (emptySource) GetChunk(context.Context, []uint64, zarr.ByteRange) ([]byte, bool, error) {
 	return nil, false, nil
 }
-func (emptySource) ChunkSize(context.Context, []uint32) (int64, bool, error) { return 0, false, nil }
 
 func fillND(ctx context.Context, zarrJSON []byte, start, shape []uint64) (*zarr.NDArray, error) {
-	arr, err := zarr.OpenArray(zarrJSON, emptySource{}, nil)
+	arr, err := zarr.NewArray(zarrJSON, emptySource{}, nil)
 	if err != nil {
 		return nil, err
 	}

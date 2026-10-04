@@ -10,7 +10,7 @@ import (
 
 	icechunk "github.com/solomonsealed/icechunk-go"
 	"github.com/solomonsealed/icechunk-go/storage"
-	"github.com/solomonsealed/icechunk-go/zarr"
+	zarr "github.com/solomonsealed/zarr-go"
 )
 
 func readAllArrays(t *testing.T, s *icechunk.Session) map[string]*zarr.NDArray {

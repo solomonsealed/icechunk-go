@@ -37,7 +37,7 @@ import (
 	"github.com/solomonsealed/icechunk-go/serve/nethttp"
 	"github.com/solomonsealed/icechunk-go/storage"
 	"github.com/solomonsealed/icechunk-go/storage/httpstore"
-	"github.com/solomonsealed/icechunk-go/zarr"
+	zarr "github.com/solomonsealed/zarr-go"
 )
 
 type virtualFlag map[string]string
@@ -286,17 +286,11 @@ func ls(s *icechunk.Session) {
 func read(ctx context.Context, s *icechunk.Session, path, sel string, asJSON bool) {
 	arr, err := s.OpenArray(ctx, path)
 	check(err)
-	start, count, squeeze, err := zarr.ParseSelection(sel, arr.Shape())
+	selectors, err := zarr.ParseSelector(sel)
 	check(err)
-	nd, err := arr.Read(ctx, start, count)
+	nd, err := arr.Get(ctx, selectors...)
 	check(err)
-	shape := []uint64{}
-	for d, c := range nd.Shape {
-		if !squeeze[d] {
-			shape = append(shape, c)
-		}
-	}
-	nd.Shape = shape
+	shape := nd.Shape
 	if asJSON {
 		b, err := json.Marshal(nd)
 		check(err)
