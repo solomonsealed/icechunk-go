@@ -4,7 +4,9 @@
 //	GET /log?ref=main&limit=50     commit history
 //	GET /nodes?ref=main            arrays and groups with shape, dtype, chunking
 //	GET /array/<path>?ref=main&slice=0:10,5
-//	                               array values as JSON (or raw bytes with format=binary)
+//	                               array values as JSON (or raw bytes with format=binary);
+//	                               slices may have steps ("::2") and integer or boolean
+//	                               lists ("[3, 0, 7]"), as in NumPy
 //	GET /chunks/<path>?ref=main    chunk references (inline / native / virtual)
 //	GET /zarr/<ref>/<key>          read-only Zarr v3 store (with Range support),
 //	                               so any Zarr client can read the repository
@@ -26,7 +28,7 @@ import (
 	"strings"
 
 	icechunk "github.com/solomonsealed/icechunk-go"
-	"github.com/solomonsealed/icechunk-go/zarr"
+	zarr "github.com/solomonsealed/zarr-go"
 )
 
 // Request is the part of an HTTP request the service looks at.
@@ -283,12 +285,16 @@ func (s *Service) array(ctx context.Context, path string, q url.Values) (*Respon
 	if err != nil {
 		return nil, err
 	}
-	start, count, squeeze, err := zarr.ParseSelection(q.Get("slice"), arr.Shape())
+	sel, err := zarr.ParseSelector(q.Get("slice"))
+	if err != nil {
+		return nil, badRequest("%v", err)
+	}
+	shape, err := arr.SelectionShape(sel...)
 	if err != nil {
 		return nil, badRequest("%v", err)
 	}
 	n := uint64(1)
-	for _, c := range count {
+	for _, c := range shape {
 		n *= c
 	}
 	limit := s.MaxElements
@@ -298,17 +304,10 @@ func (s *Service) array(ctx context.Context, path string, q url.Values) (*Respon
 	if n > limit {
 		return nil, badRequest("selection has %d elements, more than the limit of %d; narrow it with ?slice=", n, limit)
 	}
-	nd, err := arr.Read(ctx, start, count)
+	nd, err := arr.Get(ctx, sel...)
 	if err != nil {
 		return nil, err
 	}
-	shape := []uint64{}
-	for d, c := range nd.Shape {
-		if !squeeze[d] {
-			shape = append(shape, c)
-		}
-	}
-	nd.Shape = shape
 	shapeStr := strings.Trim(strings.Join(strings.Fields(fmt.Sprint(shape)), ","), "[]")
 	if q.Get("format") == "binary" {
 		if nd.DataType.Variable() {

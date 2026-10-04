@@ -21,7 +21,7 @@ import (
 
 	icechunk "github.com/solomonsealed/icechunk-go"
 	"github.com/solomonsealed/icechunk-go/storage"
-	"github.com/solomonsealed/icechunk-go/zarr"
+	zarr "github.com/solomonsealed/zarr-go"
 )
 
 type expectedArray struct {

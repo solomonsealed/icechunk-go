@@ -32,7 +32,7 @@ temperature = zarr.open_array("https://<worker>/zarr/main/temperature", mode="r"
 Needs Go ≥ 1.25 and Node (for `npx wrangler`).
 
 ```sh
-./build.sh                                   # → build/app.wasm (~2.2 MB gzipped) + build/wasm_exec.js
+./build.sh                                   # → build/app.wasm (~2.7 MB gzipped) + build/wasm_exec.js
 ./seed-r2.sh ../../testdata/upstream/test-repo-v2 test-repo-v2   # fill wrangler's local R2
 npx wrangler dev                             # http://localhost:8787
 curl 'localhost:8787/array/group1/small_chunks?ref=my-branch'
@@ -75,7 +75,7 @@ python ../python-writer/write_repo.py --r2-bucket icechunk-repos --prefix demo
   reused across requests.
 - Storage goes through the R2 binding (`bucket.get` with `range` and
   `onlyIf`) or `fetch`. `net/http` is not linked, which keeps the module at
-  ~2.2 MB gzipped (with `net/http` it would be ~3.5 MB, over the free-plan
+  ~2.7 MB gzipped (with `net/http` it would be ~3.5 MB, over the free-plan
   limit).
 - Workers forbid a request from awaiting I/O started by another request, and
   in Go's WebAssembly runtime a goroutine woken by another request's event runs

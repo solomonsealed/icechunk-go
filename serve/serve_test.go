@@ -68,6 +68,15 @@ func TestArrayEndpoint(t *testing.T) {
 	if r.Status != 200 || string(r.Body) != "\x54\x08" || r.Header["x-shape"] != "2" || r.Header["x-dtype"] != "int8" {
 		t.Fatalf("binary %d %q %v", r.Status, r.Body, r.Header)
 	}
+	// Steps and integer lists select like NumPy's orthogonal indexing.
+	r = get(t, s, "/array/group1/small_chunks?ref=my-branch&slice=[4,0,4]", nil)
+	if r.Status != 200 || string(r.Body) != `{"shape":[3],"dtype":"int8","data":[8,84,8]}` {
+		t.Fatalf("list %d %s", r.Status, r.Body)
+	}
+	r = get(t, s, "/array/group1/small_chunks?ref=my-branch&slice=::2", nil)
+	if r.Status != 200 || string(r.Body) != `{"shape":[3],"dtype":"int8","data":[84,84,8]}` {
+		t.Fatalf("step %d %s", r.Status, r.Body)
+	}
 	if r := get(t, s, "/array/group1?ref=main", nil); r.Status != 400 {
 		t.Errorf("group as array: %d %s", r.Status, r.Body)
 	}

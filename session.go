@@ -4,10 +4,11 @@ import (
 	"context"
 	"fmt"
 	"iter"
+	"math"
 	"sort"
 	"sync"
 
-	"github.com/solomonsealed/icechunk-go/zarr"
+	zarr "github.com/solomonsealed/zarr-go"
 )
 
 // Session is a view of one snapshot. Read-only sessions come from
@@ -209,7 +210,7 @@ func (s *Session) OpenArray(ctx context.Context, path string) (*zarr.Array, erro
 	if err != nil {
 		return nil, err
 	}
-	return zarr.OpenArray(n.ZarrMetadata, &chunkSource{s: s, n: n}, &zarr.Options{Concurrency: s.repo.opts.Concurrency})
+	return zarr.NewArray(n.ZarrMetadata, &chunkSource{s: s, n: n}, &zarr.Options{Concurrency: s.repo.opts.Concurrency})
 }
 
 // Attributes returns the attributes of the array or group at path.
@@ -227,29 +228,54 @@ type chunkSource struct {
 	n *Node
 }
 
-func (c *chunkSource) GetChunk(ctx context.Context, coords []uint32, offset, length int64) ([]byte, bool, error) {
-	ref, err := c.s.chunkRef(ctx, c.n, coords)
+// chunkIndices converts zarr's chunk coordinates to Icechunk's.
+func chunkIndices(coords []uint64) ([]uint32, error) {
+	out := make([]uint32, len(coords))
+	for i, c := range coords {
+		if c > math.MaxUint32 {
+			return nil, fmt.Errorf("icechunk: chunk coordinate %d out of range", c)
+		}
+		out[i] = uint32(c)
+	}
+	return out, nil
+}
+
+func (c *chunkSource) GetChunk(ctx context.Context, coords []uint64, r zarr.ByteRange) ([]byte, bool, error) {
+	idx, err := chunkIndices(coords)
+	if err != nil {
+		return nil, false, err
+	}
+	ref, err := c.s.chunkRef(ctx, c.n, idx)
 	if err != nil || ref == nil {
 		return nil, false, err
 	}
-	data, err := c.s.repo.fetchChunk(ctx, ref, offset, length)
+	// Chunk sizes are known from the manifest, so suffix ranges (for
+	// shard indexes) need no extra request.
+	off, length := r.Offset, r.Length
+	if off < 0 {
+		length = -off
+		off += int64(ref.Size()) // out of range if the suffix is longer than the chunk
+	} else if length == 0 {
+		length = -1
+	}
+	data, err := c.s.repo.fetchChunk(ctx, ref, off, length)
 	return data, err == nil, err
 }
 
 // SetChunk and DeleteChunk make chunkSource a zarr.ChunkWriter for
 // writable sessions.
-func (c *chunkSource) SetChunk(ctx context.Context, coords []uint32, data []byte) error {
-	return c.s.SetChunk(ctx, c.n.Path, coords, data)
-}
-
-func (c *chunkSource) DeleteChunk(ctx context.Context, coords []uint32) error {
-	return c.s.DeleteChunk(ctx, c.n.Path, coords)
-}
-
-func (c *chunkSource) ChunkSize(ctx context.Context, coords []uint32) (int64, bool, error) {
-	ref, err := c.s.chunkRef(ctx, c.n, coords)
-	if err != nil || ref == nil {
-		return 0, false, err
+func (c *chunkSource) SetChunk(ctx context.Context, coords []uint64, data []byte) error {
+	idx, err := chunkIndices(coords)
+	if err != nil {
+		return err
 	}
-	return int64(ref.Size()), true, nil
+	return c.s.SetChunk(ctx, c.n.Path, idx, data)
+}
+
+func (c *chunkSource) DeleteChunk(ctx context.Context, coords []uint64) error {
+	idx, err := chunkIndices(coords)
+	if err != nil {
+		return err
+	}
+	return c.s.DeleteChunk(ctx, c.n.Path, idx)
 }

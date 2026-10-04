@@ -1,8 +1,9 @@
 # icechunk-go
 
 A pure-Go implementation of [Icechunk](https://icechunk.io), reader and
-writer, with a Zarr v3 codec layer. It runs natively, and in Cloudflare
-Workers (`GOOS=js GOARCH=wasm`, ~2.3 MB gzipped).
+writer, using [zarr-go](https://github.com/solomonsealed/zarr-go) for
+Zarr arrays. It runs natively, and in Cloudflare Workers
+(`GOOS=js GOARCH=wasm`, ~2.7 MB gzipped).
 
 Go and icechunk-python/Rust can work on the same repositories: the Go writer
 produces files upstream reads and verifies, and it commits on top of
@@ -26,16 +27,12 @@ spec v1) stays with the official library; see
   exact, as in Python.
 - **Zarr v3 arrays**: region reads into N-d results, typed accessors and a
   Zarr key/value view (`Store`) using upstream's key layout.
-  - Data types: `bool`, `int8`–`int64`, `uint8`–`uint64`, `float16/32/64`,
-    `complex64/128`, `string` (vlen-utf8), `bytes`, `numpy.datetime64/timedelta64`,
-    `rN`, fixed-length UTF-32 and bytes.
-  - Codecs: `bytes` (both endians), `transpose`, `sharding_indexed` (index at
-    start or end, with ranged reads of individual inner chunks), `zstd`,
-    `gzip`, `blosc` (blosclz, lz4, lz4hc, zlib, zstd; shuffle and bitshuffle),
-    `crc32c`, `vlen-utf8`, `vlen-bytes`, and the `numcodecs.*` zlib, gzip, bz2,
-    lz4, zstd, blosc, shuffle, crc32, crc32c, adler32, fletcher32 and bitround.
-    `zarr.RegisterBytesCodec` adds more.
-  - Chunk grids: regular and rectilinear.
+  Arrays come from [zarr-go](https://github.com/solomonsealed/zarr-go): every
+  zarr-python data type and codec (plus the zarr-extensions types such as
+  bfloat16 and float8), sharding with partial reads and writes, regular and
+  rectilinear grids, and NumPy-style selections (`Array.Get`,
+  `GetCoordinates`, `GetMask`, `GetBlocks` and their `Set` counterparts).
+  `zarr.RegisterCodec` adds codecs.
 - **Storage backends**: local files and memory (`storage`); plain HTTP(S) and
   S3-compatible APIs with SigV4 for AWS, R2, MinIO, GCS interop and Tigris
   (`storage/httpstore`); R2 bindings and the Workers `fetch` API
@@ -69,10 +66,10 @@ spec v1) stays with the official library; see
   writes them: one manifest per split holding chunks, with the bounding box
   of its chunks as extents, and a commit rewrites only the splits it
   touched.
-- `zarr.Array.Write` writes regions (partly covered chunks are
-  read-modified-written; chunks holding only the fill value are deleted, as
-  zarr-python does), with encoders for every codec above except bz2, lzma
-  and blosclz/snappy (blosc frames for those are written with lz4).
+- `zarr.Array.Write` and `Set` write regions and selections (partly covered
+  chunks are read-modified-written; chunks holding only the fill value are
+  deleted, as zarr-python does; in shards only the touched inner chunks are
+  re-encoded), with encoders for every codec.
 - Writable storage (`storage.Writer`): memory, local files (atomic renames,
   conditional writes serialized with a file lock), S3-compatible APIs
   (`If-Match` / `If-None-Match`), R2 bindings and fetch-based S3 in Workers.
@@ -84,7 +81,7 @@ import (
 	icechunk "github.com/solomonsealed/icechunk-go"
 	"github.com/solomonsealed/icechunk-go/storage"
 	"github.com/solomonsealed/icechunk-go/storage/httpstore"
-	"github.com/solomonsealed/icechunk-go/zarr"
+	zarr "github.com/solomonsealed/zarr-go"
 )
 
 st := httpstore.NewS3(storage.S3Config{
@@ -177,9 +174,7 @@ icechunk-go tag    ./repo v1 main
 - Diffs between snapshots are not exposed.
 - GCS and Azure are reachable only through S3-compatible (HMAC) or plain
   HTTP access, not their native auth.
-- Not decoded: blosc snappy, `numcodecs.lzma`, numcodecs array filters other
-  than bitround (delta, fixedscaleoffset, …), Zarr v2 metadata, and storage
-  transformers.
+- Not decoded: storage transformers (Icechunk arrays are Zarr v3).
 - The JSON API (`serve`) encodes NaN/±Inf as `null`. The `/zarr/` endpoint
   and `format=binary` return exact bytes.
 

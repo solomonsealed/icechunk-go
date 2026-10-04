@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	icechunk "github.com/solomonsealed/icechunk-go"
-	"github.com/solomonsealed/icechunk-go/zarr"
+	zarr "github.com/solomonsealed/zarr-go"
 )
 
 // Write endpoints, enabled when Service.WriteToken is set and authorized
