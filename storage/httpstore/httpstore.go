@@ -7,6 +7,7 @@
 package httpstore
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -45,9 +46,20 @@ type response struct {
 }
 
 func do(ctx context.Context, o *Options, r s3req.Request) (response, error) {
-	req, err := http.NewRequestWithContext(ctx, r.Method, r.URL, nil)
+	return doBody(ctx, o, r, nil)
+}
+
+func doBody(ctx context.Context, o *Options, r s3req.Request, body []byte) (response, error) {
+	var rd io.Reader
+	if body != nil {
+		rd = bytes.NewReader(body)
+	}
+	req, err := http.NewRequestWithContext(ctx, r.Method, r.URL, rd)
 	if err != nil {
 		return response{}, err
+	}
+	if body != nil {
+		req.ContentLength = int64(len(body))
 	}
 	for k, v := range r.Header {
 		req.Header.Set(k, v)
@@ -64,8 +76,8 @@ func do(ctx context.Context, o *Options, r s3req.Request) (response, error) {
 		return response{}, err
 	}
 	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
-	return response{resp.StatusCode, body, resp.Header.Get("ETag"), resp.Header.Get("Last-Modified")}, err
+	respBody, err := io.ReadAll(resp.Body)
+	return response{resp.StatusCode, respBody, resp.Header.Get("ETag"), resp.Header.Get("Last-Modified")}, err
 }
 
 func checkStatus(o *Options, key string, resp response, opts *storage.GetOptions) ([]byte, error) {
@@ -154,4 +166,71 @@ func (s *S3) List(ctx context.Context, prefix string) ([]string, error) {
 		}
 		token = next
 	}
+}
+
+// GetVersion implements storage.Writer: the version is the object's ETag.
+func (s *S3) GetVersion(ctx context.Context, key string) ([]byte, string, error) {
+	r, err := s3req.Get(&s.cfg, key, nil, time.Now())
+	if err != nil {
+		return nil, "", err
+	}
+	resp, err := do(ctx, s.opts, r)
+	if err != nil {
+		return nil, "", err
+	}
+	data, err := checkStatus(s.opts, key, resp, nil)
+	if err != nil {
+		return nil, "", err
+	}
+	if resp.etag == "" {
+		return nil, "", fmt.Errorf("httpstore: %s: response has no ETag; conditional writes are impossible", key)
+	}
+	return data, strings.Trim(strings.TrimPrefix(resp.etag, "W/"), `"`), nil
+}
+
+// Put implements storage.Writer with PutObject, using If-Match and
+// If-None-Match for conditional writes.
+func (s *S3) Put(ctx context.Context, key string, data []byte, opts *storage.PutOptions) (string, error) {
+	r, err := s3req.Put(&s.cfg, key, data, opts, time.Now())
+	if err != nil {
+		return "", err
+	}
+	resp, err := doBody(ctx, s.opts, r, data)
+	if err != nil {
+		return "", err
+	}
+	v, err := s3req.CheckPut(key, resp.status, resp.body, resp.etag)
+	if err != nil && !errors.Is(err, storage.ErrPreconditionFailed) {
+		return "", fmt.Errorf("httpstore: %w", err)
+	}
+	return v, err
+}
+
+// Delete implements storage.Writer.
+func (s *S3) Delete(ctx context.Context, key string) error {
+	r, err := s3req.Delete(&s.cfg, key, time.Now())
+	if err != nil {
+		return err
+	}
+	resp, err := do(ctx, s.opts, r)
+	if err != nil {
+		return err
+	}
+	if resp.status != 200 && resp.status != 204 && resp.status != 404 {
+		return fmt.Errorf("httpstore: DELETE %s: status %d", key, resp.status)
+	}
+	return nil
+}
+
+// LastModified implements storage.ModTimer with HeadObject.
+func (s *S3) LastModified(ctx context.Context, key string) (time.Time, error) {
+	r, err := s3req.Head(&s.cfg, key, time.Now())
+	if err != nil {
+		return time.Time{}, err
+	}
+	resp, err := do(ctx, s.opts, r)
+	if err != nil {
+		return time.Time{}, err
+	}
+	return s3req.ParseLastModified(key, resp.status, resp.lastModified)
 }

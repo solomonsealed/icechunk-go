@@ -1,0 +1,9 @@
+# Cloudflare Worker build output and local wrangler state
+examples/worker/build/
+examples/worker/.wrangler/
+examples/worker/.dev.vars
+node_modules/
+
+# Binaries
+/icechunk-go
+*.test

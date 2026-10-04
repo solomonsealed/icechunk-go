@@ -77,7 +77,7 @@ func (st *Store) GetRange(ctx context.Context, key string, offset, length int64)
 	if err != nil {
 		return nil, err
 	}
-	node, err := st.s.snap.Node(k.path)
+	node, err := st.s.node(k.path)
 	if err != nil {
 		if errors.Is(err, ErrNodeNotFound) {
 			return nil, fmt.Errorf("%w: %s", ErrKeyNotFound, key)
@@ -113,7 +113,7 @@ func (st *Store) Exists(ctx context.Context, key string) (bool, error) {
 	if err != nil {
 		return false, nil
 	}
-	node, err := st.s.snap.Node(k.path)
+	node, err := st.s.node(k.path)
 	if err != nil {
 		if errors.Is(err, ErrNodeNotFound) {
 			return false, nil
@@ -138,12 +138,12 @@ func (st *Store) ListDir(ctx context.Context, prefix string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	node, err := st.s.snap.Node(path)
+	node, err := st.s.node(path)
 	switch {
 	case err == nil && node.Type == ArrayNode:
 		return []string{"c", "zarr.json"}, nil
 	case err == nil:
-		nodes, err := st.s.snap.Nodes()
+		nodes, err := st.s.nodes()
 		if err != nil {
 			return nil, err
 		}
@@ -167,7 +167,7 @@ func (st *Store) ListDir(ctx context.Context, prefix string) ([]string, error) {
 	// Not a node: maybe a prefix inside an array's chunk keys ("a/c/0").
 	segs := strings.Split(prefix, "/")
 	for i := len(segs) - 1; i >= 1; i-- {
-		anc, err := st.s.snap.Node("/" + strings.Join(segs[:i], "/"))
+		anc, err := st.s.node("/" + strings.Join(segs[:i], "/"))
 		if err != nil {
 			continue
 		}
@@ -199,7 +199,7 @@ func (st *Store) ListDir(ctx context.Context, prefix string) ([]string, error) {
 // ListPrefix returns every key starting with prefix ("" for all keys),
 // sorted. Listing chunk keys reads every manifest of the matching arrays.
 func (st *Store) ListPrefix(ctx context.Context, prefix string) ([]string, error) {
-	nodes, err := st.s.snap.Nodes()
+	nodes, err := st.s.nodes()
 	if err != nil {
 		return nil, err
 	}
@@ -255,7 +255,7 @@ func (st *Store) Size(ctx context.Context, key string) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	node, err := st.s.snap.Node(k.path)
+	node, err := st.s.node(k.path)
 	if err != nil {
 		if errors.Is(err, ErrNodeNotFound) {
 			return 0, fmt.Errorf("%w: %s", ErrKeyNotFound, key)
@@ -276,4 +276,31 @@ func (st *Store) Size(ctx context.Context, key string) (int64, error) {
 		return 0, fmt.Errorf("%w: %s", ErrKeyNotFound, key)
 	}
 	return int64(ref.Size()), nil
+}
+
+// Set writes a value: "…/zarr.json" creates or updates a node, chunk keys
+// store encoded chunk bytes (like upstream's IcechunkStore.set). The
+// session must be writable.
+func (st *Store) Set(ctx context.Context, key string, value []byte) error {
+	k, err := parseKey(key)
+	if err != nil {
+		return err
+	}
+	if k.metadata {
+		return st.s.SetMetadata(ctx, k.path, value)
+	}
+	return st.s.SetChunk(ctx, k.path, k.coords, value)
+}
+
+// Delete removes a key: a node (with everything below it) for metadata
+// keys, a chunk for chunk keys.
+func (st *Store) Delete(ctx context.Context, key string) error {
+	k, err := parseKey(key)
+	if err != nil {
+		return err
+	}
+	if k.metadata {
+		return st.s.DeleteNode(ctx, k.path)
+	}
+	return st.s.DeleteChunk(ctx, k.path, k.coords)
 }

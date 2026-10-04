@@ -302,11 +302,214 @@ def write_virtual_repo(name: str, spec_version: int) -> None:
     }
 
 
+def write_features_repo(name: str, spec_version: int) -> None:
+    """History, refs and hierarchy features the other repositories do not
+    exercise: deleted, reset, unicode and slash-named refs; amended and
+    detached commits; repo metadata, status and feature flags; an ops log
+    longer than one repo info file; moved and deleted nodes; resized arrays;
+    deleted chunks; inline and native chunks in one array; manifest splits
+    rewritten piecemeal; node names whose bytewise and component-wise sort
+    orders differ; and the data types and codecs not covered above.
+
+    These repositories have no entries in expected.json: they are checked
+    against icechunk-python by testdata/oracle/oracle.py and
+    consistency_test.go. Spec v1 lacks some of these features (moves,
+    amends, detached snapshots, repo metadata, status, flags, "/" in refs).
+    """
+    v2 = spec_version >= 2
+    path = OUT / name
+    config = ic.RepositoryConfig.default()
+    config.inline_chunk_threshold_bytes = 64
+    config.manifest = ic.ManifestConfig(splitting=ic.ManifestSplittingConfig.from_dict({
+        ic.ManifestSplitCondition.path_matches("split/.*"): {
+            ic.ManifestSplitDimCondition.Axis(0): 2,
+            ic.ManifestSplitDimCondition.Any(): 3,
+        },
+    }))
+    if v2:
+        # Older updates move to a previous repo info file (repo_before_updates).
+        config.num_updates_per_repo_info_file = 8
+    repo = ic.Repository.create(ic.local_filesystem_storage(str(path)), config=config, spec_version=spec_version)
+    initial = repo.lookup_branch("main")
+
+    # --- commit 1: hierarchy, attributes, data types, codecs
+    session = repo.writable_session("main")
+    root = zarr.group(store=session.store, attributes={
+        "title": "feature matrix",
+        "unicode": "ünïcødé 🧊",
+        "nested": {"list": [1, 2.5, None, True, "x"], "empty": {}, "empty_list": []},
+        "big": 2**62,
+        "negative": -12345678901,
+        "tiny": 1e-300,
+        "flag": False,
+        "nothing": None,
+    })
+    # "/order/a/b" sorts before "/order/a-b" component-wise, after it bytewise.
+    order = root.create_group("order", attributes={"about": "sort order"})
+    a = order.create_group("a", attributes={"which": "a"})
+    names = ["a-b", "a.b", "a b", "A", "ab", "a0", "é", "z", "a/b", "a/b-c/leaf"]
+    for i, n in enumerate(names):
+        arr = order.create_array(n, shape=(2,), chunks=(1,), dtype="int16", fill_value=-1, attributes={"name": n})
+        arr[...] = np.array([i, 100 + i], dtype="int16")
+    a.create_group("empty-group")
+    # Node names that look like parts of chunk keys.
+    c = root.create_group("c")
+    arr = c.create_array("0", shape=(3,), chunks=(2,), dtype="uint8", fill_value=0)
+    arr[...] = np.array([1, 2, 3], dtype="uint8")
+    arr = root.create_group("weird").create_array("c", shape=(2, 2), chunks=(1, 1), dtype="uint8", fill_value=0)
+    arr[...] = np.array([[1, 2], [3, 4]], dtype="uint8")
+    arr = root.create_group("ユニコード").create_array("データ", shape=(3,), chunks=(3,), dtype="float32", fill_value=0.0)
+    arr[...] = np.array([1.5, -2.5, 3.25], dtype="float32")
+
+    dims = root.create_group("dims")
+    arr = dims.create_array("partial", shape=(2, 3), chunks=(2, 2), dtype="int8", dimension_names=("x", None))
+    arr[...] = np.arange(6, dtype="int8").reshape(2, 3)
+    arr = dims.create_array("unnamed", shape=(2, 3), chunks=(2, 2), dtype="int8", dimension_names=(None, None))
+    arr[...] = 1
+
+    dtypes = root.create_group("dtypes")
+    utf32 = np.array(["", "a", "Ωmega", "🧊🧊", "abcde"], dtype="<U5")
+    for vname, ser in [("utf32", None), ("utf32_be", BytesCodec(endian="big"))]:
+        kw = {"serializer": ser} if ser else {}
+        arr = dtypes.create_array(vname, shape=(6,), chunks=(4,), dtype="<U5", fill_value="", **kw)
+        arr[:5] = utf32
+    arr = dtypes.create_array("nullterm_bytes", shape=(5,), chunks=(2,), dtype="S4", fill_value=b"")
+    arr[:4] = np.array([b"", b"a", b"abcd", b"\x01\x02"], dtype="S4")
+    arr = dtypes.create_array("raw_bytes", shape=(4,), chunks=(3,), dtype="V4")
+    arr[...] = np.frombuffer(bytes(range(16)), dtype="V4")
+    arr = dtypes.create_array("vlen_bytes", shape=(5,), chunks=(2,), dtype=zarr.dtype.VariableLengthBytes())
+    arr[:4] = np.array([b"", b"\x00\xff", b"hello", bytes(range(40))], dtype=object)
+    arr = dtypes.create_array("vlen_strings_sharded", shape=(9,), chunks=(2,), shards=(4,), dtype=str, fill_value="-")
+    arr[:7] = np.array(["α", "", "βγ", "a much longer value", "🧊", "x", "y"])
+    for vname, unit, ser in [("timedelta_ms", "timedelta64[ms]", None), ("timedelta_ms_be", "timedelta64[ms]", BytesCodec(endian="big")),
+                             ("datetime_ns", "datetime64[ns]", None), ("datetime_D", "datetime64[D]", None)]:
+        kw = {"serializer": ser} if ser else {}
+        arr = dtypes.create_array(vname, shape=(5,), chunks=(2,), dtype=unit, **kw)
+        arr[:4] = np.array([-5, 0, 86_400_000, "NaT"], dtype=unit)
+    arr = dtypes.create_array("bool_fill_true", shape=(5,), chunks=(2,), dtype=bool, fill_value=True)
+    arr[:2] = [False, False]
+    for vname, dt in [("float16_be", "float16"), ("uint32_be", "uint32"), ("complex64_be", "complex64"), ("complex128_be", "complex128")]:
+        arr = dtypes.create_array(vname, shape=(3, 2), chunks=(2, 2), dtype=dt, fill_value=0, serializer=BytesCodec(endian="big"))
+        data = np.arange(6).reshape(3, 2) * 3 + 1
+        arr[...] = (data + 1j * data).astype(dt) if np.dtype(dt).kind == "c" else data.astype(dt)
+
+    codecs = root.create_group("codecs")
+    arr = codecs.create_array("nested_sharding", shape=(16, 16), dtype="int32", fill_value=-1, compressors=None,
+                              chunks=(8, 8), serializer=ShardingCodec(chunk_shape=(8, 8), codecs=[ShardingCodec(chunk_shape=(4, 4))]))
+    arr[:12, :] = np.arange(16 * 16, dtype="int32").reshape(16, 16)[:12, :]
+    arr = codecs.create_array("sharding_no_index_crc", shape=(10, 10), dtype="float32", fill_value=0, compressors=None, chunks=(6, 6),
+                              serializer=ShardingCodec(chunk_shape=(3, 3), index_codecs=[BytesCodec()]))
+    arr[...] = rng_data((10, 10), "float32", seed=11)
+    arr = codecs.create_array("sharding_inner_codecs", shape=(9, 7), dtype="int64", fill_value=0, compressors=None, chunks=(6, 4),
+                              serializer=ShardingCodec(chunk_shape=(3, 2), index_location="start",
+                                                       codecs=[TransposeCodec(order=(1, 0)), BytesCodec(endian="big"), GzipCodec(level=1)]))
+    arr[...] = rng_data((9, 7), "int64", seed=12)
+    arr = codecs.create_array("sharded_all_fill", shape=(8, 8), chunks=(2, 2), shards=(4, 4), dtype="int8", fill_value=5)
+    arr[...] = 5
+    arr = codecs.create_array("zstd_checksum", shape=(20,), chunks=(7,), dtype="uint16", compressors=ZstdCodec(level=1, checksum=True))
+    arr[...] = np.arange(20, dtype="uint16") * 3
+    c1 = session.commit("hierarchy", metadata={"step": 1})
+
+    # --- commit 2: arrays the later commits change
+    session = repo.writable_session("main")
+    root = zarr.open_group(session.store, mode="r+")
+    ops = root.create_group("ops")
+    arr = ops.create_array("resize", shape=(10, 10), chunks=(3, 3), dtype="int16", fill_value=-1)
+    arr[...] = np.arange(100, dtype="int16").reshape(10, 10)
+    arr = ops.create_array("deleted_chunks", shape=(6,), chunks=(2,), dtype="int32", fill_value=0)
+    arr[...] = np.arange(1, 7, dtype="int32")
+    arr = ops.create_array("overwritten", shape=(4, 4), chunks=(2, 2), dtype="float32", fill_value=0)
+    arr[...] = 1.5
+    # Constant chunks compress below the 64 byte inline threshold; random ones do not.
+    arr = ops.create_array("inline_mixed", shape=(256,), chunks=(64,), dtype="int64", fill_value=0)
+    arr[:64] = 7
+    arr[64:128] = rng_data((64,), "int64", seed=5)
+    arr[192:] = 9
+    ops.create_group("to_delete", attributes={"doomed": True}).create_array("leaf", shape=(2,), chunks=(2,), dtype="int8")[...] = 3
+    ops.create_array("to_move", shape=(3,), chunks=(2,), dtype="int8", fill_value=0)[...] = [4, 5, 6]
+    tree = root.create_group("tree", attributes={"moved": False})
+    tree.create_array("leaf", shape=(2,), chunks=(1,), dtype="int8", fill_value=0)[...] = [7, 8]
+    split = root.create_group("split")
+    arr = split.create_array("grid", shape=(12, 9), chunks=(1, 1), dtype="int16", fill_value=-1)
+    arr[:6] = np.arange(54, dtype="int16").reshape(6, 9)
+    c2 = session.commit("chunk ops", metadata={"step": 2})
+
+    repo.create_branch("dev", c2)
+    repo.create_tag("v-c2", c2)
+    repo.create_tag("to-delete", c2)
+    repo.create_branch("ünïcode", c2)
+    repo.create_tag("with space", c2)
+    if v2:
+        repo.create_branch("feature/nested/x", c2)
+        repo.create_tag("rel/1.0", c1)
+
+    # --- commit 3: shrink, delete chunks and nodes, replace an array
+    session = repo.writable_session("main")
+    root = zarr.open_group(session.store, mode="r+")
+    zarr.open_array(session.store, path="ops/resize", mode="r+").resize((5, 5))
+    # Writing the fill value over a whole chunk deletes it.
+    zarr.open_array(session.store, path="ops/deleted_chunks", mode="r+")[2:4] = 0
+    del root["ops/overwritten"]
+    root["ops"].create_array("overwritten", shape=(3,), chunks=(2,), dtype="int8", fill_value=9)[...] = [1, 2, 3]
+    del root["ops/to_delete"]
+    zarr.open_array(session.store, path="split/grid", mode="r+")[6:] = -np.arange(54, dtype="int16").reshape(6, 9)
+    root.attrs["updated"] = True
+    session.commit("mutations", metadata={"step": 3})
+
+    # --- commit 4: grow again; edge chunks keep their stale values
+    session = repo.writable_session("main")
+    zarr.open_array(session.store, path="ops/resize", mode="r+").resize((10, 10))
+    session.commit("regrow")
+
+    if v2:
+        session = repo.rearrange_session("main")
+        session.move("/ops/to_move", "/ops/moved")
+        session.move("/tree", "/ops/tree2")
+        session.commit("move nodes")
+
+    # --- other branches
+    session = repo.writable_session("dev")
+    zarr.open_array(session.store, path="ops/inline_mixed", mode="r+")[:4] = 1
+    session.commit("dev work")
+    if v2:
+        session = repo.writable_session("dev")
+        zarr.open_array(session.store, path="ops/inline_mixed", mode="r+")[4:8] = 2
+        session.amend("dev work (amended)", metadata={"amended": True})
+
+    repo.delete_tag("to-delete")
+    repo.create_branch("temp", c1)
+    repo.delete_branch("temp")
+    repo.create_branch("reset-me", repo.lookup_branch("main"))
+    repo.reset_branch("reset-me", c2)
+    repo.create_branch("empty", initial)
+
+    if v2:
+        session = repo.writable_session("main")
+        zarr.open_array(session.store, path="c/0", mode="r+")[0] = 42
+        session.flush("detached snapshot", metadata={"detached": True})
+
+    session = repo.writable_session("main")
+    zarr.open_array(session.store, path="weird/c", mode="r+")[0, 0] = 99
+    session.commit("ünïcode message 🧊\nsecond line", metadata={
+        "author": "ünï", "tags": ["a", "b"], "float": 1.5, "int": -3, "nested": {"deep": {"deeper": [None]}},
+    })
+
+    if v2:
+        repo.set_metadata({"owner": "icechunk-go", "nested": {"x": [1, 2]}, "unicode": "日本"})
+        repo.update_metadata({"added": True})
+        repo.set_feature_flag("move_node", False)
+        repo.set_feature_flag("create_tag", True)
+        # Last: a read-only repository accepts no further updates.
+        repo.set_status(ic.RepoStatus(availability=ic.RepoAvailability.read_only, limited_availability_reason="frozen for tests"))
+
+
 REPOS = {
     "codecs-v2": lambda: write_codecs_repo("codecs-v2", spec_version=2),
     "codecs-v1": lambda: write_codecs_repo("codecs-v1", spec_version=1),
     "virtual-v2": lambda: write_virtual_repo("virtual-v2", spec_version=2),
     "virtual-v1": lambda: write_virtual_repo("virtual-v1", spec_version=1),
+    "features-v2": lambda: write_features_repo("features-v2", spec_version=2),
+    "features-v1": lambda: write_features_repo("features-v1", spec_version=1),
 }
 
 

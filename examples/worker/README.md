@@ -12,6 +12,15 @@ store that any Zarr client can read.
 | `GET /array/<path>?ref=main&slice=0:10,5` | values as JSON (`null` for NaN/Inf); `&format=binary` for raw little-endian bytes with `x-shape`/`x-dtype` headers |
 | `GET /chunks/<path>?ref=main` | chunk references (inline / native / virtual) |
 | `GET /zarr/<ref>/<key>` | Zarr v3 key/value store with `Range` support; `<ref>` is a branch, tag or snapshot id |
+| `POST /arrays/<path>?branch=main` | create an array (JSON spec: `shape`, `chunk_shape`, `shard_shape`, `data_type`, `fill_value`, `codecs`, `dimension_names`, `attributes`) and commit; needs `WRITE_TOKEN` |
+| `PUT /array/<path>?branch=main` | write `{"start": [...], "shape": [...], "data": [...]}` (flat, C order) and commit, rebasing onto concurrent commits; needs `WRITE_TOKEN` |
+
+```sh
+curl -X POST -H "Authorization: Bearer $TOKEN" "$WORKER/arrays/weather/temp" \
+  -d '{"shape":[8,6],"chunk_shape":[2,3],"data_type":"float32","fill_value":"NaN"}'
+curl -X PUT -H "Authorization: Bearer $TOKEN" "$WORKER/array/weather/temp" \
+  -d '{"start":[0,0],"shape":[1,6],"data":[1,2,3,4,5,6]}'
+```
 
 ```python
 import zarr
@@ -23,7 +32,7 @@ temperature = zarr.open_array("https://<worker>/zarr/main/temperature", mode="r"
 Needs Go ≥ 1.25 and Node (for `npx wrangler`).
 
 ```sh
-./build.sh                                   # → build/app.wasm (~1.8 MB gzipped) + build/wasm_exec.js
+./build.sh                                   # → build/app.wasm (~2.2 MB gzipped) + build/wasm_exec.js
 ./seed-r2.sh ../../testdata/upstream/test-repo-v2 test-repo-v2   # fill wrangler's local R2
 npx wrangler dev                             # http://localhost:8787
 curl 'localhost:8787/array/group1/small_chunks?ref=my-branch'
@@ -52,6 +61,8 @@ python ../python-writer/write_repo.py --r2-bucket icechunk-repos --prefix demo
 | `DEFAULT_REF` | ref used when a request names none (default `main`) |
 | `REPO_INFO_TTL` | how long branch/tag lookups are cached per isolate (default `10s`) |
 | `CACHE_MB` | decoded snapshot/manifest cache per isolate, in MiB (default `32`; isolates have 128 MB) |
+| `WRITE_TOKEN` (secret) | enables the write endpoints for `Authorization: Bearer <token>` (`wrangler secret put WRITE_TOKEN`) |
+| `CREATE_IF_MISSING` | `"true"` creates the repository on first use |
 | `VIRTUAL_CONTAINERS` | JSON object mapping virtual chunk URL prefixes to `https://…` base URLs or `r2:<BINDING>[/prefix]` |
 
 ## How it works
@@ -64,7 +75,7 @@ python ../python-writer/write_repo.py --r2-bucket icechunk-repos --prefix demo
   reused across requests.
 - Storage goes through the R2 binding (`bucket.get` with `range` and
   `onlyIf`) or `fetch`. `net/http` is not linked, which keeps the module at
-  ~1.8 MB gzipped (with `net/http` it would be ~3 MB+, over the free-plan
+  ~2.2 MB gzipped (with `net/http` it would be ~3.5 MB, over the free-plan
   limit).
 - Workers forbid a request from awaiting I/O started by another request, and
   in Go's WebAssembly runtime a goroutine woken by another request's event runs

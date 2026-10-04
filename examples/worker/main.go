@@ -19,11 +19,15 @@
 //	CACHE_MB            snapshot/manifest cache size in MiB (default 32)
 //	VIRTUAL_CONTAINERS  JSON object mapping virtual chunk URL prefixes to
 //	                    "https://..." base URLs or "r2:<BINDING>[/prefix]"
+//	WRITE_TOKEN         secret enabling the write endpoints (POST /arrays/...,
+//	                    PUT /array/...) for "Authorization: Bearer <token>"
+//	CREATE_IF_MISSING   "true" creates the repository if it does not exist
 package main
 
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -110,10 +114,16 @@ func newService(ctx context.Context, env cfworker.Env) (*serve.Service, error) {
 		}
 	}
 	repo, err := icechunk.Open(ctx, st, opts)
+	if errors.Is(err, icechunk.ErrRepositoryNotFound) && env.Var("CREATE_IF_MISSING") == "true" {
+		repo, err = icechunk.Create(ctx, st, opts)
+		if errors.Is(err, icechunk.ErrAlreadyExists) { // a concurrent request created it
+			repo, err = icechunk.Open(ctx, st, opts)
+		}
+	}
 	if err != nil {
 		return nil, err
 	}
-	return &serve.Service{Repo: repo, DefaultRef: env.Var("DEFAULT_REF")}, nil
+	return &serve.Service{Repo: repo, DefaultRef: env.Var("DEFAULT_REF"), WriteToken: env.Var("WRITE_TOKEN")}, nil
 }
 
 func main() {
@@ -122,7 +132,13 @@ func main() {
 		if err != nil {
 			return nil, err
 		}
-		resp := s.Handle(ctx, &serve.Request{Method: r.Method, URL: r.URL, Header: r.Header})
+		req := &serve.Request{Method: r.Method, URL: r.URL, Header: r.Header}
+		if r.Method == "POST" || r.Method == "PUT" {
+			if req.Body, err = r.Body(ctx); err != nil {
+				return nil, err
+			}
+		}
+		resp := s.Handle(ctx, req)
 		return &cfworker.Response{Status: resp.Status, Header: resp.Header, Body: resp.Body}, nil
 	})
 }

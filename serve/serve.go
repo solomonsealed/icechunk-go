@@ -33,8 +33,11 @@ import (
 type Request struct {
 	Method string
 	URL    *url.URL
-	// Header holds request headers with lower-case names (only "range" is used).
+	// Header holds request headers with lower-case names ("range", and
+	// "authorization" for writes).
 	Header map[string]string
+	// Body is the request body (write endpoints only).
+	Body []byte
 }
 
 // Response is an HTTP response.
@@ -51,6 +54,9 @@ type Service struct {
 	DefaultRef string
 	// MaxElements bounds the size of /array responses (default 4 Mi elements).
 	MaxElements uint64
+	// WriteToken enables the write endpoints (see write.go) for requests
+	// carrying "Authorization: Bearer <WriteToken>". Empty disables writes.
+	WriteToken string
 }
 
 type httpError struct {
@@ -113,9 +119,11 @@ func (s *Service) route(ctx context.Context, r *Request) (*Response, error) {
 	switch r.Method {
 	case "OPTIONS":
 		return &Response{Status: 204, Header: map[string]string{
-			"access-control-allow-methods": "GET, HEAD, OPTIONS",
-			"access-control-allow-headers": "range",
+			"access-control-allow-methods": "GET, HEAD, OPTIONS, POST, PUT",
+			"access-control-allow-headers": "range, authorization, content-type",
 		}}, nil
+	case "POST", "PUT":
+		return s.write(ctx, r)
 	case "GET", "HEAD":
 	default:
 		return nil, &httpError{405, "method not allowed"}

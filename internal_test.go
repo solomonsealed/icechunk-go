@@ -3,7 +3,10 @@ package icechunk
 import (
 	"context"
 	"errors"
+	"fmt"
 	"math/rand"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -264,5 +267,47 @@ func TestCacheRetriesAfterLoaderCancellation(t *testing.T) {
 	close(release)
 	if v := <-got; v != "fresh" {
 		t.Errorf("waiter got %v, want its own successful load", v)
+	}
+}
+
+// PrunedLogsFor exposes a snapshot's pruned ancestor tx logs to tests.
+func PrunedLogsFor(t *testing.T, dir string, id SnapshotID) []string {
+	raw, err := os.ReadFile(filepath.Join(dir, "repo"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	doc, err := parseRepoDoc(raw)
+	if err != nil {
+		t.Fatal(err)
+	}
+	i, ok := doc.snapshotIndex(id)
+	if !ok {
+		return nil
+	}
+	var out []string
+	for _, p := range doc.snapshots[i].pruned {
+		out = append(out, p.String())
+	}
+	return out
+}
+
+// The ops log honours num_updates_per_repo_info_file from the repo config.
+func TestOpsLogLimitFromConfig(t *testing.T) {
+	cfg, err := format.EncodeFlexBuffer(map[string]any{"num_updates_per_repo_info_file": uint64(3)})
+	if err != nil {
+		t.Fatal(err)
+	}
+	doc := &repoDoc{hasConfig: true, config: cfg}
+	if doc.updatesLimit() != 3 {
+		t.Fatalf("limit = %d", doc.updatesLimit())
+	}
+	for i := 0; i < 5; i++ {
+		doc.pushUpdate(docUpdate{typ: fbs.UpdateTypeGCRanUpdate, updatedAt: uint64(i + 1)}, fmt.Sprintf("repo.backup%d", i), doc.updatesLimit())
+	}
+	if len(doc.updates) != 3 || doc.repoBeforeUpdates == nil || *doc.repoBeforeUpdates != "repo.backup2" { // u1 was pushed out; its backup (written at push 2) still holds u1 and u0
+		t.Errorf("updates %d, before %v", len(doc.updates), doc.repoBeforeUpdates)
+	}
+	if (&repoDoc{}).updatesLimit() != 1000 {
+		t.Error("default limit")
 	}
 }

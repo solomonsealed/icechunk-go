@@ -4,6 +4,7 @@
 package nethttp
 
 import (
+	"io"
 	"net/http"
 
 	"github.com/solomonsealed/icechunk-go/serve"
@@ -12,11 +13,20 @@ import (
 // Handler adapts s to net/http.
 func Handler(s *serve.Service) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		resp := s.Handle(r.Context(), &serve.Request{
+		req := &serve.Request{
 			Method: r.Method,
 			URL:    r.URL,
-			Header: map[string]string{"range": r.Header.Get("Range")},
-		})
+			Header: map[string]string{"range": r.Header.Get("Range"), "authorization": r.Header.Get("Authorization")},
+		}
+		if r.Method == http.MethodPost || r.Method == http.MethodPut {
+			body, err := io.ReadAll(io.LimitReader(r.Body, 64<<20))
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			req.Body = body
+		}
+		resp := s.Handle(r.Context(), req)
 		for k, v := range resp.Header {
 			w.Header().Set(k, v)
 		}

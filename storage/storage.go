@@ -164,8 +164,10 @@ func (l *Local) List(ctx context.Context, prefix string) ([]string, error) {
 // Memory is an in-memory Storage, handy for tests and for repositories
 // bundled into a binary.
 type Memory struct {
-	mu      sync.RWMutex
-	objects map[string][]byte
+	mu       sync.RWMutex
+	objects  map[string][]byte
+	versions map[string]uint64
+	modTimes map[string]time.Time
 }
 
 // NewMemory returns an in-memory storage holding a copy of objects.
@@ -175,13 +177,6 @@ func NewMemory(objects map[string][]byte) *Memory {
 		m.objects[k] = v
 	}
 	return m
-}
-
-// Put stores an object.
-func (m *Memory) Put(key string, data []byte) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.objects[key] = data
 }
 
 // Get implements Storage.

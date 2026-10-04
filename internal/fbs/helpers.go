@@ -19,3 +19,19 @@ func (rcv *ObjectId8) Bytes() []byte {
 func (rcv *ArrayNodeData) HasShapeV2() bool {
 	return rcv._tab.Offset(10) != 0
 }
+
+// Presence checks for optional fields, needed to rewrite files without
+// turning absent fields into present-but-empty ones (vtable slots from the
+// generated accessors).
+
+// HasConfig reports whether Repo.config is present.
+func (rcv *Repo) HasConfig() bool { return rcv._tab.Offset(22) != 0 }
+
+// HasEnabledFeatureFlags reports whether Repo.enabled_feature_flags is present.
+func (rcv *Repo) HasEnabledFeatureFlags() bool { return rcv._tab.Offset(24) != 0 }
+
+// HasDisabledFeatureFlags reports whether Repo.disabled_feature_flags is present.
+func (rcv *Repo) HasDisabledFeatureFlags() bool { return rcv._tab.Offset(26) != 0 }
+
+// HasPrunedAncestorTxLogs reports whether SnapshotInfo.pruned_ancestor_tx_logs is present.
+func (rcv *SnapshotInfo) HasPrunedAncestorTxLogs() bool { return rcv._tab.Offset(14) != 0 }

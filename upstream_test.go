@@ -155,7 +155,7 @@ func TestCanReadOldRepo(t *testing.T) {
 			if nref == nil || nref.Kind != icechunk.NativeChunk {
 				t.Errorf("c/0/1 ref = %+v; want native", nref)
 			}
-			virtual.Put("can_read_old/chunk-1", native)
+			virtual.Put(ctx, "can_read_old/chunk-1", native, nil)
 			if v := readFloats(t, s, "group1/big_chunks"); !allEqual(v, 42) || len(v) != 100 {
 				t.Errorf("big_chunks = %v", v)
 			}

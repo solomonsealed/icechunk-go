@@ -1,22 +1,15 @@
 # icechunk-go
 
-A pure-Go, read-only implementation of [Icechunk](https://icechunk.io), with a
-Zarr v3 decoder. It runs natively, and in Cloudflare Workers (`GOOS=js
-GOARCH=wasm`, ~1.8 MB gzipped).
+A pure-Go implementation of [Icechunk](https://icechunk.io), reader and
+writer, with a Zarr v3 codec layer. It runs natively, and in Cloudflare
+Workers (`GOOS=js GOARCH=wasm`, ~2.2 MB gzipped).
 
-It follows the split recommended for porting a storage format whose writer is
-the hard part:
-
-```
- icechunk-python / Rust  ──commits──▶  object storage  ◀──reads──  Go (this module)
- (writes, conflict                      (R2, S3, GCS,              native programs,
-  resolution, GC, expiry)               HTTP, local disk)          Cloudflare Workers
-```
-
-Writing (optimistic commits, rebase, manifest splitting, garbage collection,
-expiration) stays with the official library; see
-[`examples/python-writer`](examples/python-writer). The Go side reads
-everything those writers produce.
+Go and icechunk-python/Rust can work on the same repositories: the Go writer
+produces files upstream reads and verifies, and it commits on top of
+upstream-written history (both directions are tested). Repository
+maintenance (garbage collection, expiration, configuration, migrations from
+spec v1) stays with the official library; see
+[`examples/python-writer`](examples/python-writer).
 
 ## Features
 
@@ -46,7 +39,34 @@ everything those writers produce.
   (`cfworker`).
 - **An HTTP service** (`serve`): JSON API plus a read-only Zarr store, so
   zarr-python, zarrita.js and similar clients can read a repository through a
-  Worker.
+  Worker, and optional token-protected endpoints that create and write arrays.
+
+### Writing (spec v2)
+
+- `Create` a repository, open a `WritableSession` on a branch, create groups
+  and arrays (from a `zarr.ArraySpec` or a raw `zarr.json`), write chunks,
+  virtual references and deletions, then `Commit` with metadata. Reads in a
+  writable session see its uncommitted changes.
+- Commits follow upstream's protocol: chunks, manifests, transaction log and
+  snapshot are written first, then the repo info file is replaced with a
+  conditional write (after backing it up to `overwritten/`), retrying when
+  another writer got there first. With `CommitOptions{Rebase: true}` a
+  commit whose branch moved is re-applied on the new tip unless the
+  intervening transaction logs touched the same nodes or chunks.
+- Commit metadata is stored as JSON values (upstream parses it as JSON):
+  structs become objects and `[]byte` a base64 string. Writes are refused
+  when the local clock is more than 10 minutes off the object store's, as
+  upstream does, since future timestamps would block other writers.
+- Branches and tags: create, reset and delete, honouring the repository's
+  status and the `create_tag` / `delete_tag` feature flags. The ops log and
+  everything else in the repo info file are carried over byte-for-byte.
+- `zarr.Array.Write` writes regions (partly covered chunks are
+  read-modified-written; chunks holding only the fill value are deleted, as
+  zarr-python does), with encoders for every codec above except bz2, lzma
+  and blosclz/snappy (blosc frames for those are written with lz4).
+- Writable storage (`storage.Writer`): memory, local files (atomic renames,
+  conditional writes serialized with a file lock), S3-compatible APIs
+  (`If-Match` / `If-None-Match`), R2 bindings and fetch-based S3 in Workers.
 
 ## Library usage
 
@@ -78,6 +98,23 @@ for si, err := range repo.Ancestry(ctx, icechunk.AtBranch("main")) { /* commits 
 raw, err := session.Store().Get(ctx, "temperature/c/0/0/0")      // Zarr key/value view
 ```
 
+Writing:
+
+```go
+repo, err := icechunk.Create(ctx, storage.NewLocal("./weather"), nil) // or Open an existing one
+s, err := repo.WritableSession(ctx, "main")
+arr, err := s.CreateArray(ctx, "/temperature", zarr.ArraySpec{
+	Shape: []uint64{365, 90, 180}, ChunkShape: []uint64{1, 90, 180},
+	DataType: "float32", FillValue: math.NaN(),
+	DimensionNames: []string{"time", "lat", "lon"},
+	Attributes: map[string]any{"units": "degC"},
+})                                                                   // default codecs: bytes + zstd
+day, err := zarr.FromSlice([]uint64{1, 90, 180}, values)             // values []float32
+err = arr.Write(ctx, []uint64{0, 0, 0}, day)
+id, err := s.Commit(ctx, "add day 0", &icechunk.CommitOptions{Rebase: true})
+err = repo.CreateTag(ctx, "v1", id)
+```
+
 `Repository` is safe for concurrent use and meant to be long-lived. It caches
 decoded snapshots and manifests (256 MiB by default). Manifests are searched
 in place in their flatbuffer, never expanded into per-ref Go structs, which
@@ -98,8 +135,11 @@ cfworker.Serve(func(ctx context.Context, r *cfworker.Request) (*cfworker.Respons
 })
 ```
 
-Read the [Worker README](examples/worker/README.md) for the one rule Go
-handlers in Workers must follow: never wait on I/O another request started.
+The same Worker can also write (`WRITE_TOKEN`, `CREATE_IF_MISSING`): in
+`wrangler dev` it created a repository in R2 and committed concurrent writes
+from parallel requests, and icechunk-python read the result. Read the
+[Worker README](examples/worker/README.md) for the one rule Go handlers in
+Workers must follow: never wait on I/O another request started.
 
 ## CLI
 
@@ -110,14 +150,23 @@ icechunk-go log   -ref main ./repo
 icechunk-go ls    ./repo
 icechunk-go read  -slice "0, 10:20, :" ./repo temperature
 icechunk-go cat   ./repo temperature/zarr.json
-icechunk-go serve -addr :8080 ./repo        # same API as the Worker
+icechunk-go serve -addr :8080 ./repo        # same API as the Worker (-write-token T enables writes)
+icechunk-go create ./new-repo
+icechunk-go branch ./repo dev main          # -delete to delete
+icechunk-go tag    ./repo v1 main
 ```
 
 ## Limitations
 
-- Read-only by design. Writes go through icechunk-python or the Rust crate.
-- Transaction logs (diffs, conflict detection) are not read; they are not
-  needed for reading data.
+- The writer handles spec v2 only (upgrade v1 repositories with
+  icechunk-python). It does not split manifests (each changed array gets one
+  manifest; untouched arrays keep theirs), compress virtual chunk locations,
+  amend commits, move nodes, change configuration, or run garbage collection
+  and expiration. Virtual references are not checked against the
+  repository's configured virtual chunk containers.
+- Rebase conflict detection is coarse: any commit that touched the same
+  chunk, or changed or deleted the same node, conflicts.
+- Diffs between snapshots are not exposed.
 - Ops-log entries beyond the current repo info file (`repo_before_updates`)
   are not followed.
 - GCS and Azure are reachable only through S3-compatible (HMAC) or plain
@@ -129,8 +178,8 @@ icechunk-go serve -addr :8080 ./repo        # same API as the Worker
   and `format=binary` return exact bytes.
 
 Upstream (Earthmover) recommends binding to the Rust library over
-reimplementing Icechunk. This module is an independent reader, kept honest by
-the tests below. Their README invites people implementing Icechunk support to
+reimplementing Icechunk. This module is an independent implementation, kept
+honest by the tests below. Their README invites people implementing Icechunk support to
 open an issue, which is worth doing for anything long-lived.
 
 ## How it is built and tested
@@ -144,15 +193,38 @@ open an issue, which is worth doing for anything long-lived.
 - `testdata/generated`: repositories written by icechunk-python 2.2.2 via
   `testdata/generate.py` (every data type and codec above, sharding,
   rectilinear grids, 2000 dictionary-compressed virtual chunks, checksums,
-  spec v1 and v2). Go must reproduce the SHA-256 of every array's bytes.
+  spec v1 and v2, and in `features-*` deleted, reset, amended, detached and
+  unicode/slash-named refs, moves, resizes, deletions, repo metadata, status,
+  flags and a multi-file ops log). Go must reproduce the SHA-256 of every
+  array's bytes.
+- Consistency with icechunk-python: `testdata/oracle/oracle.py` records what
+  icechunk-python reads from every fixture above (refs, ancestry, repo info,
+  snapshots, manifests, every store key and byte range, listings, malformed
+  keys, chunk refs, region and per-chunk reads, and virtual chunks with ETag
+  and Last-Modified checks against a local S3 endpoint). The `TestPython*`
+  tests require the Go reader and the HTTP service to read the same.
+  Deliberate differences are listed in `acceptedDivergence`, and ones not yet
+  fixed in `knownInconsistencies` (these fail with `ICECHUNK_STRICT=1`).
 - Corrupted flatbuffers (thousands of random mutations) must produce errors,
   never panics or runaway allocations.
 - `testdata/check_http.py` compares zarr-python reading through the HTTP
   service (native or the Worker) with icechunk-python reading the repository
   directly.
+- Writer: every repo info file in the fixtures survives a parse/encode round
+  trip unchanged; concurrent writers (memory, local files, fake S3, R2 in
+  `wrangler dev`) lose no commits; `testdata/check_go_writer.py` has
+  icechunk-python verify a Go-written repository (history, metadata, refs,
+  diffs from Go transaction logs, arrays in 16 codec configurations) and
+  commit on top of it; `testdata/check_go_on_python.py` verifies Go commits
+  on Python-written repositories (split manifests, expired history,
+  sharding).
 
 ```sh
 go test ./...
 python testdata/generate.py                    # regenerate fixtures (icechunk, zarr, numpy)
+python testdata/oracle/oracle.py               # re-record icechunk-python's answers for TestPython*
+ICECHUNK_PYTHON=.venv/bin/python go test -run Python .   # compare with a live icechunk-python
 python testdata/check_http.py testdata/generated/codecs-v2 http://localhost:8787
+ICECHUNK_GO_WRITE_DIR=/tmp/gw go test -run 'TestWriteForPython|TestWriteOnPythonRepos' .
+python testdata/check_go_writer.py /tmp/gw && python testdata/check_go_on_python.py /tmp/gw
 ```

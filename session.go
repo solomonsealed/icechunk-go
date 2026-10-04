@@ -4,34 +4,63 @@ import (
 	"context"
 	"fmt"
 	"iter"
+	"sort"
+	"sync"
 
 	"github.com/solomonsealed/icechunk-go/zarr"
 )
 
-// Session is a read-only view of one snapshot. It is safe for concurrent use.
+// Session is a view of one snapshot. Read-only sessions come from
+// Repository.ReadonlySession; writable ones from Repository.WritableSession,
+// whose reads include the session's uncommitted changes. Sessions are safe
+// for concurrent use.
 type Session struct {
 	repo *Repository
 	snap *Snapshot
 	id   SnapshotID
+
+	// Writable sessions only.
+	branch string
+	mu     sync.RWMutex
+	cs     *changeSet // nil when read-only (or after a successful commit)
 }
 
-// SnapshotID returns the id of the snapshot being read.
-func (s *Session) SnapshotID() SnapshotID { return s.id }
+// Writable reports whether the session accepts changes.
+func (s *Session) Writable() bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.cs != nil
+}
 
-// Snapshot returns the decoded snapshot.
-func (s *Session) Snapshot() *Snapshot { return s.snap }
+// Branch returns the branch a writable session commits to.
+func (s *Session) Branch() string { return s.branch }
+
+// SnapshotID returns the id of the snapshot being read (for a writable
+// session: its base snapshot, or the new one after Commit).
+func (s *Session) SnapshotID() SnapshotID {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.id
+}
+
+// Snapshot returns the decoded snapshot (see SnapshotID).
+func (s *Session) Snapshot() *Snapshot {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.snap
+}
 
 // Repository returns the repository the session reads from.
 func (s *Session) Repository() *Repository { return s.repo }
 
 // Node returns the array or group at path ("/", "/a/b" or "a/b").
-func (s *Session) Node(path string) (*Node, error) { return s.snap.Node(path) }
+func (s *Session) Node(path string) (*Node, error) { return s.node(path) }
 
 // Nodes returns all arrays and groups, sorted by path.
-func (s *Session) Nodes() ([]*Node, error) { return s.snap.Nodes() }
+func (s *Session) Nodes() ([]*Node, error) { return s.nodes() }
 
 func (s *Session) arrayNode(path string) (*Node, error) {
-	n, err := s.snap.Node(path)
+	n, err := s.node(path)
 	if err != nil {
 		return nil, err
 	}
@@ -52,6 +81,9 @@ func (s *Session) ChunkRef(ctx context.Context, path string, coords []uint32) (*
 }
 
 func (s *Session) chunkRef(ctx context.Context, n *Node, coords []uint32) (*ChunkRef, error) {
+	if ref, edited := s.sessionChunk(n, coords); edited {
+		return ref, nil
+	}
 	a := n.Array
 	if len(a.Manifests) == 0 || !a.validChunkCoord(coords) {
 		return nil, nil
@@ -107,32 +139,68 @@ func (s *Session) ChunkRefs(ctx context.Context, path string) iter.Seq2[ChunkEnt
 			yield(ChunkEntry{}, err)
 			return
 		}
+		// Session edits replace what the manifests hold for those chunks.
+		var edits map[string]chunkEntry
+		isNew := false
+		s.mu.RLock()
+		if s.cs != nil {
+			edits = make(map[string]chunkEntry, len(s.cs.chunks[n.ID]))
+			for k, e := range s.cs.chunks[n.ID] {
+				edits[k] = e
+			}
+			if nn, ok := s.cs.newNodes[n.Path]; ok && nn.ID == n.ID {
+				isNew = true
+			}
+		}
+		s.mu.RUnlock()
 		stop := fmt.Errorf("stop")
-		for i := range n.Array.Manifests {
-			mr := &n.Array.Manifests[i]
-			m, err := s.repo.manifest(ctx, mr.ID)
-			if err != nil {
-				yield(ChunkEntry{}, err)
-				return
-			}
-			err = m.forEach(n.ID, func(coords []uint32, ref *ChunkRef) error {
-				if !mr.contains(coords) || !n.Array.validChunkCoord(coords) {
+		if !isNew {
+			for i := range n.Array.Manifests {
+				mr := &n.Array.Manifests[i]
+				m, err := s.repo.manifest(ctx, mr.ID)
+				if err != nil {
+					yield(ChunkEntry{}, err)
+					return
+				}
+				err = m.forEach(n.ID, func(coords []uint32, ref *ChunkRef) error {
+					if !mr.contains(coords) || !n.Array.validChunkCoord(coords) {
+						return nil
+					}
+					if _, edited := edits[coordsKey(coords)]; edited {
+						return nil
+					}
+					if !yield(ChunkEntry{Coords: coords, Ref: ref}, nil) {
+						return stop
+					}
 					return nil
+				})
+				if err == stop {
+					return
 				}
-				if !yield(ChunkEntry{Coords: coords, Ref: ref}, nil) {
-					return stop
+				if err != nil {
+					yield(ChunkEntry{}, err)
+					return
 				}
-				return nil
-			})
-			if err == stop {
-				return
 			}
-			if err != nil {
-				yield(ChunkEntry{}, err)
+		}
+		for _, e := range sortedEdits(edits) {
+			if e.ref == nil || !n.Array.validChunkCoord(e.coords) {
+				continue
+			}
+			if !yield(ChunkEntry{Coords: e.coords, Ref: e.ref}, nil) {
 				return
 			}
 		}
 	}
+}
+
+func sortedEdits(m map[string]chunkEntry) []chunkEntry {
+	out := make([]chunkEntry, 0, len(m))
+	for _, e := range m {
+		out = append(out, e)
+	}
+	sort.Slice(out, func(i, j int) bool { return compareCoords(out[i].coords, out[j].coords) < 0 })
+	return out
 }
 
 // OpenArray opens the array at path for typed, region-based reads.
@@ -146,7 +214,7 @@ func (s *Session) OpenArray(ctx context.Context, path string) (*zarr.Array, erro
 
 // Attributes returns the attributes of the array or group at path.
 func (s *Session) Attributes(path string) (map[string]any, error) {
-	n, err := s.snap.Node(path)
+	n, err := s.node(path)
 	if err != nil {
 		return nil, err
 	}
@@ -166,6 +234,16 @@ func (c *chunkSource) GetChunk(ctx context.Context, coords []uint32, offset, len
 	}
 	data, err := c.s.repo.fetchChunk(ctx, ref, offset, length)
 	return data, err == nil, err
+}
+
+// SetChunk and DeleteChunk make chunkSource a zarr.ChunkWriter for
+// writable sessions.
+func (c *chunkSource) SetChunk(ctx context.Context, coords []uint32, data []byte) error {
+	return c.s.SetChunk(ctx, c.n.Path, coords, data)
+}
+
+func (c *chunkSource) DeleteChunk(ctx context.Context, coords []uint32) error {
+	return c.s.DeleteChunk(ctx, c.n.Path, coords)
 }
 
 func (c *chunkSource) ChunkSize(ctx context.Context, coords []uint32) (int64, bool, error) {

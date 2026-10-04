@@ -9,7 +9,6 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
-	"hash/adler32"
 	"hash/crc32"
 	"io"
 	"sync"
@@ -51,68 +50,6 @@ func lookupBytesCodec(name string) (BytesCodecFactory, bool) {
 	defer registryMu.RUnlock()
 	f, ok := bytesCodecs[name]
 	return f, ok
-}
-
-func init() {
-	plain := func(fn func([]byte) ([]byte, error)) BytesCodecFactory {
-		return func(json.RawMessage, int) (BytesCodec, error) { return BytesCodecFunc(fn), nil }
-	}
-	for _, name := range []string{"gzip", "numcodecs.gzip"} {
-		RegisterBytesCodec(name, plain(gunzip))
-	}
-	for _, name := range []string{"zstd", "numcodecs.zstd"} {
-		RegisterBytesCodec(name, plain(unzstd))
-	}
-	for _, name := range []string{"blosc", "numcodecs.blosc"} {
-		RegisterBytesCodec(name, plain(bloscDecompress))
-	}
-	RegisterBytesCodec("numcodecs.zlib", plain(unzlib))
-	RegisterBytesCodec("numcodecs.bz2", plain(unbzip2))
-	RegisterBytesCodec("numcodecs.lz4", plain(unlz4Numcodecs))
-	RegisterBytesCodec("crc32c", plain(func(in []byte) ([]byte, error) {
-		return stripChecksum(in, "end", "crc32c", func(b []byte) uint32 { return crc32.Checksum(b, castagnoli) })
-	}))
-	// numcodecs' default checksum location: "start", except "end" for CRC32C.
-	checksum := func(kind, defaultLocation string, sum func([]byte) uint32) BytesCodecFactory {
-		return func(cfg json.RawMessage, _ int) (BytesCodec, error) {
-			var c struct {
-				Location string `json:"location"`
-			}
-			if len(cfg) > 0 {
-				if err := json.Unmarshal(cfg, &c); err != nil {
-					return nil, err
-				}
-			}
-			if c.Location == "" {
-				c.Location = defaultLocation
-			}
-			return BytesCodecFunc(func(in []byte) ([]byte, error) { return stripChecksum(in, c.Location, kind, sum) }), nil
-		}
-	}
-	RegisterBytesCodec("numcodecs.crc32", checksum("crc32", "start", crc32.ChecksumIEEE))
-	RegisterBytesCodec("numcodecs.crc32c", checksum("crc32c", "end", func(b []byte) uint32 { return crc32.Checksum(b, castagnoli) }))
-	RegisterBytesCodec("numcodecs.adler32", checksum("adler32", "start", adler32.Checksum))
-	RegisterBytesCodec("numcodecs.fletcher32", plain(func(in []byte) ([]byte, error) {
-		return stripChecksum(in, "end", "fletcher32", fletcher32)
-	}))
-	RegisterBytesCodec("numcodecs.shuffle", func(cfg json.RawMessage, elemSize int) (BytesCodec, error) {
-		c := struct {
-			ElementSize int `json:"elementsize"`
-		}{ElementSize: 4}
-		if len(cfg) > 0 {
-			if err := json.Unmarshal(cfg, &c); err != nil {
-				return nil, err
-			}
-		}
-		return BytesCodecFunc(func(in []byte) ([]byte, error) {
-			if c.ElementSize <= 1 {
-				return in, nil
-			}
-			out := make([]byte, len(in))
-			unshuffle(c.ElementSize, in, out)
-			return out, nil
-		}), nil
-	})
 }
 
 var castagnoli = crc32.MakeTable(crc32.Castagnoli)
@@ -243,11 +180,14 @@ type arrayCodec interface {
 	encoded(shape []uint64, dt DataType) ([]uint64, DataType, error)
 	// decode reverses the codec, producing data of shape/dt.
 	decode(c *chunkData, shape []uint64, dt DataType) (*chunkData, error)
+	// encodeArr applies the codec.
+	encodeArr(c *chunkData) (*chunkData, error)
 }
 
 // arrayBytesCodec is the array-to-bytes codec (exactly one per pipeline).
 type arrayBytesCodec interface {
 	decode(ctx context.Context, in []byte, shape []uint64, dt DataType) (*chunkData, error)
+	encode(ctx context.Context, c *chunkData) ([]byte, error)
 }
 
 type pipeline struct {
@@ -357,7 +297,13 @@ func newArrayCodec(s CodecSpec) (arrayCodec, bool, error) {
 		return &transpose{order: order, fortran: named == "F"}, true, nil
 	case "numcodecs.bitround":
 		// Bit rounding is lossy at encode time; decoding is the identity.
-		return identityCodec{}, true, nil
+		var cfg struct {
+			Keepbits int `json:"keepbits"`
+		}
+		if err := parseConfig(s.Configuration, &cfg); err != nil {
+			return nil, true, fmt.Errorf("zarr: bitround: %w", err)
+		}
+		return bitRound{keepbits: cfg.Keepbits}, true, nil
 	}
 	return nil, false, nil
 }

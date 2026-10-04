@@ -150,6 +150,11 @@ func StripPrefix(c *Config, key string) string {
 }
 
 func sign(c *Config, r *Request, host, path, query string, now time.Time) {
+	signPayload(c, r, host, path, query, emptySHA256, now)
+}
+
+// signPayload signs a request whose body has the given SHA-256 (hex).
+func signPayload(c *Config, r *Request, host, path, query, payloadHash string, now time.Time) {
 	if c.Anonymous || c.AccessKeyID == "" {
 		return
 	}
@@ -157,11 +162,11 @@ func sign(c *Config, r *Request, host, path, query string, now time.Time) {
 	amzDate := now.Format("20060102T150405Z")
 	date := amzDate[:8]
 	r.Header["x-amz-date"] = amzDate
-	r.Header["x-amz-content-sha256"] = emptySHA256
+	r.Header["x-amz-content-sha256"] = payloadHash
 	signed := map[string]string{
 		"host":                 host,
 		"x-amz-date":           amzDate,
-		"x-amz-content-sha256": emptySHA256,
+		"x-amz-content-sha256": payloadHash,
 	}
 	if c.SessionToken != "" {
 		r.Header["x-amz-security-token"] = c.SessionToken
@@ -180,7 +185,7 @@ func sign(c *Config, r *Request, host, path, query string, now time.Time) {
 		canonHeaders.WriteString("\n")
 	}
 	signedHeaders := strings.Join(names, ";")
-	canonical := strings.Join([]string{r.Method, path, query, canonHeaders.String(), signedHeaders, emptySHA256}, "\n")
+	canonical := strings.Join([]string{r.Method, path, query, canonHeaders.String(), signedHeaders, payloadHash}, "\n")
 	scope := date + "/" + region(c) + "/s3/aws4_request"
 	sum := sha256.Sum256([]byte(canonical))
 	toSign := "AWS4-HMAC-SHA256\n" + amzDate + "\n" + scope + "\n" + hex.EncodeToString(sum[:])
@@ -299,4 +304,82 @@ func CheckConditions(key string, opts *storage.GetOptions, etag, lastModified st
 
 func stripETag(s string) string {
 	return strings.Trim(strings.TrimPrefix(s, "W/"), `"`)
+}
+
+// Put builds a PutObject request for key; the caller sends body with it.
+// Conditional writes use If-Match / If-None-Match: *, supported by AWS S3,
+// Cloudflare R2, MinIO and most S3-compatible stores.
+func Put(c *Config, key string, body []byte, opts *storage.PutOptions, now time.Time) (Request, error) {
+	base, host, path, err := target(c, fullKey(c, key))
+	if err != nil {
+		return Request{}, err
+	}
+	r := Request{Method: "PUT", URL: base + path, Header: map[string]string{"content-type": "application/octet-stream"}}
+	if opts != nil {
+		if opts.IfMatch != "" {
+			r.Header["if-match"] = `"` + stripETag(opts.IfMatch) + `"`
+		}
+		if opts.IfNotExists {
+			r.Header["if-none-match"] = "*"
+		}
+	}
+	sum := sha256.Sum256(body)
+	if !c.Anonymous && c.AccessKeyID != "" {
+		signPayload(c, &r, host, path, "", hex.EncodeToString(sum[:]), now)
+	}
+	return r, nil
+}
+
+// Delete builds a DeleteObject request for key.
+func Delete(c *Config, key string, now time.Time) (Request, error) {
+	base, host, path, err := target(c, fullKey(c, key))
+	if err != nil {
+		return Request{}, err
+	}
+	r := Request{Method: "DELETE", URL: base + path, Header: map[string]string{}}
+	sign(c, &r, host, path, "", now)
+	return r, nil
+}
+
+// CheckPut maps a PutObject response to the new version (ETag) or an
+// error. Failed conditions are 412 (or 409 when S3 sees a concurrent
+// conditional write); both mean "retry with fresh data".
+func CheckPut(key string, status int, body []byte, etag string) (string, error) {
+	switch {
+	case status == 200 || status == 201 || status == 204:
+		return stripETag(etag), nil
+	case status == 412 || status == 409:
+		return "", fmt.Errorf("%w: %s", storage.ErrPreconditionFailed, key)
+	}
+	msg := strings.TrimSpace(string(body))
+	if len(msg) > 300 {
+		msg = msg[:300] + "..."
+	}
+	return "", fmt.Errorf("PUT %s: status %d: %s", key, status, msg)
+}
+
+// Head builds a HeadObject request for key.
+func Head(c *Config, key string, now time.Time) (Request, error) {
+	base, host, path, err := target(c, fullKey(c, key))
+	if err != nil {
+		return Request{}, err
+	}
+	r := Request{Method: "HEAD", URL: base + path, Header: map[string]string{}}
+	sign(c, &r, host, path, "", now)
+	return r, nil
+}
+
+// ParseLastModified parses an HTTP Last-Modified header.
+func ParseLastModified(key string, status int, header string) (time.Time, error) {
+	switch {
+	case status == 404:
+		return time.Time{}, fmt.Errorf("%w: %s", storage.ErrNotFound, key)
+	case status != 200:
+		return time.Time{}, fmt.Errorf("HEAD %s: status %d", key, status)
+	}
+	t, err := time.Parse(httpTimeFormat, header)
+	if err != nil {
+		return time.Time{}, fmt.Errorf("HEAD %s: no usable Last-Modified header %q", key, header)
+	}
+	return t, nil
 }

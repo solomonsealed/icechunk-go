@@ -6,7 +6,10 @@
 //	icechunk-go cat    [-ref main] <repo> <zarr-key>
 //	icechunk-go read   [-ref main] [-slice 0:10,5] [-json] <repo> <array-path>
 //	icechunk-go chunks [-ref main] [-n 100] <repo> <array-path>
-//	icechunk-go serve  [-addr :8080] <repo>
+//	icechunk-go serve  [-addr :8080] [-write-token T] <repo>
+//	icechunk-go create <repo>
+//	icechunk-go branch <repo> <name> [<snapshot-or-ref>]   (-delete to delete)
+//	icechunk-go tag    <repo> <name> [<snapshot-or-ref>]   (-delete to delete)
 //
 // <repo> is a local path, file://, http(s)://, s3://bucket/prefix,
 // gs://bucket/prefix or r2://bucket/prefix. S3-style URLs read credentials
@@ -61,6 +64,9 @@ commands:
   read     decoded values of an array (optionally a -slice)
   chunks   chunk references of an array
   serve    HTTP API + read-only Zarr store (same as the Cloudflare Worker)
+  create   create an empty repository (spec v2)
+  branch   create (or -delete) a branch at a snapshot, branch or tag
+  tag      create (or -delete) a tag at a snapshot, branch or tag
 
 <repo>: path | file:// | http(s):// | s3://bucket/prefix | gs://bucket/prefix | r2://bucket/prefix
 Run "icechunk-go <command> -h" for command flags.`))
@@ -78,6 +84,8 @@ func main() {
 	sel := fs.String("slice", "", "selection such as 0:10,5,: (read)")
 	asJSON := fs.Bool("json", false, "print JSON (read)")
 	addr := fs.String("addr", "localhost:8080", "listen address (serve)")
+	writeToken := fs.String("write-token", "", "enable write endpoints with this bearer token (serve)")
+	del := fs.Bool("delete", false, "delete instead of create (branch, tag)")
 	virtual := virtualFlag{}
 	fs.Var(virtual, "virtual", "prefix=target mapping of virtual chunk locations (repeatable)")
 	fs.Parse(os.Args[2:])
@@ -94,6 +102,12 @@ func main() {
 	}
 	st, err := openStorage(args[0])
 	check(err)
+	if cmd == "create" {
+		_, err := icechunk.Create(ctx, st, opts)
+		check(err)
+		fmt.Println("created", args[0])
+		return
+	}
 	repo, err := icechunk.Open(ctx, st, opts)
 	check(err)
 
@@ -141,8 +155,29 @@ func main() {
 				break
 			}
 		}
+	case "branch", "tag":
+		need(args, 2)
+		name := args[1]
+		switch {
+		case *del && cmd == "branch":
+			check(repo.DeleteBranch(ctx, name))
+		case *del:
+			check(repo.DeleteTag(ctx, name))
+		default:
+			target := "main"
+			if len(args) > 2 {
+				target = args[2]
+			}
+			id := session(ctx, repo, target).SnapshotID()
+			if cmd == "branch" {
+				check(repo.CreateBranch(ctx, name, id))
+			} else {
+				check(repo.CreateTag(ctx, name, id))
+			}
+			fmt.Printf("%s %s -> %s\n", cmd, name, id)
+		}
 	case "serve":
-		svc := &serve.Service{Repo: repo, DefaultRef: *ref}
+		svc := &serve.Service{Repo: repo, DefaultRef: *ref, WriteToken: *writeToken}
 		fmt.Fprintf(os.Stderr, "serving on http://%s  (try /, /nodes, /array/<path>?slice=..., /zarr/%s/zarr.json)\n", *addr, *ref)
 		check(http.ListenAndServe(*addr, nethttp.Handler(svc)))
 	default:
