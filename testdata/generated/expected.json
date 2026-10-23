@@ -1,8 +1,8 @@
 {
  "_meta": {
-  "icechunk": "2.2.2",
-  "zarr": "3.4.0",
-  "numpy": "2.5.3",
+  "icechunk": "2.3.0",
+  "zarr": "3.4.1",
+  "numpy": "2.5.4",
   "commit_properties": {
    "author": "icechunk-go generator",
    "count": 42,
