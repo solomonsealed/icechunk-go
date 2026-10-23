@@ -189,7 +189,8 @@ func category(err error) string {
 	case errors.Is(err, icechunk.ErrRefNotFound), errors.Is(err, icechunk.ErrSnapshotNotFound),
 		errors.Is(err, icechunk.ErrNodeNotFound), errors.Is(err, icechunk.ErrNotAnArray):
 		return "error:not_found"
-	case errors.Is(err, icechunk.ErrInvalidChunkCoords), errors.Is(err, icechunk.ErrNoVirtualContainer):
+	case errors.Is(err, icechunk.ErrInvalidChunkCoords), errors.Is(err, icechunk.ErrNoVirtualContainer),
+		errors.Is(err, icechunk.ErrInvalidMetadata):
 		return "error:invalid"
 	}
 	return "error:other"
@@ -835,11 +836,19 @@ var endianless = map[string]bool{"bool": true, "int8": true, "uint8": true, "nul
 
 // normalizeZarrJSON drops zarr.json differences that mean nothing, as
 // scenario.py's zarr_doc does: consolidated_metadata null (same as absent),
-// empty codec configurations, and the bytes codec's endian for single-byte
-// data types.
+// empty attributes and storage_transformers (their defaults; zarr-python
+// re-renders a repaired document with them, zarr-go keeps the stored
+// document's fields), empty codec configurations, and the bytes codec's
+// endian for single-byte data types.
 func normalizeZarrJSON(doc map[string]any) {
 	if v, ok := doc["consolidated_metadata"]; ok && v == nil {
 		delete(doc, "consolidated_metadata")
+	}
+	if v, ok := doc["attributes"].(map[string]any); ok && len(v) == 0 {
+		delete(doc, "attributes")
+	}
+	if v, ok := doc["storage_transformers"].([]any); ok && len(v) == 0 {
+		delete(doc, "storage_transformers")
 	}
 	name, _ := doc["data_type"].(string)
 	if m, ok := doc["data_type"].(map[string]any); ok {

@@ -1,8 +1,8 @@
 {
  "_meta": {
-  "icechunk": "2.2.2",
-  "numpy": "2.5.3",
-  "zarr": "3.4.0"
+  "icechunk": "2.3.0",
+  "numpy": "2.5.4",
+  "zarr": "3.4.1"
  },
  "canonical": {
   "ancestry": {
@@ -928,7 +928,6 @@
      "/": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -936,7 +935,6 @@
      "/nosplit": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -1046,7 +1044,6 @@
       "type": "array",
       "values": "36e3537805e0f7f1",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -1077,14 +1074,12 @@
         6,
         6
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/small": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -1106,7 +1101,6 @@
       "type": "array",
       "values": "97f93a576b8c29e3",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -1135,7 +1129,6 @@
        "shape": [
         32
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
@@ -1156,7 +1149,6 @@
       "type": "array",
       "values": "14e115f58c58fbef",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -1185,14 +1177,12 @@
        "shape": [
         34
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/split": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -1350,7 +1340,6 @@
       "type": "array",
       "values": "464c7343657b95a4",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -1381,7 +1370,6 @@
         12,
         9
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      }
@@ -1550,7 +1538,6 @@
      "/": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -1558,7 +1545,6 @@
      "/nosplit": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -1668,7 +1654,6 @@
       "type": "array",
       "values": "36e3537805e0f7f1",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -1699,14 +1684,12 @@
         6,
         6
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/small": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -1728,7 +1711,6 @@
       "type": "array",
       "values": "97f93a576b8c29e3",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -1757,7 +1739,6 @@
        "shape": [
         32
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
@@ -1778,7 +1759,6 @@
       "type": "array",
       "values": "14e115f58c58fbef",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -1807,14 +1787,12 @@
        "shape": [
         34
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/split": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -2116,7 +2094,6 @@
       "type": "array",
       "values": "0c875ed1115a7519",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -2147,7 +2124,6 @@
         12,
         9
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      }
@@ -2316,7 +2292,6 @@
      "/": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -2324,7 +2299,6 @@
      "/nosplit": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -2434,7 +2408,6 @@
       "type": "array",
       "values": "36e3537805e0f7f1",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -2465,14 +2438,12 @@
         6,
         6
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/small": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -2494,7 +2465,6 @@
       "type": "array",
       "values": "97f93a576b8c29e3",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -2523,7 +2493,6 @@
        "shape": [
         32
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
@@ -2544,7 +2513,6 @@
       "type": "array",
       "values": "14e115f58c58fbef",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -2573,14 +2541,12 @@
        "shape": [
         34
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/split": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -2882,7 +2848,6 @@
       "type": "array",
       "values": "b851c482f065eab7",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -2913,7 +2878,6 @@
         12,
         9
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      }
@@ -3082,7 +3046,6 @@
      "/": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -3090,7 +3053,6 @@
      "/nosplit": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -3200,7 +3162,6 @@
       "type": "array",
       "values": "36e3537805e0f7f1",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -3231,14 +3192,12 @@
         6,
         6
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/small": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -3260,7 +3219,6 @@
       "type": "array",
       "values": "1884b833c24120a8",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -3289,7 +3247,6 @@
        "shape": [
         32
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
@@ -3310,7 +3267,6 @@
       "type": "array",
       "values": "14e115f58c58fbef",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -3339,14 +3295,12 @@
        "shape": [
         34
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/split": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -3648,7 +3602,6 @@
       "type": "array",
       "values": "b851c482f065eab7",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -3679,7 +3632,6 @@
         12,
         9
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      }

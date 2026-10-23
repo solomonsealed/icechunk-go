@@ -23,6 +23,7 @@ import (
 	icechunk "github.com/solomonsealed/icechunk-go"
 	"github.com/solomonsealed/icechunk-go/storage"
 	"github.com/solomonsealed/icechunk-go/storage/httpstore"
+	zarr "github.com/solomonsealed/zarr-go"
 )
 
 // fixtureServer serves a directory like a static file host / public bucket,
@@ -308,5 +309,143 @@ func TestS3StoreWrites(t *testing.T) {
 	}
 	if attrs, _ := rs.Attributes("/"); attrs["on"] != "s3" {
 		t.Errorf("attributes = %v", attrs)
+	}
+}
+
+// recordingS3 is a fakeS3 that records each request's key and User-Agent.
+type recordingS3 struct {
+	fakeS3
+	mu       sync.Mutex
+	requests [][2]string // key, User-Agent
+}
+
+func (f *recordingS3) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	f.mu.Lock()
+	f.requests = append(f.requests, [2]string{strings.TrimPrefix(r.URL.Path, "/bucket/repo/"), r.Header.Get("User-Agent")})
+	f.mu.Unlock()
+	f.fakeS3.ServeHTTP(w, r)
+}
+
+func (f *recordingS3) take() [][2]string {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	out := f.requests
+	f.requests = nil
+	return out
+}
+
+// Every request a repository makes carries its attribution in the
+// User-Agent header, as upstream's do (icechunk 2.3.0): chunk requests
+// (virtual ones included) name the array and chunk, manifest requests the
+// array, and the others neither.
+func TestAttributionUserAgents(t *testing.T) {
+	ctx := context.Background()
+	srv := &recordingS3{fakeS3: fakeS3{objects: map[string][]byte{}}}
+	hs := httptest.NewServer(srv)
+	defer hs.Close()
+	var virtualUA []string
+	var vmu sync.Mutex
+	vs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		vmu.Lock()
+		virtualUA = append(virtualUA, r.Header.Get("User-Agent"))
+		vmu.Unlock()
+		http.ServeContent(w, r, "f", time.Time{}, bytes.NewReader(bytes.Repeat([]byte{7}, 4096)))
+	}))
+	defer vs.Close()
+	st := httpstore.NewS3(storage.S3Config{Bucket: "bucket", Prefix: "repo", Endpoint: hs.URL, AccessKeyID: "AK", SecretAccessKey: "SK"},
+		&httpstore.Options{Header: http.Header{"User-Agent": {"my-app/1"}}})
+	opts := &icechunk.Options{
+		Attribution:            icechunk.Attribution{Client: "weatherlib/0.9", Workload: "nightly-ingest", Principal: "u_123"},
+		VirtualChunkContainers: map[string]storage.Storage{"s3://src/": httpstore.New(vs.URL, nil)},
+	}
+	const labels = "my-app/1 weatherlib/0.9 icechunk-go/0.1.0 (workload=nightly-ingest; principal=u_123"
+	check := func(what string, reqs [][2]string, chunks map[string]bool) {
+		t.Helper()
+		if len(reqs) == 0 {
+			t.Errorf("%s: no requests", what)
+		}
+		for _, r := range reqs {
+			key, ua := r[0], r[1]
+			switch {
+			case strings.HasPrefix(key, "chunks/"):
+				c, ok := strings.CutPrefix(ua, labels+"; array=g/temperature; chunk=")
+				if !ok || !strings.HasSuffix(c, ")") || !chunks[strings.TrimSuffix(c, ")")] {
+					t.Errorf("%s: %s sent %q", what, key, ua)
+				}
+			case strings.HasPrefix(key, "manifests/"):
+				if ua != labels+"; array=g/temperature)" {
+					t.Errorf("%s: %s sent %q", what, key, ua)
+				}
+			default:
+				if ua != labels+")" {
+					t.Errorf("%s: %s sent %q", what, key, ua)
+				}
+			}
+		}
+	}
+
+	repo, err := icechunk.Create(ctx, st, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	s, _ := repo.WritableSession(ctx, "main")
+	arr, err := s.CreateArray(ctx, "/g/temperature", zarr.ArraySpec{Shape: []uint64{300}, ChunkShape: []uint64{100}, DataType: "float64",
+		Codecs: []zarr.CodecSpec{{Name: "bytes", Configuration: []byte(`{"endian": "little"}`)}}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	vals := make([]float64, 200)
+	for i := range vals {
+		vals[i] = float64(i) + 0.5
+	}
+	nd, _ := zarr.FromSlice([]uint64{200}, vals)
+	if err := arr.Write(ctx, []uint64{0}, nd); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.SetVirtualRef(ctx, "/g/temperature", []uint32{2}, icechunk.VirtualRef{Location: "s3://src/f", Offset: 0, Length: 800}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := s.Commit(ctx, "attributed", nil); err != nil {
+		t.Fatal(err)
+	}
+	check("create and commit", srv.take(), map[string]bool{"0": true, "1": true})
+
+	r2, err := icechunk.Open(ctx, st, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rs, err := r2.ReadonlySession(ctx, icechunk.AtBranch("main"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	ra, _ := rs.OpenArray(ctx, "/g/temperature")
+	if _, err := ra.ReadAll(ctx); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := rs.Store().Get(ctx, "g/temperature/c/1"); err != nil {
+		t.Fatal(err)
+	}
+	check("read", srv.take(), map[string]bool{"0": true, "1": true})
+	vmu.Lock()
+	if len(virtualUA) == 0 || virtualUA[0] != "weatherlib/0.9 icechunk-go/0.1.0 (workload=nightly-ingest; principal=u_123; array=g/temperature; chunk=2)" {
+		t.Errorf("virtual chunk requests sent %q", virtualUA)
+	}
+	vmu.Unlock()
+
+	// Unattributed repositories identify the module only.
+	r3, err := icechunk.Open(ctx, st, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := r3.LookupBranch(ctx, "main"); err != nil {
+		t.Fatal(err)
+	}
+	for _, r := range srv.take() {
+		if r[1] != "my-app/1 icechunk-go/0.1.0" {
+			t.Errorf("unattributed %s sent %q", r[0], r[1])
+		}
+	}
+	if _, err := icechunk.Open(ctx, st, &icechunk.Options{Attribution: icechunk.Attribution{Workload: "a;b"}}); err == nil {
+		t.Error("invalid attribution accepted")
 	}
 }

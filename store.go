@@ -104,7 +104,7 @@ func (st *Store) GetRange(ctx context.Context, key string, offset, length int64)
 	if ref == nil {
 		return nil, fmt.Errorf("%w: %s", ErrKeyNotFound, key)
 	}
-	return st.s.repo.fetchChunk(ctx, ref, offset, length)
+	return st.s.repo.fetchChunk(st.s.repo.reqChunk(ctx, node.Path, k.coords), ref, offset, length)
 }
 
 // Exists reports whether key has a value.

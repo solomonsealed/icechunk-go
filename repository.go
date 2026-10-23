@@ -52,6 +52,10 @@ type Options struct {
 	// Concurrency bounds parallel chunk fetches in multi-chunk reads made
 	// through Session.OpenArray. Zero means 16.
 	Concurrency int
+
+	// Attribution labels every request to the object store (sent as the
+	// User-Agent header by HTTP-based storages); see Attribution.
+	Attribution Attribution
 }
 
 type virtualContainer struct {
@@ -65,6 +69,7 @@ type virtualContainer struct {
 type Repository struct {
 	storage    storage.Storage
 	opts       Options
+	labels     requestLabels
 	spec       int
 	cache      *cache.Cache[cacheKey]
 	containers []virtualContainer
@@ -85,6 +90,10 @@ func Open(ctx context.Context, st storage.Storage, opts *Options) (*Repository, 
 	r := &Repository{storage: st}
 	if opts != nil {
 		r.opts = *opts
+	}
+	var err error
+	if r.labels, err = newRequestLabels(r.opts.Attribution); err != nil {
+		return nil, err
 	}
 	budget := r.opts.CacheBytes
 	switch {
@@ -111,7 +120,7 @@ func Open(ctx context.Context, st storage.Storage, opts *Options) (*Repository, 
 		return nil, err
 	}
 	// No repo info file: a spec v1 repository is identified by its main branch.
-	if _, err := r.storage.Get(ctx, v1BranchKey("main"), nil); err != nil {
+	if _, err := r.storage.Get(r.req(ctx), v1BranchKey("main"), nil); err != nil {
 		if isNotFound(err) {
 			return nil, ErrRepositoryNotFound
 		}
@@ -128,7 +137,7 @@ func (r *Repository) SpecVersion() int { return r.spec }
 func (r *Repository) Storage() storage.Storage { return r.storage }
 
 func (r *Repository) fetchRepoInfo(ctx context.Context) (*RepoInfo, error) {
-	raw, err := r.storage.Get(ctx, repoInfoPath, nil)
+	raw, err := r.storage.Get(r.req(ctx), repoInfoPath, nil)
 	if err != nil {
 		if isNotFound(err) {
 			return nil, ErrRepositoryNotFound
@@ -216,7 +225,7 @@ func (r *Repository) OpsLog(ctx context.Context) iter.Seq2[Update, error] {
 			}
 			seen[prev] = true
 			file = prev
-			raw, gerr := r.storage.Get(ctx, overwrittenPrefix+prev, nil)
+			raw, gerr := r.storage.Get(r.req(ctx), overwrittenPrefix+prev, nil)
 			if gerr != nil {
 				err = fmt.Errorf("icechunk: reading older repo info %s: %w", prev, gerr)
 				continue
@@ -277,7 +286,7 @@ func (r *Repository) validRefName(name string) error {
 }
 
 func (r *Repository) readV1Ref(ctx context.Context, key, name string) (SnapshotID, error) {
-	raw, err := r.storage.Get(ctx, key, nil)
+	raw, err := r.storage.Get(r.req(ctx), key, nil)
 	if err != nil {
 		if isNotFound(err) {
 			return SnapshotID{}, fmt.Errorf("%w: %s", ErrRefNotFound, name)
@@ -318,7 +327,7 @@ func (r *Repository) LookupTag(ctx context.Context, name string) (SnapshotID, er
 		return SnapshotID{}, err
 	}
 	if r.spec == 1 {
-		_, err := r.storage.Get(ctx, v1TagKey(name)+".deleted", nil)
+		_, err := r.storage.Get(r.req(ctx), v1TagKey(name)+".deleted", nil)
 		switch {
 		case err == nil:
 			return SnapshotID{}, fmt.Errorf("%w: tag %s was deleted", ErrRefNotFound, name)
@@ -368,7 +377,7 @@ func (r *Repository) listV1Refs(ctx context.Context, kind string) ([]string, err
 	if !ok {
 		return nil, fmt.Errorf("icechunk: listing refs of a spec v1 repository needs a storage that supports listing (%T does not)", r.storage)
 	}
-	keys, err := l.List(ctx, v1RefsPrefix+kind)
+	keys, err := l.List(r.req(ctx), v1RefsPrefix+kind)
 	if err != nil {
 		return nil, err
 	}
@@ -436,10 +445,18 @@ func (v Version) String() string {
 	return "no version"
 }
 
-// Resolve returns the snapshot id a Version refers to.
+// Resolve returns the snapshot id a Version refers to. In spec v2
+// repositories a snapshot id must be listed in the repo info, as upstream
+// requires: snapshots of expired history are not, nor those upstream writes
+// for forked sessions (since 2.3.0, unregistered until merged).
 func (r *Repository) Resolve(ctx context.Context, v Version) (SnapshotID, error) {
 	switch v.kind {
 	case versionSnapshot:
+		if r.spec >= 2 {
+			if err := r.checkListed(ctx, v.id); err != nil {
+				return SnapshotID{}, err
+			}
+		}
 		return v.id, nil
 	case versionTag:
 		return r.LookupTag(ctx, v.name)
@@ -449,13 +466,35 @@ func (r *Repository) Resolve(ctx context.Context, v Version) (SnapshotID, error)
 	return SnapshotID{}, fmt.Errorf("icechunk: empty version")
 }
 
+// checkListed reports ErrSnapshotNotFound for a snapshot the repo info does
+// not list, refetching a cached repo info that may predate it.
+func (r *Repository) checkListed(ctx context.Context, id SnapshotID) error {
+	for attempt := 0; attempt < 2; attempt++ {
+		info, err := r.RepoInfo(ctx)
+		if err != nil {
+			return err
+		}
+		if _, ok := info.snapshot(id); ok {
+			return nil
+		}
+		r.mu.Lock()
+		cached := r.opts.RepoInfoTTL > 0 && r.infoAt != (time.Time{})
+		r.mu.Unlock()
+		if !cached {
+			break
+		}
+		r.Refresh()
+	}
+	return fmt.Errorf("%w: %s", ErrSnapshotNotFound, id)
+}
+
 // ---------------------------------------------------------------------------
 // Snapshots and ancestry
 
 // Snapshot fetches (or returns cached) snapshot id.
 func (r *Repository) Snapshot(ctx context.Context, id SnapshotID) (*Snapshot, error) {
 	v, err := r.cache.Get(ctx, cacheKey{kind: 's', id: id}, func() (any, int64, error) {
-		raw, err := r.storage.Get(ctx, snapshotsPrefix+id.String(), nil)
+		raw, err := r.storage.Get(r.req(ctx), snapshotsPrefix+id.String(), nil)
 		if err != nil {
 			if isNotFound(err) {
 				return nil, 0, fmt.Errorf("%w: %s", ErrSnapshotNotFound, id)
@@ -476,7 +515,7 @@ func (r *Repository) Snapshot(ctx context.Context, id SnapshotID) (*Snapshot, er
 
 func (r *Repository) manifest(ctx context.Context, id ManifestID) (*Manifest, error) {
 	v, err := r.cache.Get(ctx, cacheKey{kind: 'm', id: id}, func() (any, int64, error) {
-		raw, err := r.storage.Get(ctx, manifestsPrefix+id.String(), nil)
+		raw, err := r.storage.Get(r.req(ctx), manifestsPrefix+id.String(), nil)
 		if err != nil {
 			return nil, 0, fmt.Errorf("icechunk: reading manifest %s: %w", id, err)
 		}
@@ -567,7 +606,7 @@ func (r *Repository) fetchChunk(ctx context.Context, ref *ChunkRef, off, length 
 	case InlineChunk:
 		return append([]byte(nil), ref.Inline[off:off+length]...), nil
 	case NativeChunk:
-		data, err := r.storage.Get(ctx, chunksPrefix+ref.ID.String(), storage.RangeOf(int64(ref.Offset)+off, length))
+		data, err := r.storage.Get(r.req(ctx), chunksPrefix+ref.ID.String(), storage.RangeOf(int64(ref.Offset)+off, length))
 		if err != nil {
 			return nil, fmt.Errorf("icechunk: reading chunk %s: %w", ref.ID, err)
 		}
@@ -580,7 +619,7 @@ func (r *Repository) fetchChunk(ctx context.Context, ref *ChunkRef, off, length 
 		opts := storage.RangeOf(int64(ref.Offset)+off, length)
 		opts.IfMatch = ref.ETag
 		opts.IfUnmodifiedSince = ref.LastModified
-		data, err := c.store.Get(ctx, key, opts)
+		data, err := c.store.Get(r.req(ctx), key, opts)
 		if err != nil {
 			if errors.Is(err, storage.ErrPreconditionFailed) {
 				return nil, fmt.Errorf("%w: %s", ErrChunkModified, ref.Location)

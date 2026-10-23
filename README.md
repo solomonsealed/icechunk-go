@@ -3,7 +3,7 @@
 A pure-Go implementation of [Icechunk](https://icechunk.io), reader and
 writer, using [zarr-go](https://github.com/solomonsealed/zarr-go) for
 Zarr arrays. It runs natively, and in Cloudflare Workers
-(`GOOS=js GOARCH=wasm`, ~2.7 MB gzipped).
+(`GOOS=js GOARCH=wasm`, ~2.8 MB gzipped).
 
 Go and icechunk-python/Rust can work on the same repositories: the Go writer
 produces files upstream reads and verifies, and it commits on top of
@@ -22,7 +22,9 @@ spec v1) stays with the official library; see
 - **Branches, tags (deleted tags hidden), snapshot ids, ancestry, commit and
   repository metadata** (MessagePack in v1, FlexBuffers in v2), plus repo
   config, status and the whole ops log (`Repository.OpsLog` follows it into
-  older repo info files). Spec v1 refs are found under the percent-encoded
+  older repo info files). As upstream, spec v2 opens only snapshots the repo
+  info lists: not those of expired history, nor the ones icechunk 2.3 writes
+  for forked sessions until they are merged. Spec v1 refs are found under the percent-encoded
   keys upstream stores them at, and `zarr.json` attributes keep integers
   exact, as in Python.
 - **Zarr v3 arrays**: region reads into N-d results, typed accessors and a
@@ -32,11 +34,21 @@ spec v1) stays with the official library; see
   bfloat16 and float8), sharding with partial reads and writes, regular and
   rectilinear grids, and NumPy-style selections (`Array.Get`,
   `GetCoordinates`, `GetMask`, `GetBlocks` and their `Set` counterparts).
-  `zarr.RegisterCodec` adds codecs.
+  `zarr.RegisterCodec` adds codecs. Metadata older zarr-python releases
+  stored is read as zarr-python 3.4.1 reads it (chunk sizes of 0 as 1, float
+  rectilinear edges as integers), and a repair that moves chunks is stored
+  before the first chunk write, as zarr-python does through upstream's
+  store.
 - **Storage backends**: local files and memory (`storage`); plain HTTP(S) and
   S3-compatible APIs with SigV4 for AWS, R2, MinIO, GCS interop and Tigris
   (`storage/httpstore`); R2 bindings and the Workers `fetch` API
   (`cfworker`).
+- **Request attribution**, as in icechunk 2.3: every request names itself in
+  its `User-Agent` header, with the array path and chunk coordinates it is
+  for and the optional `Options.Attribution` labels (client, workload,
+  principal), e.g. `weatherlib/0.9 icechunk-go/0.1.0 (workload=nightly;
+  array=g/temperature; chunk=0/1/2)`. The product token is `icechunk-go`,
+  not upstream's `icechunk`.
 - **An HTTP service** (`serve`): JSON API plus a read-only Zarr store, so
   zarr-python, zarrita.js and similar clients can read a repository through a
   Worker, and optional token-protected endpoints that create and write arrays.
@@ -46,7 +58,9 @@ spec v1) stays with the official library; see
 - `Create` a repository, open a `WritableSession` on a branch, create groups
   and arrays (from a `zarr.ArraySpec` or a raw `zarr.json`), write chunks,
   virtual references and deletions, then `Commit` with metadata. Reads in a
-  writable session see its uncommitted changes.
+  writable session see its uncommitted changes. A `zarr.json` is accepted
+  or refused (`ErrInvalidMetadata`) as upstream's store does, and its chunk
+  grid counted the same way.
 - Commits follow upstream's protocol: chunks, manifests, transaction log and
   snapshot are written first, then the repo info file is replaced with a
   conditional write (after backing it up to `overwritten/`), retrying when
@@ -93,6 +107,8 @@ repo, err := icechunk.Open(ctx, st, &icechunk.Options{
 	VirtualChunkContainers: map[string]storage.Storage{
 		"s3://source-bucket/": httpstore.NewS3(storage.S3Config{Bucket: "source-bucket", Anonymous: true}, nil),
 	},
+	// Optional labels for the bucket owner's access logs (User-Agent).
+	Attribution: icechunk.Attribution{Client: "weatherlib/0.9", Workload: "nightly-ingest"},
 })
 session, err := repo.ReadonlySession(ctx, icechunk.AtBranch("main")) // or AtTag, AtSnapshot
 
@@ -171,6 +187,13 @@ icechunk-go tag    ./repo v1 main
   repository's configured virtual chunk containers.
 - Rebase conflict detection is coarse: any commit that touched the same
   chunk, or changed or deleted the same node, conflicts.
+- Arrays must use the `default` chunk key encoding with separator `/`, the
+  only chunk keys upstream's store addresses: `CreateArray` refuses others
+  (zarr-go's `v2` and `template` included), and writes through `zarr.Array`
+  to such arrays fail, as zarr-python's do on upstream. Go still reads them
+  by chunk coordinates.
+- Storage classes from the repository config are not applied to writes,
+  and objects carry no `ic*` user metadata.
 - Diffs between snapshots are not exposed.
 - GCS and Azure are reachable only through S3-compatible (HMAC) or plain
   HTTP access, not their native auth.
@@ -194,18 +217,20 @@ open an issue, which is worth doing for anything long-lived.
   test.
 - `testdata/upstream`: upstream's own on-disk compatibility fixtures. The tests
   assert the same facts as upstream's `test_can_read_old.py`.
-- `testdata/generated`: repositories written by icechunk-python 2.2.2 via
+- `testdata/generated`: repositories written by icechunk-python 2.3.0 (with
+  zarr-python 3.4.1; `testdata/requirements.txt` pins the environment) via
   `testdata/generate.py` (every data type and codec above, sharding,
   rectilinear grids, 2000 dictionary-compressed virtual chunks, checksums,
   spec v1 and v2, and in `features-*` deleted, reset, amended, detached and
-  unicode/slash-named refs, moves, resizes, deletions, repo metadata, status,
-  flags and a multi-file ops log). Go must reproduce the SHA-256 of every
-  array's bytes.
+  unicode/slash-named refs, an unregistered fork snapshot, moves, resizes,
+  deletions, repo metadata, status, flags and a multi-file ops log). Go must
+  reproduce the SHA-256 of every array's bytes.
 - Consistency with icechunk-python: `testdata/oracle/oracle.py` records what
   icechunk-python reads from every fixture above (refs, ancestry, repo info,
   snapshots, manifests, every store key and byte range, listings, malformed
-  keys, chunk refs, region and per-chunk reads, and virtual chunks with ETag
-  and Last-Modified checks against a local S3 endpoint). The `TestPython*`
+  keys, sessions at snapshot files nothing lists, chunk refs, region and
+  per-chunk reads, and virtual chunks with ETag and Last-Modified checks
+  against a local S3 endpoint). The `TestPython*`
   tests require the Go reader and the HTTP service to read the same.
   Deliberate differences are listed in `acceptedDivergence`, and ones not yet
   fixed in `knownInconsistencies` (these fail with `ICECHUNK_STRICT=1`).
@@ -226,8 +251,11 @@ open an issue, which is worth doing for anything long-lived.
   lists scenarios (arrays of every writable type and codec, partial and
   fill-value writes, zarr.json rewrites, deletions, virtual refs, refs and
   their refusals, concurrent sessions with and without rebase, a
-  non-default repository config, tricky node names, and single-change
-  commits for the HTTP write endpoints). `TestWriterScenarios` runs each
+  non-default repository config, tricky node names, single-change
+  commits for the HTTP write endpoints, and `zarr.json` documents older
+  zarr-python releases stored: the repairs zarr-python 3.4.1 stores before
+  writing, the chunk grids upstream refuses and the chunk key encodings it
+  cannot address). `TestWriterScenarios` runs each
   with the Go writer and compares every step's outcome and a canonical
   description of the result (values, chunk bytes for deterministic codecs,
   inline/native placement, keys, manifest extents, history, refs, ops log)
@@ -239,6 +267,7 @@ open an issue, which is worth doing for anything long-lived.
 
 ```sh
 go test ./...
+python3.13 -m venv .venv && .venv/bin/pip install -r testdata/requirements.txt
 python testdata/generate.py                    # regenerate fixtures (icechunk, zarr, numpy)
 python testdata/oracle/oracle.py               # re-record icechunk-python's answers for TestPython*
 ICECHUNK_PYTHON=.venv/bin/python go test -run Python ./internal/conformance   # compare with a live icechunk-python

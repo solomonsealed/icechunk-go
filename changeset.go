@@ -27,6 +27,10 @@ var (
 	ErrAlreadyExists = errors.New("icechunk: already exists")
 	// ErrInvalidChunkCoords means chunk coordinates are outside the array's chunk grid.
 	ErrInvalidChunkCoords = errors.New("icechunk: invalid chunk coordinates")
+	// ErrInvalidMetadata means a zarr.json that upstream's store refuses
+	// (not JSON, an unknown node type, or a chunk grid it cannot read), or
+	// an array whose chunks it cannot address (see Session.CreateArray).
+	ErrInvalidMetadata = errors.New("icechunk: invalid zarr.json")
 )
 
 // changeSet records a session's uncommitted edits, with upstream's
@@ -83,70 +87,38 @@ func randomID12() ObjectID12 {
 
 // parseNodeMetadata reads what Icechunk itself needs from a zarr.json: the
 // node type and, for arrays, the shape in chunks and the dimension names.
-// Codecs and data types are not validated, as upstream does not either.
+// Codecs, data types and chunk key encodings are not validated, as upstream
+// does not either.
 func parseNodeMetadata(doc []byte) (NodeType, *arrayEdit, error) {
 	var m struct {
 		NodeType  string   `json:"node_type"`
 		Shape     []uint64 `json:"shape"`
 		ChunkGrid struct {
-			Name          string `json:"name"`
-			Configuration struct {
-				ChunkShape  []uint64          `json:"chunk_shape"`
-				ChunkShapes []json.RawMessage `json:"chunk_shapes"`
-			} `json:"configuration"`
+			Name          string          `json:"name"`
+			Configuration json.RawMessage `json:"configuration"`
 		} `json:"chunk_grid"`
 		DimensionNames []*string `json:"dimension_names"`
 	}
 	if err := json.Unmarshal(doc, &m); err != nil {
-		return 0, nil, fmt.Errorf("icechunk: invalid zarr.json: %w", err)
+		return 0, nil, fmt.Errorf("%w: %v", ErrInvalidMetadata, err)
 	}
 	switch m.NodeType {
 	case "group":
 		return GroupNode, nil, nil
 	case "array":
 	default:
-		return 0, nil, fmt.Errorf("icechunk: zarr.json node_type must be \"array\" or \"group\", not %q", m.NodeType)
+		return 0, nil, fmt.Errorf("%w: node_type must be \"array\" or \"group\", not %q", ErrInvalidMetadata, m.NodeType)
+	}
+	num, err := numChunks(m.ChunkGrid.Name, m.ChunkGrid.Configuration, m.Shape)
+	if err != nil {
+		return 0, nil, err
 	}
 	edit := &arrayEdit{userData: doc, shape: make([]DimensionShape, len(m.Shape))}
-	cfg := m.ChunkGrid.Configuration
 	for d, n := range m.Shape {
-		var num uint64
-		switch m.ChunkGrid.Name {
-		case "regular":
-			if len(cfg.ChunkShape) != len(m.Shape) {
-				return 0, nil, fmt.Errorf("icechunk: chunk_shape has %d dimensions, shape has %d", len(cfg.ChunkShape), len(m.Shape))
-			}
-			if c := cfg.ChunkShape[d]; c > 0 {
-				num = (n + c - 1) / c
-			}
-		case "rectilinear":
-			if len(cfg.ChunkShapes) != len(m.Shape) {
-				return 0, nil, fmt.Errorf("icechunk: chunk_shapes has %d dimensions, shape has %d", len(cfg.ChunkShapes), len(m.Shape))
-			}
-			var step uint64
-			var entries []json.RawMessage
-			switch {
-			case json.Unmarshal(cfg.ChunkShapes[d], &step) == nil && step > 0:
-				num = (n + step - 1) / step
-			case json.Unmarshal(cfg.ChunkShapes[d], &entries) == nil:
-				for _, e := range entries {
-					var rle []uint64
-					if json.Unmarshal(e, &rle) == nil && len(rle) == 2 {
-						num += rle[1]
-					} else {
-						num++
-					}
-				}
-			default:
-				return 0, nil, fmt.Errorf("icechunk: invalid rectilinear chunk_shapes entry %s", cfg.ChunkShapes[d])
-			}
-		default:
-			return 0, nil, fmt.Errorf("icechunk: unsupported chunk grid %q", m.ChunkGrid.Name)
+		if num[d] > 1<<32-1 {
+			return 0, nil, fmt.Errorf("%w: too many chunks along dimension %d", ErrInvalidMetadata, d)
 		}
-		if num > 1<<32-1 {
-			return 0, nil, fmt.Errorf("icechunk: too many chunks along dimension %d", d)
-		}
-		edit.shape[d] = DimensionShape{ArrayLength: n, NumChunks: uint32(num)}
+		edit.shape[d] = DimensionShape{ArrayLength: n, NumChunks: uint32(num[d])}
 	}
 	if m.DimensionNames != nil {
 		edit.dims = make([]string, len(m.DimensionNames))
@@ -157,6 +129,92 @@ func parseNodeMetadata(doc []byte) (NodeType, *arrayEdit, error) {
 		}
 	}
 	return ArrayNode, edit, nil
+}
+
+// numChunks counts the chunks along each axis of a chunk grid as upstream
+// does (ArrayMetadata::num_chunks), accepting and refusing the same
+// documents. Regular chunk sizes must be integers >= 0; a size of 0 gives
+// no chunks (zarr-python 3.4.1 reads it as 1 and stores that before writing
+// chunks; see chunkSource.prepareWrite). Rectilinear axes must be lists of
+// edge lengths, each any number (zarr-python 3.2 wrote integral floats) or
+// a run [length, count] whose count is an integer >= 0.
+func numChunks(grid string, config json.RawMessage, shape []uint64) ([]uint64, error) {
+	var cfg map[string]json.RawMessage
+	if json.Unmarshal(config, &cfg) != nil || cfg == nil {
+		return nil, fmt.Errorf("%w: unsupported chunk grid configuration %s", ErrInvalidMetadata, config)
+	}
+	var num []uint64
+	switch grid {
+	case "regular":
+		sizes, ok := jsonArray(cfg["chunk_shape"])
+		if !ok {
+			return nil, fmt.Errorf("%w: cannot parse chunk_shape for regular chunk grid", ErrInvalidMetadata)
+		}
+		// Upstream pairs sizes with axes, so extra sizes are ignored.
+		for d := 0; d < len(sizes) && d < len(shape); d++ {
+			var c uint64
+			if json.Unmarshal(sizes[d], &c) != nil {
+				return nil, fmt.Errorf("%w: cannot parse chunk_shape for regular chunk grid: %s", ErrInvalidMetadata, sizes[d])
+			}
+			if c > 0 {
+				num = append(num, (shape[d]+c-1)/c)
+			} else {
+				num = append(num, 0)
+			}
+		}
+	case "rectilinear":
+		axes, ok := jsonArray(cfg["chunk_shapes"])
+		if !ok {
+			return nil, fmt.Errorf("%w: cannot parse chunk_shapes for rectilinear chunk grid", ErrInvalidMetadata)
+		}
+		for _, axis := range axes {
+			edges, ok := jsonArray(axis)
+			if !ok {
+				return nil, fmt.Errorf("%w: cannot parse chunk_shapes for rectilinear chunk grid: %s", ErrInvalidMetadata, axis)
+			}
+			var n uint64
+			for _, e := range edges {
+				if run, ok := jsonArray(e); ok {
+					var count uint64
+					if len(run) < 2 || json.Unmarshal(run[1], &count) != nil {
+						return nil, fmt.Errorf("%w: cannot parse chunk_shapes for rectilinear chunk grid: %s", ErrInvalidMetadata, e)
+					}
+					n += count
+				} else if isJSONNumber(e) {
+					n++
+				} else {
+					return nil, fmt.Errorf("%w: cannot parse chunk_shapes for rectilinear chunk grid: %s", ErrInvalidMetadata, e)
+				}
+			}
+			num = append(num, n)
+		}
+	default:
+		return nil, fmt.Errorf("%w: unsupported chunk grid %q: only regular and rectilinear chunk grids are supported", ErrInvalidMetadata, grid)
+	}
+	if len(num) != len(shape) {
+		return nil, fmt.Errorf("%w: the chunk grid has %d dimensions, shape has %d", ErrInvalidMetadata, len(num), len(shape))
+	}
+	return num, nil
+}
+
+// jsonArray splits a JSON array into its elements; ok is false for any
+// other value (null included).
+func jsonArray(raw json.RawMessage) ([]json.RawMessage, bool) {
+	raw = bytes.TrimSpace(raw)
+	if len(raw) == 0 || raw[0] != '[' {
+		return nil, false
+	}
+	var out []json.RawMessage
+	if json.Unmarshal(raw, &out) != nil {
+		return nil, false
+	}
+	return out, true
+}
+
+// isJSONNumber reports whether a JSON value is a number.
+func isJSONNumber(raw json.RawMessage) bool {
+	raw = bytes.TrimSpace(raw)
+	return len(raw) > 0 && (raw[0] == '-' || raw[0] >= '0' && raw[0] <= '9')
 }
 
 // ---------------------------------------------------------------------------
@@ -476,7 +534,7 @@ func (s *Session) SetChunk(ctx context.Context, path string, coords []uint32, da
 		ref = &ChunkRef{Kind: InlineChunk, Inline: append([]byte(nil), data...)}
 	} else {
 		id := randomID12()
-		if _, err := w.Put(ctx, chunksPrefix+id.String(), data, nil); err != nil {
+		if _, err := w.Put(s.repo.reqChunk(ctx, n.Path, coords), chunksPrefix+id.String(), data, nil); err != nil {
 			return fmt.Errorf("icechunk: writing chunk: %w", err)
 		}
 		ref = &ChunkRef{Kind: NativeChunk, ID: id, Length: uint64(len(data))}
@@ -544,10 +602,19 @@ func (s *Session) HasUncommittedChanges() bool {
 	return !s.cs.isEmpty()
 }
 
-// CreateArray creates an array from a spec and opens it for writing.
+// CreateArray creates an array from a spec and opens it for writing. Its
+// chunk key encoding must be the default one, the only one upstream's
+// store can address.
 func (s *Session) CreateArray(ctx context.Context, path string, spec zarr.ArraySpec) (*zarr.Array, error) {
 	doc, err := spec.Metadata()
 	if err != nil {
+		return nil, err
+	}
+	meta, err := zarr.ParseMetadata(doc)
+	if err != nil {
+		return nil, err
+	}
+	if err := checkChunkKeys(path, meta); err != nil {
 		return nil, err
 	}
 	if _, err := s.node(path); err == nil {

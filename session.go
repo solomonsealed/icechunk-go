@@ -1,11 +1,15 @@
 package icechunk
 
 import (
+	"bytes"
+	"cmp"
 	"context"
+	"encoding/json"
 	"fmt"
 	"iter"
 	"math"
 	"sort"
+	"strings"
 	"sync"
 
 	zarr "github.com/solomonsealed/zarr-go"
@@ -94,7 +98,7 @@ func (s *Session) chunkRef(ctx context.Context, n *Node, coords []uint32) (*Chun
 		if !mr.contains(coords) {
 			continue
 		}
-		m, err := s.repo.manifest(ctx, mr.ID)
+		m, err := s.repo.manifest(s.repo.reqArray(ctx, n.Path), mr.ID)
 		if err != nil {
 			return nil, err
 		}
@@ -117,11 +121,15 @@ func (s *Session) GetChunk(ctx context.Context, path string, coords []uint32) (d
 // GetChunkRange returns length encoded bytes of a chunk starting at offset
 // (length < 0 reads to the end). ok is false when the chunk was never written.
 func (s *Session) GetChunkRange(ctx context.Context, path string, coords []uint32, offset, length int64) ([]byte, bool, error) {
-	ref, err := s.ChunkRef(ctx, path, coords)
+	n, err := s.arrayNode(path)
+	if err != nil {
+		return nil, false, err
+	}
+	ref, err := s.chunkRef(ctx, n, coords)
 	if err != nil || ref == nil {
 		return nil, false, err
 	}
-	data, err := s.repo.fetchChunk(ctx, ref, offset, length)
+	data, err := s.repo.fetchChunk(s.repo.reqChunk(ctx, n.Path, coords), ref, offset, length)
 	return data, err == nil, err
 }
 
@@ -158,7 +166,7 @@ func (s *Session) ChunkRefs(ctx context.Context, path string) iter.Seq2[ChunkEnt
 		if !isNew {
 			for i := range n.Array.Manifests {
 				mr := &n.Array.Manifests[i]
-				m, err := s.repo.manifest(ctx, mr.ID)
+				m, err := s.repo.manifest(s.repo.reqArray(ctx, n.Path), mr.ID)
 				if err != nil {
 					yield(ChunkEntry{}, err)
 					return
@@ -204,13 +212,18 @@ func sortedEdits(m map[string]chunkEntry) []chunkEntry {
 	return out
 }
 
-// OpenArray opens the array at path for typed, region-based reads.
+// OpenArray opens the array at path for typed, region-based reads (and,
+// in a writable session, writes).
 func (s *Session) OpenArray(ctx context.Context, path string) (*zarr.Array, error) {
 	n, err := s.arrayNode(path)
 	if err != nil {
 		return nil, err
 	}
-	return zarr.NewArray(n.ZarrMetadata, &chunkSource{s: s, n: n}, &zarr.Options{Concurrency: s.repo.opts.Concurrency})
+	meta, err := zarr.ParseMetadata(n.ZarrMetadata)
+	if err != nil {
+		return nil, err
+	}
+	return zarr.NewArrayFromMetadata(meta, &chunkSource{s: s, n: n, meta: meta}, &zarr.Options{Concurrency: s.repo.opts.Concurrency})
 }
 
 // Attributes returns the attributes of the array or group at path.
@@ -224,8 +237,113 @@ func (s *Session) Attributes(path string) (map[string]any, error) {
 
 // chunkSource adapts one array node to zarr.ChunkSource.
 type chunkSource struct {
-	s *Session
-	n *Node
+	s    *Session
+	mu   sync.Mutex
+	n    *Node          // guarded by mu
+	meta *zarr.Metadata // as the array was opened
+	// prepared is set once the first write has checked the array's
+	// current zarr.json (see prepareWrite).
+	prepared bool
+}
+
+func (c *chunkSource) node() *Node {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return c.n
+}
+
+// prepareWrite runs before the first chunk is written or deleted through
+// the array. It reads the array's zarr.json again, since the session may
+// have replaced it since the array was opened: if the new one lays out
+// chunks differently the write fails. Then, as zarr-python 3.4.1 does
+// through upstream's store, it stores the repaired document of a stored one
+// whose repair moves chunks (a chunk size of 0 read as 1, or as the inner
+// chunk size of a shard; see zarr.Metadata.RepairPending), so that readers
+// of the stored document find the chunks written under the repaired one.
+// Arrays whose chunk key encoding upstream's store cannot address are
+// refused, as zarr-python's writes to them fail there.
+func (c *chunkSource) prepareWrite(ctx context.Context) (*Node, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if c.prepared {
+		return c.n, nil
+	}
+	cur, err := c.s.arrayNode(c.n.Path)
+	if err != nil {
+		return nil, err
+	}
+	if cur.ID != c.n.ID {
+		return nil, fmt.Errorf("%w: %s was replaced in this session", ErrNodeNotFound, c.n.Path)
+	}
+	m := c.meta
+	if !bytes.Equal(cur.ZarrMetadata, c.n.ZarrMetadata) {
+		if m, err = zarr.ParseMetadata(cur.ZarrMetadata); err != nil {
+			return nil, fmt.Errorf("icechunk: array %s: %w", cur.Path, err)
+		}
+		if chunkLayout(m) != chunkLayout(c.meta) {
+			return nil, fmt.Errorf("icechunk: array %s: its zarr.json has changed since the array was opened; reopen the array to write to it", cur.Path)
+		}
+	}
+	if err := checkChunkKeys(cur.Path, m); err != nil {
+		return nil, err
+	}
+	if m.RepairPending() {
+		doc, err := m.Document()
+		if err != nil {
+			return nil, err
+		}
+		if err := c.s.SetMetadata(ctx, cur.Path, doc); err != nil {
+			return nil, err
+		}
+		if cur, err = c.s.arrayNode(cur.Path); err != nil {
+			return nil, err
+		}
+	}
+	c.n, c.prepared = cur, true
+	return cur, nil
+}
+
+// checkChunkKeys refuses arrays whose chunks zarr clients would look for
+// under keys other than "<path>/c/<i>/<j>": upstream's store addresses
+// chunks only by those keys (the "default" chunk key encoding with "/"),
+// and refuses any other.
+func checkChunkKeys(path string, m *zarr.Metadata) error {
+	if k := m.ChunkKeyEncoding; k.Name != "default" || k.Separator != "/" {
+		return fmt.Errorf("%w: array %s: Icechunk stores chunks only under the \"default\" chunk key encoding with separator \"/\", not %q with %q", ErrInvalidMetadata, path, k.Name, cmp.Or(k.Template, k.Separator))
+	}
+	return nil
+}
+
+// chunkLayout describes where an array's chunks lie: its regular chunk
+// shape, or the chunk edges along each axis of a rectilinear grid, and the
+// inner chunk shape of a sharded array.
+func chunkLayout(m *zarr.Metadata) string {
+	var b strings.Builder
+	if grid := m.GridShape(); len(m.ChunkShape) == len(grid) {
+		fmt.Fprint(&b, m.ChunkShape)
+	} else {
+		for d := range grid {
+			coords := make([]uint64, len(grid))
+			b.WriteString("[")
+			for i := range grid[d] {
+				coords[d] = i
+				_, shape := m.ChunkBounds(coords)
+				fmt.Fprint(&b, " ", shape[d])
+			}
+			b.WriteString("]")
+		}
+	}
+	for _, c := range m.Codecs {
+		if c.Name == "sharding_indexed" {
+			var cfg struct {
+				ChunkShape []uint64 `json:"chunk_shape"`
+			}
+			json.Unmarshal(c.Configuration, &cfg)
+			fmt.Fprint(&b, " ", cfg.ChunkShape)
+			break
+		}
+	}
+	return b.String()
 }
 
 // chunkIndices converts zarr's chunk coordinates to Icechunk's.
@@ -245,7 +363,8 @@ func (c *chunkSource) GetChunk(ctx context.Context, coords []uint64, r zarr.Byte
 	if err != nil {
 		return nil, false, err
 	}
-	ref, err := c.s.chunkRef(ctx, c.n, idx)
+	n := c.node()
+	ref, err := c.s.chunkRef(ctx, n, idx)
 	if err != nil || ref == nil {
 		return nil, false, err
 	}
@@ -258,7 +377,7 @@ func (c *chunkSource) GetChunk(ctx context.Context, coords []uint64, r zarr.Byte
 	} else if length == 0 {
 		length = -1
 	}
-	data, err := c.s.repo.fetchChunk(ctx, ref, off, length)
+	data, err := c.s.repo.fetchChunk(c.s.repo.reqChunk(ctx, n.Path, idx), ref, off, length)
 	return data, err == nil, err
 }
 
@@ -269,7 +388,11 @@ func (c *chunkSource) SetChunk(ctx context.Context, coords []uint64, data []byte
 	if err != nil {
 		return err
 	}
-	return c.s.SetChunk(ctx, c.n.Path, idx, data)
+	n, err := c.prepareWrite(ctx)
+	if err != nil {
+		return err
+	}
+	return c.s.SetChunk(ctx, n.Path, idx, data)
 }
 
 func (c *chunkSource) DeleteChunk(ctx context.Context, coords []uint64) error {
@@ -277,5 +400,9 @@ func (c *chunkSource) DeleteChunk(ctx context.Context, coords []uint64) error {
 	if err != nil {
 		return err
 	}
-	return c.s.DeleteChunk(ctx, c.n.Path, idx)
+	n, err := c.prepareWrite(ctx)
+	if err != nil {
+		return err
+	}
+	return c.s.DeleteChunk(ctx, n.Path, idx)
 }

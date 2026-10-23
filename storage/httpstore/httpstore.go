@@ -71,6 +71,12 @@ func doBody(ctx context.Context, o *Options, r s3req.Request, body []byte) (resp
 			}
 		}
 	}
+	if ua := storage.UserAgent(ctx); ua != "" {
+		if own := req.Header.Get("User-Agent"); own != "" {
+			ua = own + " " + ua
+		}
+		req.Header.Set("User-Agent", ua)
+	}
 	resp, err := o.client().Do(req)
 	if err != nil {
 		return response{}, err

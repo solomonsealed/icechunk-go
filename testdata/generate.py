@@ -304,8 +304,8 @@ def write_virtual_repo(name: str, spec_version: int) -> None:
 
 def write_features_repo(name: str, spec_version: int) -> None:
     """History, refs and hierarchy features the other repositories do not
-    exercise: deleted, reset, unicode and slash-named refs; amended and
-    detached commits; repo metadata, status and feature flags; an ops log
+    exercise: deleted, reset, unicode and slash-named refs; amended,
+    detached and forked (unregistered) commits; repo metadata, status and feature flags; an ops log
     longer than one repo info file; moved and deleted nodes; resized arrays;
     deleted chunks; inline and native chunks in one array; manifest splits
     rewritten piecemeal; node names whose bytewise and component-wise sort
@@ -314,7 +314,8 @@ def write_features_repo(name: str, spec_version: int) -> None:
     These repositories have no entries in expected.json: they are checked
     against icechunk-python by testdata/oracle/oracle.py and
     internal/conformance. Spec v1 lacks some of these features (moves,
-    amends, detached snapshots, repo metadata, status, flags, "/" in refs).
+    amends, detached and forked snapshots, repo metadata, status, flags, "/"
+    in refs).
     """
     v2 = spec_version >= 2
     path = OUT / name
@@ -487,6 +488,11 @@ def write_features_repo(name: str, spec_version: int) -> None:
         session = repo.writable_session("main")
         zarr.open_array(session.store, path="c/0", mode="r+")[0] = 42
         session.flush("detached snapshot", metadata={"detached": True})
+        # A fork of a session with changes writes a snapshot that, since
+        # icechunk 2.3.0, the repo info does not list until it is merged.
+        session = repo.writable_session("main")
+        zarr.open_array(session.store, path="c/0", mode="r+")[1] = 43
+        session.fork()
 
     session = repo.writable_session("main")
     zarr.open_array(session.store, path="weird/c", mode="r+")[0, 0] = 99

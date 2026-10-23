@@ -151,6 +151,7 @@ func (r *Repository) updateRepo(ctx context.Context, mutate func(doc *repoDoc, b
 	if err != nil {
 		return err
 	}
+	ctx = r.req(ctx)
 	for attempt := 0; attempt < maxRepoAttempts; attempt++ {
 		if attempt >= 5 {
 			// Immediate retries first, then exponential backoff with jitter.
@@ -220,6 +221,15 @@ func Create(ctx context.Context, st storage.Storage, opts *Options) (*Repository
 	if !ok {
 		return nil, ErrReadOnlyStorage
 	}
+	var attribution Attribution
+	if opts != nil {
+		attribution = opts.Attribution
+	}
+	labels, err := newRequestLabels(attribution)
+	if err != nil {
+		return nil, err
+	}
+	ctx = storage.WithUserAgent(ctx, labels.userAgent("", false, nil, false))
 	for _, key := range []string{repoInfoPath, v1BranchKey("main")} {
 		if _, err := st.Get(ctx, key, storage.RangeOf(0, 1)); err == nil {
 			return nil, fmt.Errorf("%w: a repository already exists here", ErrAlreadyExists)
@@ -315,6 +325,8 @@ type commitPlan struct {
 	flushedAt uint64
 	txLog     []byte
 	manifests map[ManifestID][]byte
+	// manifestPaths holds the path of the array each manifest is for.
+	manifestPaths map[ManifestID]string
 }
 
 // Commit writes the session's changes as a new snapshot and moves the
@@ -357,14 +369,14 @@ func (s *Session) Commit(ctx context.Context, message string, opts *CommitOption
 			return SnapshotID{}, err
 		}
 		for id, data := range plan.manifests {
-			if _, err := w.Put(ctx, manifestsPrefix+id.String(), data, nil); err != nil {
+			if _, err := w.Put(s.repo.reqArray(ctx, plan.manifestPaths[id]), manifestsPrefix+id.String(), data, nil); err != nil {
 				return SnapshotID{}, fmt.Errorf("icechunk: writing manifest: %w", err)
 			}
 		}
-		if _, err := w.Put(ctx, "transactions/"+plan.id.String(), plan.txLog, nil); err != nil {
+		if _, err := w.Put(s.repo.req(ctx), "transactions/"+plan.id.String(), plan.txLog, nil); err != nil {
 			return SnapshotID{}, fmt.Errorf("icechunk: writing transaction log: %w", err)
 		}
-		if _, err := w.Put(ctx, snapshotsPrefix+plan.id.String(), plan.snapshot, nil); err != nil {
+		if _, err := w.Put(s.repo.req(ctx), snapshotsPrefix+plan.id.String(), plan.snapshot, nil); err != nil {
 			return SnapshotID{}, fmt.Errorf("icechunk: writing snapshot: %w", err)
 		}
 		err = s.repo.updateRepo(ctx, func(doc *repoDoc, backup string, now time.Time) error {
@@ -515,7 +527,7 @@ func (s *Session) buildCommit(ctx context.Context, base *Snapshot, message strin
 	for _, f := range baseFiles {
 		fileInfo[f.ID] = f
 	}
-	plan := &commitPlan{id: randomID12(), manifests: map[ManifestID][]byte{}}
+	plan := &commitPlan{id: randomID12(), manifests: map[ManifestID][]byte{}, manifestPaths: map[ManifestID]string{}}
 	var files []ManifestFileInfo
 	seenFile := map[ManifestID]bool{}
 	for _, n := range nodes {
@@ -586,7 +598,7 @@ func (s *Session) buildCommit(ctx context.Context, base *Snapshot, message strin
 				refs = append(refs, mr)
 				continue
 			}
-			m, err := s.repo.manifest(ctx, mr.ID)
+			m, err := s.repo.manifest(s.repo.reqArray(ctx, n.Path), mr.ID)
 			if err != nil {
 				return nil, err
 			}
@@ -620,6 +632,7 @@ func (s *Session) buildCommit(ctx context.Context, base *Snapshot, message strin
 				return nil, err
 			}
 			plan.manifests[mid] = data
+			plan.manifestPaths[mid] = n.Path
 			files = append(files, ManifestFileInfo{ID: mid, SizeBytes: uint64(len(data)), NumChunkRefs: uint32(len(entries))})
 			refs = append(refs, ManifestRef{ID: mid, Extents: boundingBox(entries)})
 		}
@@ -903,7 +916,7 @@ func boundingBox(entries []chunkEntry) []ChunkRange {
 // checkRebase verifies that the commits between base and the new tip did
 // not touch what this session changed, using their transaction logs.
 func (s *Session) checkRebase(ctx context.Context, base, tip SnapshotID) error {
-	raw, err := s.repo.storage.Get(ctx, repoInfoPath, nil)
+	raw, err := s.repo.storage.Get(s.repo.req(ctx), repoInfoPath, nil)
 	if err != nil {
 		return err
 	}
@@ -938,7 +951,7 @@ func (s *Session) checkRebase(ctx context.Context, base, tip SnapshotID) error {
 		touched[id] = true
 	}
 	for _, id := range between {
-		raw, err := s.repo.storage.Get(ctx, "transactions/"+id.String(), nil)
+		raw, err := s.repo.storage.Get(s.repo.req(ctx), "transactions/"+id.String(), nil)
 		if err != nil {
 			return conflict(fmt.Sprintf("cannot read transaction log of %s: %v", id, err))
 		}

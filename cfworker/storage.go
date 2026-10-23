@@ -131,11 +131,19 @@ func fetch(ctx context.Context, r s3req.Request, extra map[string]string) (respo
 	init := jsObject.New()
 	init.Set("method", r.Method)
 	h := jsObject.New()
+	ua := storage.UserAgent(ctx)
 	for k, v := range extra {
+		if ua != "" && strings.EqualFold(k, "User-Agent") {
+			ua = v + " " + ua // a configured User-Agent goes first
+			continue
+		}
 		h.Set(k, v)
 	}
 	for k, v := range r.Header {
 		h.Set(k, v)
+	}
+	if ua != "" {
+		h.Set("User-Agent", ua)
 	}
 	init.Set("headers", h)
 	resp, err := Await(ctx, js.Global().Call("fetch", r.URL, init))
