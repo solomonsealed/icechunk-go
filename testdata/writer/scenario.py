@@ -142,7 +142,8 @@ def gen_values(meta: dict, shape: list[int], seed: int) -> np.ndarray:
 
 def make_config(c: dict | None):
     """A scenario's repository config: inline_chunk_threshold_bytes,
-    num_updates_per_repo_info_file, and manifest_split {path, axis0, any}."""
+    num_updates_per_repo_info_file, manifest_split {path, axis0, any}, and
+    storage (StorageSettings fields, e.g. storage_class)."""
     if not c:
         return None
     cfg = ic.RepositoryConfig.default()
@@ -150,6 +151,8 @@ def make_config(c: dict | None):
         cfg.inline_chunk_threshold_bytes = c["inline_chunk_threshold_bytes"]
     if "num_updates_per_repo_info_file" in c:
         cfg.num_updates_per_repo_info_file = c["num_updates_per_repo_info_file"]
+    if "storage" in c:
+        cfg.storage = ic.StorageSettings(**c["storage"])
     if "manifest_split" in c:
         sp = c["manifest_split"]
         cfg.manifest = ic.ManifestConfig(splitting=ic.ManifestSplittingConfig.from_dict({

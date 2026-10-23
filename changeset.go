@@ -29,7 +29,8 @@ var (
 	ErrInvalidChunkCoords = errors.New("icechunk: invalid chunk coordinates")
 	// ErrInvalidMetadata means a zarr.json that upstream's store refuses
 	// (not JSON, an unknown node type, or a chunk grid it cannot read), or
-	// an array whose chunks it cannot address (see Session.CreateArray).
+	// a zarr write to an array whose chunk keys it cannot address (any
+	// chunk key encoding but "default" with "/").
 	ErrInvalidMetadata = errors.New("icechunk: invalid zarr.json")
 )
 
@@ -534,7 +535,7 @@ func (s *Session) SetChunk(ctx context.Context, path string, coords []uint32, da
 		ref = &ChunkRef{Kind: InlineChunk, Inline: append([]byte(nil), data...)}
 	} else {
 		id := randomID12()
-		if _, err := w.Put(s.repo.reqChunk(ctx, n.Path, coords), chunksPrefix+id.String(), data, nil); err != nil {
+		if _, err := w.Put(s.repo.reqChunk(ctx, n.Path, coords), chunksPrefix+id.String(), data, s.repo.writeSettings().chunk()); err != nil {
 			return fmt.Errorf("icechunk: writing chunk: %w", err)
 		}
 		ref = &ChunkRef{Kind: NativeChunk, ID: id, Length: uint64(len(data))}
@@ -602,19 +603,13 @@ func (s *Session) HasUncommittedChanges() bool {
 	return !s.cs.isEmpty()
 }
 
-// CreateArray creates an array from a spec and opens it for writing. Its
-// chunk key encoding must be the default one, the only one upstream's
-// store can address.
+// CreateArray creates an array from a spec and opens it for writing. As
+// with upstream's store, any chunk key encoding is accepted, but chunks can
+// be written through the array only under the default one (see
+// checkChunkKeys).
 func (s *Session) CreateArray(ctx context.Context, path string, spec zarr.ArraySpec) (*zarr.Array, error) {
 	doc, err := spec.Metadata()
 	if err != nil {
-		return nil, err
-	}
-	meta, err := zarr.ParseMetadata(doc)
-	if err != nil {
-		return nil, err
-	}
-	if err := checkChunkKeys(path, meta); err != nil {
 		return nil, err
 	}
 	if _, err := s.node(path); err == nil {

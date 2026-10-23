@@ -56,6 +56,12 @@ type Options struct {
 	// Attribution labels every request to the object store (sent as the
 	// User-Agent header by HTTP-based storages); see Attribution.
 	Attribution Attribution
+
+	// StorageSettings override, field by field, the storage settings
+	// persisted in the repository's configuration (storage classes and
+	// object metadata), as the config given to upstream's Repository.open
+	// does. They are not persisted, not even by Create.
+	StorageSettings StorageSettings
 }
 
 type virtualContainer struct {

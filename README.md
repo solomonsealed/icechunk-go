@@ -46,9 +46,9 @@ spec v1) stays with the official library; see
 - **Request attribution**, as in icechunk 2.3: every request names itself in
   its `User-Agent` header, with the array path and chunk coordinates it is
   for and the optional `Options.Attribution` labels (client, workload,
-  principal), e.g. `weatherlib/0.9 icechunk-go/0.1.0 (workload=nightly;
-  array=g/temperature; chunk=0/1/2)`. The product token is `icechunk-go`,
-  not upstream's `icechunk`.
+  principal), e.g. `weatherlib/0.9 icechunk/2.3.0 (workload=nightly;
+  array=g/temperature; chunk=0/1/2)`. The product token is upstream's, at
+  the release this module is aligned with (`icechunk.CompatibleVersion`).
 - **An HTTP service** (`serve`): JSON API plus a read-only Zarr store, so
   zarr-python, zarrita.js and similar clients can read a repository through a
   Worker, and optional token-protected endpoints that create and write arrays.
@@ -87,6 +87,19 @@ spec v1) stays with the official library; see
 - Writable storage (`storage.Writer`): memory, local files (atomic renames,
   conditional writes serialized with a file lock), S3-compatible APIs
   (`If-Match` / `If-None-Match`), R2 bindings and fetch-based S3 in Workers.
+- Writes apply the repository's storage settings as upstream does: those
+  persisted in its config, overridden by `Options.StorageSettings`. That
+  means storage classes (`storage_class`, `metadata_storage_class`,
+  `chunks_storage_class`), and with `unsafe_use_metadata` (the default
+  except for repositories upstream created on local files) the object
+  metadata upstream stamps: `icspecver`, `icclient`, `icfiletype` and
+  `iccompalg` on snapshots, manifests, transaction logs and the repo info
+  file. A conditional write of the repo info file carries a write id
+  (`icechunkwriteid`): when it fails with a failed condition or a lost
+  response, the store reads the object back, and the write succeeded if
+  the object holds that id. Repo info backups are server-side copies where
+  the store supports them (S3 `CopyObject`, conditional on the version
+  read), keeping the original's metadata.
 
 ## Library usage
 
@@ -187,13 +200,17 @@ icechunk-go tag    ./repo v1 main
   repository's configured virtual chunk containers.
 - Rebase conflict detection is coarse: any commit that touched the same
   chunk, or changed or deleted the same node, conflicts.
-- Arrays must use the `default` chunk key encoding with separator `/`, the
-  only chunk keys upstream's store addresses: `CreateArray` refuses others
-  (zarr-go's `v2` and `template` included), and writes through `zarr.Array`
-  to such arrays fail, as zarr-python's do on upstream. Go still reads them
-  by chunk coordinates.
-- Storage classes from the repository config are not applied to writes,
-  and objects carry no `ic*` user metadata.
+- As upstream's store addresses only the `default` chunk key encoding with
+  separator `/`, arrays with other encodings (zarr-go's `v2` and `template`
+  included) are created, but writes through `zarr.Array` to them fail, as
+  zarr-python's do on upstream. Go still reads and writes their chunks by
+  coordinates.
+- Of the repository's storage settings, only the storage classes and
+  `unsafe_use_metadata` apply. Writes are always conditional
+  (`unsafe_use_conditional_*` are ignored), never multipart, and
+  concurrency, retry and timeout settings are not used. R2 bindings cannot
+  copy objects, so repo info backups there are written anew, with the
+  metadata of a repo info file.
 - Diffs between snapshots are not exposed.
 - GCS and Azure are reachable only through S3-compatible (HMAC) or plain
   HTTP access, not their native auth.
@@ -260,6 +277,11 @@ open an issue, which is worth doing for anything long-lived.
   description of the result (values, chunk bytes for deterministic codecs,
   inline/native placement, keys, manifest extents, history, refs, ops log)
   with icechunk-python's run of the same steps (`testdata/writer/expected`).
+- Object metadata and storage classes on S3: `TestWriteToS3` and
+  `testdata/check_s3_objects.py` write the same repository with Go and
+  icechunk-python to an S3 endpoint (e.g. a local `moto_server`), require
+  every kind of object to carry the same storage class and metadata, and
+  have each commit on top of the other's repository.
   With `ICECHUNK_PYTHON` set, `TestWriterScenariosLive` also has
   icechunk-python read every Go-written repository, transaction logs and
   the whole ops log included, and interleaves the Go library, the HTTP
@@ -276,4 +298,7 @@ ICECHUNK_PYTHON=.venv/bin/python go test -run WriterScenarios ./internal/conform
 python testdata/check_http.py testdata/generated/codecs-v2 http://localhost:8787
 ICECHUNK_GO_WRITE_DIR=/tmp/gw go test -run 'TestWriteForPython|TestWriteOnPythonRepos' ./internal/conformance
 python testdata/check_go_writer.py /tmp/gw && python testdata/check_go_on_python.py /tmp/gw
+python testdata/check_s3_objects.py http://localhost:5555 icechunk-check   # S3 endpoint and bucket, then:
+ICECHUNK_S3_ENDPOINT=http://localhost:5555 ICECHUNK_S3_BUCKET=icechunk-check go test -run TestWriteToS3 ./internal/conformance
+python testdata/check_s3_objects.py http://localhost:5555 icechunk-check
 ```

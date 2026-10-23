@@ -3,16 +3,21 @@ package httpstore_test
 import (
 	"bytes"
 	"context"
+	"crypto/hmac"
 	"crypto/md5"
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"html"
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"os"
 	"path/filepath"
+	"reflect"
+	"regexp"
 	"slices"
 	"sort"
 	"strings"
@@ -196,18 +201,85 @@ func TestHTTPStoreVerifiesChecksumsItself(t *testing.T) {
 }
 
 // fakeS3 is an in-memory S3 endpoint with ETags and conditional PUTs.
+// fakeS3 is an S3 endpoint for the bucket "bucket" and the credentials
+// AK/SK: it verifies SigV4 signatures, refusing unsigned x-amz-* headers as
+// S3 does, and keeps each object's storage class and user metadata.
 type fakeS3 struct {
 	mu      sync.Mutex
 	objects map[string][]byte
+	attrs   map[string]http.Header // x-amz-storage-class and x-amz-meta-* of each object
+	puts    []fakePut
+}
+
+// fakePut records a PUT: its key, the storage class and user metadata it
+// stored, and for a CopyObject, the key copied.
+type fakePut struct {
+	key, copyOf string
+	attrs       http.Header
 }
 
 func (f *fakeS3) etag(b []byte) string { return fmt.Sprintf(`"%x"`, md5.Sum(b)) }
 
+func (f *fakeS3) takePuts() []fakePut {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	out := f.puts
+	f.puts = nil
+	return out
+}
+
+func hmacSum(key []byte, data string) []byte {
+	h := hmac.New(sha256.New, key)
+	h.Write([]byte(data))
+	return h.Sum(nil)
+}
+
+// verifySigV4 checks a request's AWS Signature Version 4 for the secret key
+// "SK", and that every x-amz-* header is signed.
+func verifySigV4(r *http.Request) error {
+	const prefix = "AWS4-HMAC-SHA256 Credential="
+	auth, ok := strings.CutPrefix(r.Header.Get("Authorization"), prefix)
+	parts := strings.Split(auth, ", ")
+	if !ok || len(parts) != 3 {
+		return fmt.Errorf("not a SigV4 authorization: %q", r.Header.Get("Authorization"))
+	}
+	cred := strings.Split(parts[0], "/")
+	signedList, _ := strings.CutPrefix(parts[1], "SignedHeaders=")
+	if len(cred) != 5 || cred[0] != "AK" {
+		return fmt.Errorf("bad credential %q", parts[0])
+	}
+	signed := strings.Split(signedList, ";")
+	for k := range r.Header {
+		if k := strings.ToLower(k); strings.HasPrefix(k, "x-amz-") && !slices.Contains(signed, k) {
+			return fmt.Errorf("header %s is not signed", k)
+		}
+	}
+	var canon strings.Builder
+	for _, h := range signed {
+		v := r.Host
+		if h != "host" {
+			v = strings.Join(strings.Fields(r.Header.Get(h)), " ")
+		}
+		canon.WriteString(h + ":" + v + "\n")
+	}
+	canonical := strings.Join([]string{r.Method, r.URL.EscapedPath(), r.URL.RawQuery, canon.String(), signedList, r.Header.Get("X-Amz-Content-Sha256")}, "\n")
+	sum := sha256.Sum256([]byte(canonical))
+	toSign := "AWS4-HMAC-SHA256\n" + r.Header.Get("X-Amz-Date") + "\n" + strings.Join(cred[1:], "/") + "\n" + hex.EncodeToString(sum[:])
+	key := hmacSum([]byte("AWS4SK"), cred[1])
+	for _, s := range cred[2:] {
+		key = hmacSum(key, s)
+	}
+	if want := "Signature=" + hex.EncodeToString(hmacSum(key, toSign)); parts[2] != want {
+		return fmt.Errorf("signature mismatch")
+	}
+	return nil
+}
+
 func (f *fakeS3) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
-	if !strings.HasPrefix(r.Header.Get("Authorization"), "AWS4-HMAC-SHA256 Credential=AK/") {
-		w.WriteHeader(http.StatusForbidden)
+	if err := verifySigV4(r); err != nil {
+		http.Error(w, err.Error(), http.StatusForbidden)
 		return
 	}
 	key := strings.TrimPrefix(r.URL.Path, "/bucket/")
@@ -229,14 +301,48 @@ func (f *fakeS3) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	cur, exists := f.objects[key]
 	switch r.Method {
-	case "GET":
+	case "GET", "HEAD":
 		if !exists {
 			w.WriteHeader(http.StatusNotFound)
 			return
 		}
 		w.Header().Set("ETag", f.etag(cur))
+		for k, v := range f.attrs[key] {
+			w.Header()[k] = v
+		}
 		http.ServeContent(w, r, key, time.Time{}, bytes.NewReader(cur))
 	case "PUT":
+		if src := r.Header.Get("X-Amz-Copy-Source"); src != "" {
+			// CopyObject keeps the source's metadata; the storage class is
+			// the request's.
+			srcKey, _ := url.PathUnescape(strings.TrimPrefix(src, "/bucket/"))
+			data, ok := f.objects[srcKey]
+			switch {
+			case !ok:
+				w.WriteHeader(http.StatusNotFound)
+				return
+			case r.Header.Get("X-Amz-Copy-Source-If-Match") != "" && r.Header.Get("X-Amz-Copy-Source-If-Match") != f.etag(data):
+				w.WriteHeader(http.StatusPreconditionFailed)
+				return
+			}
+			attrs := http.Header{}
+			for k, v := range f.attrs[srcKey] {
+				if strings.HasPrefix(strings.ToLower(k), "x-amz-meta-") {
+					attrs[k] = v
+				}
+			}
+			if c := r.Header.Get("X-Amz-Storage-Class"); c != "" {
+				attrs.Set("X-Amz-Storage-Class", c)
+			}
+			f.objects[key] = slices.Clone(data)
+			if f.attrs == nil {
+				f.attrs = map[string]http.Header{}
+			}
+			f.attrs[key] = attrs
+			f.puts = append(f.puts, fakePut{key: strings.TrimPrefix(key, "repo/"), copyOf: strings.TrimPrefix(srcKey, "repo/"), attrs: attrs})
+			fmt.Fprintf(w, "<CopyObjectResult><ETag>%s</ETag></CopyObjectResult>", html.EscapeString(f.etag(data)))
+			return
+		}
 		body, _ := io.ReadAll(r.Body)
 		sum := sha256.Sum256(body)
 		if r.Header.Get("X-Amz-Content-Sha256") != hex.EncodeToString(sum[:]) {
@@ -252,6 +358,17 @@ func (f *fakeS3) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		f.objects[key] = body
+		attrs := http.Header{}
+		for k, v := range r.Header {
+			if lk := strings.ToLower(k); lk == "x-amz-storage-class" || strings.HasPrefix(lk, "x-amz-meta-") {
+				attrs[k] = v
+			}
+		}
+		if f.attrs == nil {
+			f.attrs = map[string]http.Header{}
+		}
+		f.attrs[key] = attrs
+		f.puts = append(f.puts, fakePut{key: strings.TrimPrefix(key, "repo/"), attrs: attrs})
 		w.Header().Set("ETag", f.etag(body))
 	case "DELETE":
 		delete(f.objects, key)
@@ -358,7 +475,7 @@ func TestAttributionUserAgents(t *testing.T) {
 		Attribution:            icechunk.Attribution{Client: "weatherlib/0.9", Workload: "nightly-ingest", Principal: "u_123"},
 		VirtualChunkContainers: map[string]storage.Storage{"s3://src/": httpstore.New(vs.URL, nil)},
 	}
-	const labels = "my-app/1 weatherlib/0.9 icechunk-go/0.1.0 (workload=nightly-ingest; principal=u_123"
+	const labels = "my-app/1 weatherlib/0.9 icechunk/2.3.0 (workload=nightly-ingest; principal=u_123"
 	check := func(what string, reqs [][2]string, chunks map[string]bool) {
 		t.Helper()
 		if len(reqs) == 0 {
@@ -427,7 +544,7 @@ func TestAttributionUserAgents(t *testing.T) {
 	}
 	check("read", srv.take(), map[string]bool{"0": true, "1": true})
 	vmu.Lock()
-	if len(virtualUA) == 0 || virtualUA[0] != "weatherlib/0.9 icechunk-go/0.1.0 (workload=nightly-ingest; principal=u_123; array=g/temperature; chunk=2)" {
+	if len(virtualUA) == 0 || virtualUA[0] != "weatherlib/0.9 icechunk/2.3.0 (workload=nightly-ingest; principal=u_123; array=g/temperature; chunk=2)" {
 		t.Errorf("virtual chunk requests sent %q", virtualUA)
 	}
 	vmu.Unlock()
@@ -441,11 +558,270 @@ func TestAttributionUserAgents(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, r := range srv.take() {
-		if r[1] != "my-app/1 icechunk-go/0.1.0" {
+		if r[1] != "my-app/1 icechunk/2.3.0" {
 			t.Errorf("unattributed %s sent %q", r[0], r[1])
 		}
 	}
 	if _, err := icechunk.Open(ctx, st, &icechunk.Options{Attribution: icechunk.Attribution{Workload: "a;b"}}); err == nil {
 		t.Error("invalid attribution accepted")
 	}
+}
+
+// faultyS3 is a fakeS3 whose next PUT fails as set by fault: "lost" stores
+// the object and drops the connection before answering, "drop" drops it
+// without storing, "replay" stores the object and answers 412 (as when a
+// retried write trips its own condition), and "headfail" drops it and
+// answers the next HEAD with 500.
+type faultyS3 struct {
+	*fakeS3
+	mu            sync.Mutex
+	fault         string
+	failHead      bool
+	heads         int
+	headsAfterPut int
+}
+
+func (f *faultyS3) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	f.mu.Lock()
+	fault := ""
+	if r.Method == "PUT" {
+		fault, f.fault = f.fault, ""
+		if fault == "headfail" {
+			f.failHead = true
+		}
+	}
+	failHead := r.Method == "HEAD" && f.failHead
+	if r.Method == "HEAD" {
+		f.heads++
+		f.failHead = false
+	}
+	f.mu.Unlock()
+	drop := func() {
+		conn, _, err := w.(http.Hijacker).Hijack()
+		if err == nil {
+			conn.Close()
+		}
+	}
+	switch {
+	case failHead:
+		w.WriteHeader(http.StatusInternalServerError)
+	case fault == "lost":
+		f.fakeS3.ServeHTTP(httptest.NewRecorder(), r)
+		drop()
+	case fault == "drop", fault == "headfail":
+		io.ReadAll(r.Body)
+		drop()
+	case fault == "replay":
+		f.fakeS3.ServeHTTP(httptest.NewRecorder(), r)
+		w.WriteHeader(http.StatusPreconditionFailed)
+	default:
+		f.fakeS3.ServeHTTP(w, r)
+	}
+}
+
+// A conditional write stamped with a write id recovers from a lost
+// response by reading the object back, as upstream's do.
+func TestS3PutReadsBackConditionalWrites(t *testing.T) {
+	ctx := context.Background()
+	f := &faultyS3{fakeS3: &fakeS3{objects: map[string][]byte{}}}
+	srv := httptest.NewServer(f)
+	defer srv.Close()
+	st := httpstore.NewS3(storage.S3Config{Bucket: "bucket", Endpoint: srv.URL, AccessKeyID: "AK", SecretAccessKey: "SK"}, nil)
+	withID := func(id string, o storage.PutOptions) *storage.PutOptions {
+		o.Metadata = map[string]string{storage.WriteIDMetadataKey: id, "icfiletype": "repo-info"}
+		return &o
+	}
+	put := func(fault, key, data string, opts *storage.PutOptions) (string, error) {
+		f.mu.Lock()
+		f.fault, f.heads = fault, 0
+		f.mu.Unlock()
+		return st.Put(ctx, key, []byte(data), opts)
+	}
+	heads := func() int {
+		f.mu.Lock()
+		defer f.mu.Unlock()
+		return f.heads
+	}
+
+	// The response of a write that landed is lost: the read-back finds it.
+	v1, err := put("lost", "k", "one", withID("w1", storage.PutOptions{IfNotExists: true}))
+	if err != nil || v1 == "" {
+		t.Fatalf("lost response: %q, %v", v1, err)
+	}
+	if _, v, _ := st.GetVersion(ctx, "k"); v != v1 {
+		t.Errorf("version %q, stored %q", v1, v)
+	}
+	// A write whose (retried) request trips its own condition succeeded.
+	v2, err := put("replay", "k", "two", withID("w2", storage.PutOptions{IfMatch: v1}))
+	if err != nil || v2 == v1 {
+		t.Fatalf("replayed write: %q, %v", v2, err)
+	}
+	// A genuine conflict: the stored object is another write.
+	if _, err := put("", "k", "three", withID("w3", storage.PutOptions{IfMatch: v1})); !errors.Is(err, storage.ErrPreconditionFailed) {
+		t.Errorf("conflict: %v", err)
+	}
+	if heads() != 1 {
+		t.Errorf("conflict: %d read-backs", heads())
+	}
+	// A write that did not land returns its own error.
+	if _, err := put("drop", "new", "x", withID("w4", storage.PutOptions{IfNotExists: true})); err == nil || errors.Is(err, storage.ErrPreconditionFailed) {
+		t.Errorf("lost write: %v", err)
+	}
+	// A failed read-back is reported, not guessed from.
+	if _, err := put("headfail", "new", "x", withID("w5", storage.PutOptions{IfNotExists: true})); err == nil || !strings.Contains(err.Error(), "reading back") {
+		t.Errorf("failed read-back: %v", err)
+	}
+	// Unconditional writes, and conditional ones without a write id, are
+	// not read back.
+	if _, err := put("drop", "new", "x", withID("w6", storage.PutOptions{})); err == nil || heads() != 0 {
+		t.Errorf("unconditional: %v, %d read-backs", err, heads())
+	}
+	if _, err := put("", "k", "x", &storage.PutOptions{IfMatch: v1}); !errors.Is(err, storage.ErrPreconditionFailed) || heads() != 0 {
+		t.Errorf("without a write id: %v, %d read-backs", err, heads())
+	}
+}
+
+// Writes apply the storage settings: the storage classes and the object
+// metadata (icspecver, icclient, icfiletype, iccompalg, and a write id on
+// conditional writes of the repo info file) upstream writes.
+func TestStorageSettings(t *testing.T) {
+	ctx := context.Background()
+	f := &fakeS3{objects: map[string][]byte{}}
+	srv := httptest.NewServer(f)
+	defer srv.Close()
+	st := httpstore.NewS3(storage.S3Config{Bucket: "bucket", Prefix: "repo", Endpoint: srv.URL, AccessKeyID: "AK", SecretAccessKey: "SK"}, nil)
+	uuid := regexp.MustCompile(`^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$`)
+	fileTypes := map[string]string{"snapshots/": "snapshot", "manifests/": "manifest", "transactions/": "transaction-log", "repo": "repo-info", "overwritten/": "repo-info"}
+	// check verifies the PUTs of puts given the storage class of each kind
+	// of object ("chunks/", "metadata" for snapshots, manifests and
+	// transaction logs, and "repo" for the repo info file and its backups).
+	check := func(what string, puts []fakePut, classes map[string]string, metadata bool) {
+		t.Helper()
+		seen := map[string]bool{}
+		repoMeta := http.Header{} // of the repo info version last written
+		for _, p := range puts {
+			kind := "metadata"
+			switch {
+			case strings.HasPrefix(p.key, "chunks/"):
+				kind = "chunks/"
+			case p.key == "repo", strings.HasPrefix(p.key, "overwritten/"):
+				kind = "repo"
+			}
+			seen[kind] = true
+			if got := p.attrs.Get("X-Amz-Storage-Class"); got != classes[kind] {
+				t.Errorf("%s: %s stored in class %q, want %q", what, p.key, got, classes[kind])
+			}
+			var fileType string
+			for prefix, ft := range fileTypes {
+				if strings.HasPrefix(p.key, prefix) {
+					fileType = ft
+				}
+			}
+			meta := map[string]string{}
+			metaHeader := http.Header{}
+			for k := range p.attrs {
+				if name, ok := strings.CutPrefix(strings.ToLower(k), "x-amz-meta-"); ok {
+					meta[name] = p.attrs.Get(k)
+					metaHeader[k] = p.attrs[k]
+				}
+			}
+			if strings.HasPrefix(p.key, "overwritten/") {
+				// Backups are server-side copies of the repo info version
+				// read, as upstream's: they keep its metadata.
+				if p.copyOf != "repo" || !reflect.DeepEqual(metaHeader, repoMeta) {
+					t.Errorf("%s: backup %s copies %q with metadata %v, want a copy of repo with %v", what, p.key, p.copyOf, metaHeader, repoMeta)
+				}
+				continue
+			}
+			if p.key == "repo" {
+				repoMeta = metaHeader
+			}
+			want := map[string]string{}
+			if metadata && fileType != "" {
+				want = map[string]string{"icspecver": "2", "icclient": "icechunk_go-0.1.0", "icfiletype": fileType, "iccompalg": "zstd"}
+				if p.key == "repo" {
+					want[storage.WriteIDMetadataKey] = meta[storage.WriteIDMetadataKey]
+					if !uuid.MatchString(meta[storage.WriteIDMetadataKey]) {
+						t.Errorf("%s: repo info write id %q", what, meta[storage.WriteIDMetadataKey])
+					}
+				}
+			}
+			if !reflect.DeepEqual(meta, want) {
+				t.Errorf("%s: %s has metadata %v, want %v", what, p.key, meta, want)
+			}
+		}
+		for _, kind := range []string{"chunks/", "metadata", "repo"} {
+			if !seen[kind] {
+				t.Errorf("%s: no %s written", what, kind)
+			}
+		}
+	}
+	commit := func(repo *icechunk.Repository, path string) {
+		t.Helper()
+		s, err := repo.WritableSession(ctx, "main")
+		if err != nil {
+			t.Fatal(err)
+		}
+		arr, err := s.CreateArray(ctx, path, zarr.ArraySpec{Shape: []uint64{200}, ChunkShape: []uint64{100}, DataType: "float64",
+			Codecs: []zarr.CodecSpec{{Name: "bytes", Configuration: []byte(`{"endian": "little"}`)}}})
+		if err != nil {
+			t.Fatal(err)
+		}
+		nd, _ := zarr.FromSlice([]uint64{200}, make([]float64, 200))
+		for i := range 200 {
+			nd.Data[8*i] = byte(i + 1)
+		}
+		if err := arr.Write(ctx, []uint64{0}, nd); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := s.Commit(ctx, "write "+path, nil); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	// A repository created with settings (Go does not persist them).
+	opts := &icechunk.Options{StorageSettings: icechunk.StorageSettings{StorageClass: "STANDARD_IA", ChunksStorageClass: "INTELLIGENT_TIERING"}}
+	repo, err := icechunk.Create(ctx, st, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	commit(repo, "/a")
+	classes := map[string]string{"chunks/": "INTELLIGENT_TIERING", "metadata": "STANDARD_IA", "repo": "STANDARD_IA"}
+	check("created", f.takePuts(), classes, true)
+
+	// Settings persisted by icechunk-python, which also persists that its
+	// local repositories keep no metadata.
+	f2 := &fakeS3{objects: map[string][]byte{}}
+	srv2 := httptest.NewServer(f2)
+	defer srv2.Close()
+	dir := "../../testdata/writer/initial/config"
+	err = filepath.WalkDir(dir, func(p string, d os.DirEntry, err error) error {
+		if err != nil || d.IsDir() {
+			return err
+		}
+		b, err := os.ReadFile(p)
+		rel, _ := filepath.Rel(dir, p)
+		f2.objects["repo/"+filepath.ToSlash(rel)] = b
+		return err
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	st2 := httpstore.NewS3(storage.S3Config{Bucket: "bucket", Prefix: "repo", Endpoint: srv2.URL, AccessKeyID: "AK", SecretAccessKey: "SK"}, nil)
+	repo, err = icechunk.Open(ctx, st2, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	commit(repo, "/b")
+	persisted := map[string]string{"chunks/": "INTELLIGENT_TIERING", "metadata": "GLACIER_IR", "repo": "STANDARD_IA"}
+	check("persisted", f2.takePuts(), persisted, false)
+
+	// Settings given to Open override the persisted ones field by field.
+	on := true
+	repo, err = icechunk.Open(ctx, st2, &icechunk.Options{StorageSettings: icechunk.StorageSettings{StorageClass: "ONEZONE_IA", UnsafeUseMetadata: &on}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	commit(repo, "/c")
+	check("overridden", f2.takePuts(), map[string]string{"chunks/": "INTELLIGENT_TIERING", "metadata": "GLACIER_IR", "repo": "ONEZONE_IA"}, true)
 }

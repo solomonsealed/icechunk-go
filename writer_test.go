@@ -818,34 +818,29 @@ func TestChunkKeyEncodings(t *testing.T) {
 		{Name: "default", Separator: "."},
 		{Name: "template", Template: "{0}/{1}.bin"},
 	} {
-		spec := zarr.ArraySpec{Shape: []uint64{4, 4}, ChunkShape: []uint64{2, 2}, DataType: "int32", ChunkKeyEncoding: enc}
-		if _, err := s.CreateArray(ctx, "/x", spec); !errors.Is(err, icechunk.ErrInvalidMetadata) {
-			t.Errorf("create with %+v: %v", enc, err)
-		}
-		if _, err := s.Node("/x"); !errors.Is(err, icechunk.ErrNodeNotFound) {
-			t.Errorf("create with %+v left a node: %v", enc, err)
-		}
-		// Stored as upstream stores it, but zarr writes are refused.
-		doc, err := spec.Metadata()
+		// Created as upstream's store stores the metadata, but zarr writes
+		// are refused, as zarr-python's are there.
+		spec := zarr.ArraySpec{Shape: []uint64{4, 4}, ChunkShape: []uint64{2, 2}, DataType: "int32", ChunkKeyEncoding: enc,
+			Codecs: []zarr.CodecSpec{{Name: "bytes", Configuration: []byte(`{"endian": "little"}`)}}}
+		arr, err := s.CreateArray(ctx, "/x", spec)
 		if err != nil {
-			t.Fatal(err)
-		}
-		if err := s.SetMetadata(ctx, "/x", doc); err != nil {
-			t.Fatalf("set metadata with %+v: %v", enc, err)
-		}
-		arr, err := s.OpenArray(ctx, "/x")
-		if err != nil {
-			t.Fatal(err)
+			t.Fatalf("create with %+v: %v", enc, err)
 		}
 		if err := arr.Write(ctx, []uint64{0, 0}, one); !errors.Is(err, icechunk.ErrInvalidMetadata) {
 			t.Errorf("write with %+v: %v", enc, err)
 		}
+		// Chunks written by coordinates are read back by coordinates.
+		if err := s.SetChunk(ctx, "/x", []uint32{1, 1}, int32Bytes(5, 6, 7, 8)); err != nil {
+			t.Fatal(err)
+		}
+		if nd, err := arr.Read(ctx, []uint64{2, 2}, []uint64{2, 2}); err != nil {
+			t.Error(err)
+		} else if v, _ := nd.Values(); !slices.Equal(v.([]int32), []int32{5, 6, 7, 8}) {
+			t.Errorf("read with %+v: %v", enc, v)
+		}
 		if err := s.DeleteNode(ctx, "/x"); err != nil {
 			t.Fatal(err)
 		}
-	}
-	if s.HasUncommittedChanges() {
-		t.Error("refused writes left changes")
 	}
 	spec := zarr.ArraySpec{Shape: []uint64{4, 4}, ChunkShape: []uint64{2, 2}, DataType: "int32", ChunkKeyEncoding: zarr.ChunkKeyEncoding{Name: "default", Separator: "/"}}
 	arr, err := s.CreateArray(ctx, "/ok", spec)

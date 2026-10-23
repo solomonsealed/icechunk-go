@@ -4,6 +4,7 @@
 package s3req
 
 import (
+	"bytes"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
@@ -163,14 +164,16 @@ func signPayload(c *Config, r *Request, host, path, query, payloadHash string, n
 	date := amzDate[:8]
 	r.Header["x-amz-date"] = amzDate
 	r.Header["x-amz-content-sha256"] = payloadHash
-	signed := map[string]string{
-		"host":                 host,
-		"x-amz-date":           amzDate,
-		"x-amz-content-sha256": payloadHash,
-	}
 	if c.SessionToken != "" {
 		r.Header["x-amz-security-token"] = c.SessionToken
-		signed["x-amz-security-token"] = c.SessionToken
+	}
+	// S3 refuses requests with x-amz-* headers that are not signed (such as
+	// x-amz-storage-class and x-amz-meta-*), so all of them are.
+	signed := map[string]string{"host": host}
+	for k, v := range r.Header {
+		if strings.HasPrefix(k, "x-amz-") {
+			signed[k] = v
+		}
 	}
 	names := make([]string, 0, len(signed))
 	for k := range signed {
@@ -181,7 +184,7 @@ func signPayload(c *Config, r *Request, host, path, query, payloadHash string, n
 	for _, k := range names {
 		canonHeaders.WriteString(k)
 		canonHeaders.WriteString(":")
-		canonHeaders.WriteString(strings.TrimSpace(signed[k]))
+		canonHeaders.WriteString(strings.Join(strings.Fields(signed[k]), " "))
 		canonHeaders.WriteString("\n")
 	}
 	signedHeaders := strings.Join(names, ";")
@@ -308,7 +311,8 @@ func stripETag(s string) string {
 
 // Put builds a PutObject request for key; the caller sends body with it.
 // Conditional writes use If-Match / If-None-Match: *, supported by AWS S3,
-// Cloudflare R2, MinIO and most S3-compatible stores.
+// Cloudflare R2, MinIO and most S3-compatible stores. The storage class
+// and user metadata go in x-amz-storage-class and x-amz-meta-* headers.
 func Put(c *Config, key string, body []byte, opts *storage.PutOptions, now time.Time) (Request, error) {
 	base, host, path, err := target(c, fullKey(c, key))
 	if err != nil {
@@ -322,12 +326,66 @@ func Put(c *Config, key string, body []byte, opts *storage.PutOptions, now time.
 		if opts.IfNotExists {
 			r.Header["if-none-match"] = "*"
 		}
+		if opts.StorageClass != "" {
+			r.Header["x-amz-storage-class"] = opts.StorageClass
+		}
+		for k, v := range opts.Metadata {
+			r.Header[metadataPrefix+strings.ToLower(k)] = v
+		}
 	}
 	sum := sha256.Sum256(body)
 	if !c.Anonymous && c.AccessKeyID != "" {
 		signPayload(c, &r, host, path, "", hex.EncodeToString(sum[:]), now)
 	}
 	return r, nil
+}
+
+// Copy builds a CopyObject request copying src to dst, keeping src's user
+// metadata (S3's default metadata directive), with opts's storage class
+// and, if opts.IfMatch is set, only if src's ETag is IfMatch.
+func Copy(c *Config, src, dst string, opts *storage.PutOptions, now time.Time) (Request, error) {
+	base, host, path, err := target(c, fullKey(c, dst))
+	if err != nil {
+		return Request{}, err
+	}
+	r := Request{Method: "PUT", URL: base + path, Header: map[string]string{
+		"x-amz-copy-source": "/" + c.Bucket + "/" + EscapePath(fullKey(c, src)),
+	}}
+	if opts != nil {
+		if opts.IfMatch != "" {
+			r.Header["x-amz-copy-source-if-match"] = `"` + stripETag(opts.IfMatch) + `"`
+		}
+		if opts.StorageClass != "" {
+			r.Header["x-amz-storage-class"] = opts.StorageClass
+		}
+	}
+	sign(c, &r, host, path, "", now)
+	return r, nil
+}
+
+// CheckCopy maps a CopyObject response to the copy's version (the ETag in
+// its CopyObjectResult) or an error: a failed x-amz-copy-source-if-match is
+// 412, and S3 may report a failed copy in a 200 response's body.
+func CheckCopy(src, dst string, status int, body []byte) (string, error) {
+	switch {
+	case status == 412:
+		return "", fmt.Errorf("%w: %s", storage.ErrPreconditionFailed, src)
+	case status == 404:
+		return "", fmt.Errorf("%w: %s", storage.ErrNotFound, src)
+	case status == 200 && !bytes.Contains(body, []byte("<Error>")):
+		var res struct {
+			ETag string `xml:"ETag"`
+		}
+		if xml.Unmarshal(body, &res) == nil && res.ETag != "" {
+			return stripETag(res.ETag), nil
+		}
+		return "", fmt.Errorf("copy %s to %s: no ETag in the response", src, dst)
+	}
+	msg := strings.TrimSpace(string(body))
+	if len(msg) > 300 {
+		msg = msg[:300] + "..."
+	}
+	return "", fmt.Errorf("copy %s to %s: status %d: %s", src, dst, status, msg)
 }
 
 // Delete builds a DeleteObject request for key.
@@ -356,6 +414,45 @@ func CheckPut(key string, status int, body []byte, etag string) (string, error) 
 		msg = msg[:300] + "..."
 	}
 	return "", fmt.Errorf("PUT %s: status %d: %s", key, status, msg)
+}
+
+// metadataPrefix starts the headers that carry an object's user metadata.
+const metadataPrefix = "x-amz-meta-"
+
+// WriteIDHeader is the response header holding an object's write id
+// (storage.WriteIDMetadataKey).
+const WriteIDHeader = metadataPrefix + storage.WriteIDMetadataKey
+
+// ConditionalWriteID returns the write id a conditional write stamps on the
+// object (storage.WriteIDMetadataKey in its metadata), or "" for
+// unconditional writes and those without one.
+func ConditionalWriteID(opts *storage.PutOptions) string {
+	if opts == nil || opts.IfMatch == "" && !opts.IfNotExists {
+		return ""
+	}
+	return opts.Metadata[storage.WriteIDMetadataKey]
+}
+
+// ReadBack classifies the HeadObject response read after a conditional
+// write stamped with writeID failed with a failed condition or a transport
+// error, whose response may have been lost, as upstream does
+// (icechunk-storage readback.rs): ours reports that the stored object is
+// that write, whose version is its ETag. A missing object, or one with
+// another write id or none, is not ours. err reports a failed read-back
+// (any other status), or our object without an ETag; callers return it
+// rather than guess the write's outcome.
+func ReadBack(key, writeID string, status int, storedID, etag string) (version string, ours bool, err error) {
+	switch {
+	case status == 404:
+		return "", false, nil
+	case status != 200:
+		return "", false, fmt.Errorf("HEAD %s: status %d, reading back a conditional write", key, status)
+	case storedID != writeID:
+		return "", false, nil
+	case etag == "":
+		return "", false, fmt.Errorf("HEAD %s: the conditional write landed, but the object has no ETag", key)
+	}
+	return stripETag(etag), true, nil
 }
 
 // Head builds a HeadObject request for key.

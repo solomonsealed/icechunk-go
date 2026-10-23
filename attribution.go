@@ -6,14 +6,18 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/solomonsealed/icechunk-go/internal/format"
 	"github.com/solomonsealed/icechunk-go/storage"
 )
 
-// UserAgentProduct is the product token that identifies this module in the
-// User-Agent header of every request a repository makes (upstream sends
-// "icechunk/<version>").
-const UserAgentProduct = "icechunk-go/" + format.Version
+// CompatibleVersion is the upstream Icechunk release this module is aligned
+// with.
+const CompatibleVersion = "2.3.0"
+
+// UserAgentProduct is the product token the User-Agent header of every
+// request a repository makes starts with: upstream's, at the release this
+// module is aligned with, so that request logs show which Icechunk it is
+// compatible with.
+const UserAgentProduct = "icechunk/" + CompatibleVersion
 
 // Attribution labels the requests a repository makes to its object store,
 // as upstream's Attribution (icechunk 2.3.0) does. Storages that make HTTP
@@ -21,7 +25,7 @@ const UserAgentProduct = "icechunk-go/" + format.Version
 // storage.WithUserAgent), so that the bucket owner can break traffic down
 // in access logs. A chunk read of an attributed repository sends
 //
-//	weatherlib/0.9 icechunk-go/0.1.0 (workload=nightly-ingest; principal=u_123; array=g/temperature; chunk=0/1/2)
+//	weatherlib/0.9 icechunk/2.3.0 (workload=nightly-ingest; principal=u_123; array=g/temperature; chunk=0/1/2)
 //
 // The repository adds the array path and chunk coordinates itself: chunk
 // reads and writes (virtual chunks included) carry both, manifest reads and

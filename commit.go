@@ -183,7 +183,18 @@ func (r *Repository) updateRepo(ctx context.Context, mutate func(doc *repoDoc, b
 		if err != nil {
 			return err
 		}
-		if _, err := w.Put(ctx, overwrittenPrefix+backup, raw, nil); err != nil {
+		ws := r.writeSettings()
+		if c, ok := w.(storage.Copier); ok {
+			// As upstream: a server-side copy of the version read, which
+			// keeps its metadata, and fails if another writer replaced it.
+			_, err := c.Copy(ctx, repoInfoPath, overwrittenPrefix+backup, &storage.PutOptions{IfMatch: version, StorageClass: ws.storageClass})
+			if errors.Is(err, storage.ErrPreconditionFailed) || errors.Is(err, storage.ErrNotFound) {
+				continue
+			}
+			if err != nil {
+				return fmt.Errorf("icechunk: backing up repo info: %w", err)
+			}
+		} else if _, err := w.Put(ctx, overwrittenPrefix+backup, raw, ws.repoInfo(doc.specVersion, storage.PutOptions{})); err != nil {
 			return fmt.Errorf("icechunk: backing up repo info: %w", err)
 		}
 		// The backup was just written: its store timestamp is the store's
@@ -195,7 +206,7 @@ func (r *Repository) updateRepo(ctx context.Context, mutate func(doc *repoDoc, b
 				}
 			}
 		}
-		if _, err := w.Put(ctx, repoInfoPath, enc, &storage.PutOptions{IfMatch: version}); err != nil {
+		if _, err := w.Put(ctx, repoInfoPath, enc, ws.repoInfo(doc.specVersion, storage.PutOptions{IfMatch: version})); err != nil {
 			if errors.Is(err, storage.ErrPreconditionFailed) {
 				continue
 			}
@@ -221,11 +232,11 @@ func Create(ctx context.Context, st storage.Storage, opts *Options) (*Repository
 	if !ok {
 		return nil, ErrReadOnlyStorage
 	}
-	var attribution Attribution
+	var o Options
 	if opts != nil {
-		attribution = opts.Attribution
+		o = *opts
 	}
-	labels, err := newRequestLabels(attribution)
+	labels, err := newRequestLabels(o.Attribution)
 	if err != nil {
 		return nil, err
 	}
@@ -266,14 +277,15 @@ func Create(ctx context.Context, st storage.Storage, opts *Options) (*Repository
 	if err != nil {
 		return nil, err
 	}
-	if _, err := w.Put(ctx, snapshotsPrefix+InitialSnapshotID.String(), snap, nil); err != nil {
+	ws := resolveWriteSettings(nil, o.StorageSettings)
+	if _, err := w.Put(ctx, snapshotsPrefix+InitialSnapshotID.String(), snap, ws.file(fileTypeSnapshot)); err != nil {
 		return nil, err
 	}
-	if _, err := w.Put(ctx, "transactions/"+InitialSnapshotID.String(), tx, nil); err != nil {
+	if _, err := w.Put(ctx, "transactions/"+InitialSnapshotID.String(), tx, ws.file(fileTypeTransactionLog)); err != nil {
 		return nil, err
 	}
 	// The repo info file goes last: it is what makes the repository exist.
-	if _, err := w.Put(ctx, repoInfoPath, repoFile, &storage.PutOptions{IfNotExists: true}); err != nil {
+	if _, err := w.Put(ctx, repoInfoPath, repoFile, ws.repoInfo(doc.specVersion, storage.PutOptions{IfNotExists: true})); err != nil {
 		if errors.Is(err, storage.ErrPreconditionFailed) {
 			return nil, fmt.Errorf("%w: a repository already exists here", ErrAlreadyExists)
 		}
@@ -368,15 +380,16 @@ func (s *Session) Commit(ctx context.Context, message string, opts *CommitOption
 		if err != nil {
 			return SnapshotID{}, err
 		}
+		ws := s.repo.writeSettings()
 		for id, data := range plan.manifests {
-			if _, err := w.Put(s.repo.reqArray(ctx, plan.manifestPaths[id]), manifestsPrefix+id.String(), data, nil); err != nil {
+			if _, err := w.Put(s.repo.reqArray(ctx, plan.manifestPaths[id]), manifestsPrefix+id.String(), data, ws.file(fileTypeManifest)); err != nil {
 				return SnapshotID{}, fmt.Errorf("icechunk: writing manifest: %w", err)
 			}
 		}
-		if _, err := w.Put(s.repo.req(ctx), "transactions/"+plan.id.String(), plan.txLog, nil); err != nil {
+		if _, err := w.Put(s.repo.req(ctx), "transactions/"+plan.id.String(), plan.txLog, ws.file(fileTypeTransactionLog)); err != nil {
 			return SnapshotID{}, fmt.Errorf("icechunk: writing transaction log: %w", err)
 		}
-		if _, err := w.Put(s.repo.req(ctx), snapshotsPrefix+plan.id.String(), plan.snapshot, nil); err != nil {
+		if _, err := w.Put(s.repo.req(ctx), snapshotsPrefix+plan.id.String(), plan.snapshot, ws.file(fileTypeSnapshot)); err != nil {
 			return SnapshotID{}, fmt.Errorf("icechunk: writing snapshot: %w", err)
 		}
 		err = s.repo.updateRepo(ctx, func(doc *repoDoc, backup string, now time.Time) error {

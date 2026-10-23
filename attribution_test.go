@@ -25,15 +25,15 @@ func TestAttributionUserAgent(t *testing.T) {
 	for _, c := range []struct {
 		got, want string
 	}{
-		{none.userAgent("", false, nil, false), "icechunk-go/0.1.0"},
+		{none.userAgent("", false, nil, false), "icechunk/2.3.0"},
 		{labels(Attribution{Client: "weatherlib/0.9", Workload: "nightly-ingest", Principal: "u_123"}).userAgent("", false, nil, false),
-			"weatherlib/0.9 icechunk-go/0.1.0 (workload=nightly-ingest; principal=u_123)"},
+			"weatherlib/0.9 icechunk/2.3.0 (workload=nightly-ingest; principal=u_123)"},
 		{labels(Attribution{Workload: "w"}).userAgent("g/temperature", true, []uint32{0, 1, 2}, true),
-			"icechunk-go/0.1.0 (workload=w; array=g/temperature; chunk=0/1/2)"},
-		{none.userAgent("a", true, nil, false), "icechunk-go/0.1.0 (array=a)"},
-		{none.userAgent("", true, []uint32{}, true), "icechunk-go/0.1.0 (array=; chunk=)"}, // a root scalar array
-		{none.userAgent("a(b)c\\d;e=f%gé h", true, nil, false), "icechunk-go/0.1.0 (array=a%28b%29c%5Cd%3Be%3Df%25g%C3%A9 h)"},
-		{labels(Attribution{Principal: "p"}).userAgent("", false, nil, false), "icechunk-go/0.1.0 (principal=p)"},
+			"icechunk/2.3.0 (workload=w; array=g/temperature; chunk=0/1/2)"},
+		{none.userAgent("a", true, nil, false), "icechunk/2.3.0 (array=a)"},
+		{none.userAgent("", true, []uint32{}, true), "icechunk/2.3.0 (array=; chunk=)"}, // a root scalar array
+		{none.userAgent("a(b)c\\d;e=f%gé h", true, nil, false), "icechunk/2.3.0 (array=a%28b%29c%5Cd%3Be%3Df%25g%C3%A9 h)"},
+		{labels(Attribution{Principal: "p"}).userAgent("", false, nil, false), "icechunk/2.3.0 (principal=p)"},
 	} {
 		if c.got != c.want {
 			t.Errorf("got %q, want %q", c.got, c.want)

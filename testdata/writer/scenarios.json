@@ -269,8 +269,8 @@
   ]
  },
  "config": {
-  "description": "A repository created with a non-default config: a 64 byte inline threshold (chunks of 64 and 68 bytes), six updates per repo info file (so the ops log spans several files), and manifest splitting for split/.* (2 along axis 0, 3 along others).",
-  "config": {"inline_chunk_threshold_bytes": 64, "num_updates_per_repo_info_file": 6, "manifest_split": {"path": "split/.*", "axis0": 2, "any": 3}},
+  "description": "A repository created with a non-default config: a 64 byte inline threshold (chunks of 64 and 68 bytes), six updates per repo info file (so the ops log spans several files), manifest splitting for split/.* (2 along axis 0, 3 along others), and storage classes (applied by object stores, recorded in the config).",
+  "config": {"inline_chunk_threshold_bytes": 64, "num_updates_per_repo_info_file": 6, "manifest_split": {"path": "split/.*", "axis0": 2, "any": 3}, "storage": {"storage_class": "STANDARD_IA", "metadata_storage_class": "GLACIER_IR", "chunks_storage_class": "INTELLIGENT_TIERING"}},
   "steps": [
    {"op": "open", "session": "s1", "branch": "main"},
    {"op": "create_group", "session": "s1", "path": "/"},
