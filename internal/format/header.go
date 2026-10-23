@@ -54,7 +54,7 @@ const (
 
 // Header is the parsed fixed-size header of a metadata file.
 type Header struct {
-	// Implementation is the writer's self-reported name, e.g. "ic-2.2.2".
+	// Implementation is the writer's self-reported name, e.g. "ic-2.3.0".
 	Implementation string
 	SpecVersion    uint8
 	FileType       FileType

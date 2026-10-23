@@ -1,6 +1,8 @@
 package s3req
 
 import (
+	"errors"
+	"strings"
 	"testing"
 	"time"
 
@@ -59,5 +61,78 @@ func TestGetHeaders(t *testing.T) {
 	})
 	if h["range"] != "bytes=10-14" || h["if-match"] != `"abc"` || h["if-unmodified-since"] != "Tue, 02 Jan 2024 03:04:05 GMT" {
 		t.Errorf("headers = %v", h)
+	}
+}
+
+func TestPutHeaders(t *testing.T) {
+	c := &Config{Bucket: "b", Region: "us-east-1", AccessKeyID: "AK", SecretAccessKey: "SK"}
+	r, err := Put(c, "repo", []byte("x"), &storage.PutOptions{IfMatch: `"v"`, StorageClass: "STANDARD_IA",
+		Metadata: map[string]string{"icFileType": "repo-info", storage.WriteIDMetadataKey: "w"}}, time.Now())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if r.Header["if-match"] != `"v"` || r.Header["x-amz-storage-class"] != "STANDARD_IA" ||
+		r.Header["x-amz-meta-icfiletype"] != "repo-info" || r.Header[WriteIDHeader] != "w" {
+		t.Errorf("headers = %v", r.Header)
+	}
+	if !strings.Contains(r.Header["authorization"], "SignedHeaders=host;x-amz-content-sha256;x-amz-date;x-amz-meta-icechunkwriteid;x-amz-meta-icfiletype;x-amz-storage-class,") {
+		t.Errorf("authorization = %s", r.Header["authorization"])
+	}
+	if ConditionalWriteID(&storage.PutOptions{IfNotExists: true, Metadata: map[string]string{storage.WriteIDMetadataKey: "w"}}) != "w" ||
+		ConditionalWriteID(&storage.PutOptions{Metadata: map[string]string{storage.WriteIDMetadataKey: "w"}}) != "" ||
+		ConditionalWriteID(&storage.PutOptions{IfMatch: "v"}) != "" || ConditionalWriteID(nil) != "" {
+		t.Error("ConditionalWriteID")
+	}
+}
+
+func TestReadBack(t *testing.T) {
+	for _, c := range []struct {
+		status          int
+		stored, etag    string
+		version         string
+		ours, wantError bool
+	}{
+		{200, "w", `"e1"`, "e1", true, false},
+		{200, "other", `"e1"`, "", false, false},
+		{200, "", `"e1"`, "", false, false},
+		{404, "", "", "", false, false},
+		{200, "w", "", "", false, true},
+		{500, "", "", "", false, true},
+		{403, "w", `"e1"`, "", false, true},
+	} {
+		v, ours, err := ReadBack("k", "w", c.status, c.stored, c.etag)
+		if v != c.version || ours != c.ours || (err != nil) != c.wantError {
+			t.Errorf("ReadBack(%d, %q, %q) = %q, %v, %v", c.status, c.stored, c.etag, v, ours, err)
+		}
+	}
+}
+
+func TestCopy(t *testing.T) {
+	c := &Config{Bucket: "b", Prefix: "repos/r", Endpoint: "http://localhost:9000", AccessKeyID: "AK", SecretAccessKey: "SK"}
+	r, err := Copy(c, "repo", "overwritten/repo.1.X", &storage.PutOptions{IfMatch: `"e1"`, StorageClass: "STANDARD_IA"}, time.Now())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if r.Method != "PUT" || r.URL != "http://localhost:9000/b/repos/r/overwritten/repo.1.X" || r.Header["x-amz-copy-source"] != "/b/repos/r/repo" ||
+		r.Header["x-amz-copy-source-if-match"] != `"e1"` || r.Header["x-amz-storage-class"] != "STANDARD_IA" ||
+		!strings.Contains(r.Header["authorization"], "x-amz-copy-source;x-amz-copy-source-if-match;") {
+		t.Errorf("request = %+v", r)
+	}
+	for _, tc := range []struct {
+		status  int
+		body    string
+		version string
+		err     error
+	}{
+		{200, `<CopyObjectResult><LastModified>x</LastModified><ETag>&quot;e2&quot;</ETag></CopyObjectResult>`, "e2", nil},
+		{412, ``, "", storage.ErrPreconditionFailed},
+		{404, ``, "", storage.ErrNotFound},
+		{200, `<Error><Code>InternalError</Code></Error>`, "", nil},
+		{500, `oops`, "", nil},
+	} {
+		v, err := CheckCopy("repo", "dst", tc.status, []byte(tc.body))
+		if v != tc.version || (tc.err != nil && !errors.Is(err, tc.err)) || (tc.version == "" && err == nil) {
+			t.Errorf("CheckCopy(%d, %s) = %q, %v", tc.status, tc.body, v, err)
+		}
 	}
 }

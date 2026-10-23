@@ -14,14 +14,32 @@ import (
 	"time"
 )
 
-// PutOptions makes a write conditional.
+// PutOptions makes a write conditional, and sets the stored object's
+// storage class and user metadata.
 type PutOptions struct {
 	// IfMatch, when non-empty, only writes if the object exists and its
 	// current version equals IfMatch (an optimistic-concurrency update).
 	IfMatch string
 	// IfNotExists only writes if no object exists under the key.
 	IfNotExists bool
+	// StorageClass, when non-empty, is the storage class of the object,
+	// passed to the store as is (S3's x-amz-storage-class, R2's
+	// storageClass). Storages without storage classes ignore it.
+	StorageClass string
+	// Metadata is user metadata stored with the object (S3's x-amz-meta-*
+	// headers, R2's custom metadata). Storages that keep no metadata
+	// ignore it. When a conditional write's metadata holds a
+	// WriteIDMetadataKey, storages that keep metadata recover from a lost
+	// response as upstream does: if the write fails with a failed condition
+	// or a transport error, they read the object back, and the write
+	// succeeded if the object holds that write id.
+	Metadata map[string]string
 }
+
+// WriteIDMetadataKey is the user metadata key of the unique id a
+// conditional write stamps on the object, to recognise its own write when
+// its response is lost (upstream's icechunkwriteid).
+const WriteIDMetadataKey = "icechunkwriteid"
 
 // Writer is implemented by storages that Icechunk can write to. Commits
 // rely on GetVersion and conditional Put to update the repository's single
@@ -36,6 +54,18 @@ type Writer interface {
 	Put(ctx context.Context, key string, data []byte, opts *PutOptions) (version string, err error)
 	// Delete removes an object; deleting a missing object is not an error.
 	Delete(ctx context.Context, key string) error
+}
+
+// Copier is implemented by storages that copy objects server side.
+// Repositories back up their repo info file with it, as upstream does,
+// and write the backup with Put otherwise.
+type Copier interface {
+	// Copy copies the object at src to dst, keeping its user metadata, and
+	// returns the copy's version. opts may set the copy's StorageClass and,
+	// with IfMatch, require src's version to be IfMatch (failing with an
+	// error wrapping ErrPreconditionFailed otherwise); its other fields are
+	// ignored.
+	Copy(ctx context.Context, src, dst string, opts *PutOptions) (version string, err error)
 }
 
 // ModTimer is implemented by storages that can report when an object was

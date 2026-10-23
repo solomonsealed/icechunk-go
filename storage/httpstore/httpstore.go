@@ -43,6 +43,7 @@ type response struct {
 	status             int
 	body               []byte
 	etag, lastModified string
+	header             http.Header
 }
 
 func do(ctx context.Context, o *Options, r s3req.Request) (response, error) {
@@ -71,13 +72,19 @@ func doBody(ctx context.Context, o *Options, r s3req.Request, body []byte) (resp
 			}
 		}
 	}
+	if ua := storage.UserAgent(ctx); ua != "" {
+		if own := req.Header.Get("User-Agent"); own != "" {
+			ua = own + " " + ua
+		}
+		req.Header.Set("User-Agent", ua)
+	}
 	resp, err := o.client().Do(req)
 	if err != nil {
 		return response{}, err
 	}
 	defer resp.Body.Close()
 	respBody, err := io.ReadAll(resp.Body)
-	return response{resp.StatusCode, respBody, resp.Header.Get("ETag"), resp.Header.Get("Last-Modified")}, err
+	return response{resp.StatusCode, respBody, resp.Header.Get("ETag"), resp.Header.Get("Last-Modified"), resp.Header}, err
 }
 
 func checkStatus(o *Options, key string, resp response, opts *storage.GetOptions) ([]byte, error) {
@@ -189,18 +196,68 @@ func (s *S3) GetVersion(ctx context.Context, key string) ([]byte, string, error)
 }
 
 // Put implements storage.Writer with PutObject, using If-Match and
-// If-None-Match for conditional writes.
+// If-None-Match for conditional writes, x-amz-storage-class for the storage
+// class and x-amz-meta-* headers for user metadata. A conditional write
+// stamped with a write id (storage.WriteIDMetadataKey) that fails with a
+// failed condition or a transport error reads the object back: if it holds
+// that write id, the write landed and its response was lost.
 func (s *S3) Put(ctx context.Context, key string, data []byte, opts *storage.PutOptions) (string, error) {
 	r, err := s3req.Put(&s.cfg, key, data, opts, time.Now())
 	if err != nil {
 		return "", err
 	}
+	writeID := s3req.ConditionalWriteID(opts)
 	resp, err := doBody(ctx, s.opts, r, data)
 	if err != nil {
+		if writeID != "" {
+			if v, ours, rerr := s.readBack(ctx, key, writeID); rerr != nil || ours {
+				return v, rerr
+			}
+		}
 		return "", err
 	}
 	v, err := s3req.CheckPut(key, resp.status, resp.body, resp.etag)
+	if errors.Is(err, storage.ErrPreconditionFailed) && writeID != "" {
+		if v, ours, rerr := s.readBack(ctx, key, writeID); rerr != nil || ours {
+			return v, rerr
+		}
+	}
 	if err != nil && !errors.Is(err, storage.ErrPreconditionFailed) {
+		return "", fmt.Errorf("httpstore: %w", err)
+	}
+	return v, err
+}
+
+// readBack reads key's write id after an ambiguous conditional write (see
+// s3req.ReadBack).
+func (s *S3) readBack(ctx context.Context, key, writeID string) (string, bool, error) {
+	r, err := s3req.Head(&s.cfg, key, time.Now())
+	if err != nil {
+		return "", false, err
+	}
+	resp, err := do(ctx, s.opts, r)
+	if err != nil {
+		return "", false, fmt.Errorf("httpstore: reading back %s: %w", key, err)
+	}
+	v, ours, err := s3req.ReadBack(key, writeID, resp.status, resp.header.Get(s3req.WriteIDHeader), resp.etag)
+	if err != nil {
+		return "", false, fmt.Errorf("httpstore: %w", err)
+	}
+	return v, ours, nil
+}
+
+// Copy implements storage.Copier with CopyObject.
+func (s *S3) Copy(ctx context.Context, src, dst string, opts *storage.PutOptions) (string, error) {
+	r, err := s3req.Copy(&s.cfg, src, dst, opts, time.Now())
+	if err != nil {
+		return "", err
+	}
+	resp, err := do(ctx, s.opts, r)
+	if err != nil {
+		return "", err
+	}
+	v, err := s3req.CheckCopy(src, dst, resp.status, resp.body)
+	if err != nil && !errors.Is(err, storage.ErrPreconditionFailed) && !errors.Is(err, storage.ErrNotFound) {
 		return "", fmt.Errorf("httpstore: %w", err)
 	}
 	return v, err

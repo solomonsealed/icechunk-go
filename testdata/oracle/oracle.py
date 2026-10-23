@@ -11,7 +11,8 @@ versions recorded in each file's "_meta" reproduce the checked-in files):
 Each fixture gets testdata/oracle/<fixture>.json.gz (compact JSON; pass
 --pretty for indented, uncompressed .json files to read) with:
 
-  repo       spec version, branches, tags, ref lookups that fail, the
+  repo       spec version, branches, tags, ref lookups that fail (and
+             sessions at snapshot files no ref or repo info lists), the
              ancestry of every branch, tag and snapshot, every snapshot's
              commit info, and (spec v2) the repo info file: status, metadata,
              feature flags, ops log, stored config.
@@ -372,7 +373,7 @@ def describe_config(cfg) -> dict | None:
     }
 
 
-def describe_repo(repo, spec: int, stored_config) -> tuple[dict, list[str]]:
+def describe_repo(repo, spec: int, stored_config, path: Path) -> tuple[dict, list[str]]:
     out: dict = {"spec_version": spec}
     # Listed refs map to their snapshot, or to the error looking them up
     # raises: in spec v1, upstream lists the storage key form of names with
@@ -416,6 +417,13 @@ def describe_repo(repo, spec: int, stored_config) -> tuple[dict, list[str]]:
         walk(f"snapshot:{sid}", snapshot_id=sid)
     out["ancestry"] = ancestry
     out["snapshot_infos"] = {sid: snapshot_info(repo.lookup_snapshot(sid)) for sid in sorted(set(snapshot_ids) | set(infos))}
+    # Snapshot files the repo info does not list (expired history, and the
+    # snapshots of forked sessions, unregistered since icechunk 2.3.0): spec
+    # v2 refuses to open them by id.
+    snapshot_dir = path / "snapshots"
+    for f in sorted(snapshot_dir.iterdir()) if snapshot_dir.is_dir() else []:
+        if f.name not in out["snapshot_infos"]:
+            lookups[f"session:{f.name}"] = outcome(lambda: repo.readonly_session(snapshot_id=f.name).snapshot_id)
 
     if isinstance(info, dict):
         status = repo.get_status()
@@ -800,7 +808,7 @@ def describe(name: str) -> dict:
             creds = ic.containers_credentials({p: ic.s3_anonymous_credentials() for p in virtual})
         repo = ic.Repository.open(storage, config=config, authorize_virtual_chunk_access=creds)
 
-        repo_desc, snapshot_ids = describe_repo(repo, spec, stored_config)
+        repo_desc, snapshot_ids = describe_repo(repo, spec, stored_config, ROOT / rel)
         arrays: dict = {}
         manifests: dict = {}
         snapshots = {}

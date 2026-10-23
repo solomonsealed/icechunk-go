@@ -1,6 +1,7 @@
 package icechunk_test
 
 import (
+	"bytes"
 	"context"
 	"encoding/binary"
 	"errors"
@@ -15,6 +16,7 @@ import (
 
 	icechunk "github.com/solomonsealed/icechunk-go"
 	"github.com/solomonsealed/icechunk-go/storage"
+	zarr "github.com/solomonsealed/zarr-go"
 )
 
 // int32Array is a zarr.json for an uncompressed little-endian int32 array,
@@ -607,5 +609,245 @@ func TestReadOnlyStatusRefusesWrites(t *testing.T) {
 	}
 	if err := repo.CreateBranch(ctx, "x", icechunk.InitialSnapshotID); !errors.Is(err, icechunk.ErrRepositoryNotOnline) {
 		t.Errorf("write to a %s repository: %v", info.Status.Availability, err)
+	}
+}
+
+// TestChunkGridsAsUpstream checks which chunk grids SetMetadata accepts, and
+// the chunks it counts, against upstream's store (ArrayMetadata::num_chunks).
+func TestChunkGridsAsUpstream(t *testing.T) {
+	ctx := context.Background()
+	repo, err := icechunk.Create(ctx, storage.NewMemory(nil), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	s, err := repo.WritableSession(ctx, "main")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, c := range []struct {
+		shape, grid string
+		chunks      []uint32 // nil: refused
+	}{
+		{`[10, 7]`, `{"name": "regular", "configuration": {"chunk_shape": [3, 7]}}`, []uint32{4, 1}},
+		{`[4]`, `{"name": "regular", "configuration": {"chunk_shape": [0]}}`, []uint32{0}},
+		{`[4]`, `{"name": "regular", "configuration": {"chunk_shape": [2, 3]}}`, []uint32{2}},
+		{`[]`, `{"name": "regular", "configuration": {"chunk_shape": []}}`, []uint32{}},
+		{`[8, 6]`, `{"name": "rectilinear", "configuration": {"kind": "inline", "chunk_shapes": [[[4, 2]], [2, 4]]}}`, []uint32{2, 2}},
+		{`[8]`, `{"name": "rectilinear", "configuration": {"kind": "inline", "chunk_shapes": [[[4.0, 2]]]}}`, []uint32{2}},
+		{`[7]`, `{"name": "rectilinear", "configuration": {"kind": "inline", "chunk_shapes": [[4.0, 3.0]]}}`, []uint32{2}},
+		{`[9]`, `{"name": "rectilinear", "configuration": {"kind": "inline", "chunk_shapes": [[[2, 3, 99], 3]]}}`, []uint32{4}},
+		{`[4]`, `{"name": "regular", "configuration": {"chunk_shape": [false]}}`, nil},
+		{`[4]`, `{"name": "regular", "configuration": {"chunk_shape": [true]}}`, nil},
+		{`[4]`, `{"name": "regular", "configuration": {"chunk_shape": [2.0]}}`, nil},
+		{`[4]`, `{"name": "regular", "configuration": {"chunk_shape": [-2]}}`, nil},
+		{`[4]`, `{"name": "regular", "configuration": {"chunk_shape": null}}`, nil},
+		{`[4, 4]`, `{"name": "regular", "configuration": {"chunk_shape": [2]}}`, nil},
+		{`[8, 6]`, `{"name": "regular", "configuration": {"chunk_shape": [4, [2, 4]]}}`, nil},
+		{`[2]`, `{"name": "rectilinear", "configuration": {"kind": "inline", "chunk_shapes": [[true, true]]}}`, nil},
+		{`[8, 6]`, `{"name": "rectilinear", "configuration": {"kind": "inline", "chunk_shapes": [4, [2, 4]]}}`, nil},
+		{`[8]`, `{"name": "rectilinear", "configuration": {"kind": "inline", "chunk_shapes": [[[4, 2.0]]]}}`, nil},
+		{`[8]`, `{"name": "rectilinear", "configuration": {"kind": "inline", "chunk_shapes": [[[4]]]}}`, nil},
+		{`[8, 6]`, `{"name": "rectilinear", "configuration": {"kind": "inline", "chunk_shapes": [[4, 4]]}}`, nil},
+		{`[4]`, `{"name": "other", "configuration": {"chunk_shape": [2]}}`, nil},
+		{`[4]`, `{"name": "regular", "configuration": [2]}`, nil},
+	} {
+		doc := `{"zarr_format": 3, "node_type": "array", "shape": ` + c.shape + `, "data_type": "int32", "chunk_grid": ` + c.grid +
+			`, "chunk_key_encoding": {"name": "default", "configuration": {"separator": "/"}}, "fill_value": 0, "codecs": [{"name": "bytes", "configuration": {"endian": "little"}}]}`
+		err := s.SetMetadata(ctx, "/a", []byte(doc))
+		if c.chunks == nil {
+			if !errors.Is(err, icechunk.ErrInvalidMetadata) {
+				t.Errorf("shape %s, grid %s: got %v, want ErrInvalidMetadata", c.shape, c.grid, err)
+			}
+			continue
+		}
+		if err != nil {
+			t.Errorf("shape %s, grid %s: %v", c.shape, c.grid, err)
+			continue
+		}
+		n, err := s.Node("/a")
+		if err != nil {
+			t.Fatal(err)
+		}
+		got := []uint32{}
+		for _, d := range n.Array.Shape {
+			got = append(got, d.NumChunks)
+		}
+		if !slices.Equal(got, c.chunks) {
+			t.Errorf("shape %s, grid %s: %v chunks, want %v", c.shape, c.grid, got, c.chunks)
+		}
+		if err := s.DeleteNode(ctx, "/a"); err != nil {
+			t.Fatal(err)
+		}
+	}
+}
+
+// TestWriteStoresRepairedMetadata: an array whose stored chunk size zarr-go
+// repairs in a way that moves chunks (0 read as 1) gets its repaired
+// zarr.json stored before the first chunk write, as zarr-python does.
+func TestWriteStoresRepairedMetadata(t *testing.T) {
+	ctx := context.Background()
+	repo, err := icechunk.Create(ctx, storage.NewMemory(nil), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	s, err := repo.WritableSession(ctx, "main")
+	if err != nil {
+		t.Fatal(err)
+	}
+	stored := func(chunk string) []byte {
+		return []byte(`{"shape": [64], "data_type": "int32", "chunk_grid": {"name": "regular", "configuration": {"chunk_shape": [` + chunk +
+			`]}}, "chunk_key_encoding": {"name": "default", "configuration": {"separator": "/"}}, "fill_value": -1, "codecs": [{"name": "bytes", "configuration": {"endian": "little"}}], "attributes": {"k": "v"}, "zarr_format": 3, "node_type": "array", "storage_transformers": []}`)
+	}
+	if err := s.SetMetadata(ctx, "/a", stored("0")); err != nil {
+		t.Fatal(err)
+	}
+	oldID, err := s.Commit(ctx, "stored by an old zarr-python", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	s, err = repo.WritableSession(ctx, "main")
+	if err != nil {
+		t.Fatal(err)
+	}
+	arr, err := s.OpenArray(ctx, "/a")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !arr.Metadata().RepairPending() {
+		t.Fatal("chunk size 0 should need a repair that moves chunks")
+	}
+	early, err := s.OpenArray(ctx, "/a") // opened before the repair is stored
+	if err != nil {
+		t.Fatal(err)
+	}
+	// 64 chunks of one element, written concurrently: the repair is stored once.
+	vals := make([]int32, 64)
+	for i := range vals {
+		vals[i] = int32(i * 3)
+	}
+	nd, err := zarr.FromSlice([]uint64{64}, vals)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := arr.Write(ctx, []uint64{0}, nd); err != nil {
+		t.Fatal(err)
+	}
+	n, err := s.Node("/a")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !bytes.Equal(n.ZarrMetadata, mustDocument(t, arr.Metadata())) || n.Array.Shape[0].NumChunks != 64 {
+		t.Errorf("after the first write: zarr.json %s, %d chunks", n.ZarrMetadata, n.Array.Shape[0].NumChunks)
+	}
+	if attrs, _ := s.Attributes("/a"); attrs["k"] != "v" {
+		t.Errorf("attributes after the repair: %v", attrs)
+	}
+	// The repair is stored: a handle opened before it writes without storing it again.
+	one, _ := zarr.FromSlice([]uint64{1}, []int32{1000})
+	if err := early.Write(ctx, []uint64{5}, one); err != nil {
+		t.Fatal(err)
+	}
+	vals[5] = 1000
+	if got := readInt32s(t, s, "/a"); !slices.Equal(got, vals) {
+		t.Errorf("read back %v", got)
+	}
+	// A handle whose zarr.json was replaced with other chunks must be reopened.
+	stale, err := s.OpenArray(ctx, "/a")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := s.SetMetadata(ctx, "/a", int32Array([]uint64{64}, []uint64{8})); err != nil {
+		t.Fatal(err)
+	}
+	if err := stale.Write(ctx, []uint64{0}, one); err == nil {
+		t.Error("write through a handle whose chunk grid changed: no error")
+	}
+	if err := s.SetMetadata(ctx, "/a", stored("1")); err != nil {
+		t.Fatal(err)
+	}
+	id, err := s.Commit(ctx, "write", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ro, err := repo.ReadonlySession(ctx, icechunk.AtSnapshot(id))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := readInt32s(t, ro, "/a"); !slices.Equal(got, vals) {
+		t.Errorf("committed %v", got)
+	}
+
+	// Reading the stored document needs no repair to be stored: the array
+	// holds only its fill value.
+	ro, err = repo.ReadonlySession(ctx, icechunk.AtSnapshot(oldID))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := readInt32s(t, ro, "/a"); !slices.Equal(got, slices.Repeat([]int32{-1}, 64)) {
+		t.Errorf("read before the repair: %v", got)
+	}
+	if n, _ := ro.Node("/a"); !bytes.Equal(n.ZarrMetadata, stored("0")) {
+		t.Errorf("read-only zarr.json changed: %s", n.ZarrMetadata)
+	}
+}
+
+func mustDocument(t *testing.T, m *zarr.Metadata) []byte {
+	t.Helper()
+	b, err := m.Document()
+	if err != nil {
+		t.Fatal(err)
+	}
+	return b
+}
+
+// TestChunkKeyEncodings: Icechunk stores chunks only under default keys.
+func TestChunkKeyEncodings(t *testing.T) {
+	ctx := context.Background()
+	repo, err := icechunk.Create(ctx, storage.NewMemory(nil), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	s, err := repo.WritableSession(ctx, "main")
+	if err != nil {
+		t.Fatal(err)
+	}
+	one, _ := zarr.FromSlice([]uint64{2, 2}, []int32{1, 2, 3, 4})
+	for _, enc := range []zarr.ChunkKeyEncoding{
+		{Name: "v2"},
+		{Name: "v2", Separator: "/"},
+		{Name: "default", Separator: "."},
+		{Name: "template", Template: "{0}/{1}.bin"},
+	} {
+		// Created as upstream's store stores the metadata, but zarr writes
+		// are refused, as zarr-python's are there.
+		spec := zarr.ArraySpec{Shape: []uint64{4, 4}, ChunkShape: []uint64{2, 2}, DataType: "int32", ChunkKeyEncoding: enc,
+			Codecs: []zarr.CodecSpec{{Name: "bytes", Configuration: []byte(`{"endian": "little"}`)}}}
+		arr, err := s.CreateArray(ctx, "/x", spec)
+		if err != nil {
+			t.Fatalf("create with %+v: %v", enc, err)
+		}
+		if err := arr.Write(ctx, []uint64{0, 0}, one); !errors.Is(err, icechunk.ErrInvalidMetadata) {
+			t.Errorf("write with %+v: %v", enc, err)
+		}
+		// Chunks written by coordinates are read back by coordinates.
+		if err := s.SetChunk(ctx, "/x", []uint32{1, 1}, int32Bytes(5, 6, 7, 8)); err != nil {
+			t.Fatal(err)
+		}
+		if nd, err := arr.Read(ctx, []uint64{2, 2}, []uint64{2, 2}); err != nil {
+			t.Error(err)
+		} else if v, _ := nd.Values(); !slices.Equal(v.([]int32), []int32{5, 6, 7, 8}) {
+			t.Errorf("read with %+v: %v", enc, v)
+		}
+		if err := s.DeleteNode(ctx, "/x"); err != nil {
+			t.Fatal(err)
+		}
+	}
+	spec := zarr.ArraySpec{Shape: []uint64{4, 4}, ChunkShape: []uint64{2, 2}, DataType: "int32", ChunkKeyEncoding: zarr.ChunkKeyEncoding{Name: "default", Separator: "/"}}
+	arr, err := s.CreateArray(ctx, "/ok", spec)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := arr.Write(ctx, []uint64{2, 2}, one); err != nil {
+		t.Fatal(err)
 	}
 }

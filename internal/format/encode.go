@@ -7,9 +7,14 @@ import (
 	"github.com/klauspost/compress/zstd"
 )
 
-// ImplementationName is written into the header of every file this module
-// produces ("<name>-<version>", like upstream's "ic-2.2.2").
-const ImplementationName = "icechunk_go-0.1.0"
+// CompatibleVersion is the upstream Icechunk release this module is aligned
+// with.
+const CompatibleVersion = "2.3.0"
+
+// ImplementationName is the client name written into the header of every
+// file this module produces, and stamped on objects as their icclient
+// metadata: upstream's, at the release this module is aligned with.
+const ImplementationName = "ic-" + CompatibleVersion
 
 var (
 	encoderOnce sync.Once
@@ -19,7 +24,8 @@ var (
 
 // Encode wraps a finished flatbuffer in the Icechunk file envelope: the
 // binary header followed by the zstd-compressed payload. The zstd frame
-// records its content size, as upstream's writer does.
+// records its content size, as upstream's writer does since 2.3.0 (whose
+// reader then requires it to be exact).
 func Encode(fileType FileType, specVersion uint8, payload []byte) ([]byte, error) {
 	encoderOnce.Do(func() {
 		encoder, encoderErr = zstd.NewWriter(nil, zstd.WithEncoderConcurrency(1))

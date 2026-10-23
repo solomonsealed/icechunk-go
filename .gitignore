@@ -7,3 +7,6 @@ node_modules/
 # Binaries
 /icechunk-go
 *.test
+
+# Python environment for the testdata tooling (testdata/requirements.txt)
+.venv/

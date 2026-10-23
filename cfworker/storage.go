@@ -124,20 +124,39 @@ type response struct {
 	status             int
 	body               []byte
 	etag, lastModified string
+	header             func(name string) string
 }
 
 // fetch performs a request with the Workers fetch API.
 func fetch(ctx context.Context, r s3req.Request, extra map[string]string) (response, error) {
+	return fetchWith(ctx, r, extra, nil)
+}
+
+// fetchWith performs a request with the Workers fetch API, sending extra
+// (configured) headers, the request's own, the User-Agent set on ctx (see
+// storage.WithUserAgent; a configured one goes first) and body, if any.
+func fetchWith(ctx context.Context, r s3req.Request, extra map[string]string, body []byte) (response, error) {
 	init := jsObject.New()
 	init.Set("method", r.Method)
 	h := jsObject.New()
+	ua := storage.UserAgent(ctx)
 	for k, v := range extra {
+		if ua != "" && strings.EqualFold(k, "User-Agent") {
+			ua = v + " " + ua
+			continue
+		}
 		h.Set(k, v)
 	}
 	for k, v := range r.Header {
 		h.Set(k, v)
 	}
+	if ua != "" {
+		h.Set("User-Agent", ua)
+	}
 	init.Set("headers", h)
+	if body != nil {
+		init.Set("body", toUint8Array(body))
+	}
 	resp, err := Await(ctx, js.Global().Call("fetch", r.URL, init))
 	if err != nil {
 		return response{}, err
@@ -146,14 +165,18 @@ func fetch(ctx context.Context, r s3req.Request, extra map[string]string) (respo
 	if err != nil {
 		return response{}, err
 	}
+	headers := resp.Get("headers")
 	header := func(name string) string {
-		v := resp.Get("headers").Call("get", name)
+		v := headers.Call("get", name)
 		if v.Type() != js.TypeString {
 			return ""
 		}
 		return v.String()
 	}
-	return response{resp.Get("status").Int(), bytesOf(buf), header("etag"), header("last-modified")}, nil
+	return response{
+		status: resp.Get("status").Int(), body: bytesOf(buf),
+		etag: header("etag"), lastModified: header("last-modified"), header: header,
+	}, nil
 }
 
 func checkResponse(key string, resp response, opts *storage.GetOptions, notFound []int) ([]byte, error) {

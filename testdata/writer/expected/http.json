@@ -1,8 +1,8 @@
 {
  "_meta": {
-  "icechunk": "2.2.2",
-  "numpy": "2.5.3",
-  "zarr": "3.4.0"
+  "icechunk": "2.3.0",
+  "numpy": "2.5.4",
+  "zarr": "3.4.1"
  },
  "canonical": {
   "ancestry": {
@@ -654,7 +654,6 @@
      "/": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -662,7 +661,6 @@
      "/c": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -687,7 +685,6 @@
       "type": "array",
       "values": "d83741d2d53b7020",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -721,7 +718,6 @@
         3,
         2
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
@@ -732,7 +728,6 @@
       "type": "array",
       "values": "837885c8f8091aea",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -765,14 +760,12 @@
        "shape": [
         7
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/ints": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -800,7 +793,6 @@
       "type": "array",
       "values": "959b94ef14a2e5fe",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -861,7 +853,6 @@
         8,
         8
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
@@ -883,7 +874,6 @@
       "type": "array",
       "values": "c779afbf4cdb66d7",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -915,7 +905,6 @@
        "shape": [
         10
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
@@ -937,7 +926,6 @@
       "type": "array",
       "values": "618e6c2fecf2e727",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -966,14 +954,12 @@
        "shape": [
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/temps": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -1052,14 +1038,12 @@
         6,
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/text": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -1081,7 +1065,6 @@
       "type": "array",
       "values": "f2c006a27f5a7fbe",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -1114,7 +1097,6 @@
        "shape": [
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      }
@@ -1155,7 +1137,6 @@
      "/": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -1163,7 +1144,6 @@
      "/c": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -1175,7 +1155,6 @@
       "type": "array",
       "values": "cc8c5355c91ca8b0",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -1209,14 +1188,12 @@
         3,
         2
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/ints": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -1244,7 +1221,6 @@
       "type": "array",
       "values": "959b94ef14a2e5fe",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -1305,7 +1281,6 @@
         8,
         8
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
@@ -1327,7 +1302,6 @@
       "type": "array",
       "values": "c779afbf4cdb66d7",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -1359,7 +1333,6 @@
        "shape": [
         10
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
@@ -1381,7 +1354,6 @@
       "type": "array",
       "values": "618e6c2fecf2e727",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -1410,14 +1382,12 @@
        "shape": [
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/temps": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -1496,14 +1466,12 @@
         6,
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/text": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -1525,7 +1493,6 @@
       "type": "array",
       "values": "f2c006a27f5a7fbe",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -1558,7 +1525,6 @@
        "shape": [
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      }
@@ -1574,7 +1540,6 @@
      "/": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -1582,7 +1547,6 @@
      "/temps": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -1644,7 +1608,6 @@
         6,
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      }
@@ -1690,7 +1653,6 @@
      "/": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -1698,7 +1660,6 @@
      "/c": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -1723,7 +1684,6 @@
       "type": "array",
       "values": "d83741d2d53b7020",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -1757,7 +1717,6 @@
         3,
         2
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
@@ -1778,7 +1737,6 @@
       "type": "array",
       "values": "a24048d2d7b12e9a",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -1811,14 +1769,12 @@
        "shape": [
         7
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/ints": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -1846,7 +1802,6 @@
       "type": "array",
       "values": "959b94ef14a2e5fe",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -1907,7 +1862,6 @@
         8,
         8
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
@@ -1929,7 +1883,6 @@
       "type": "array",
       "values": "c779afbf4cdb66d7",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -1961,7 +1914,6 @@
        "shape": [
         10
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
@@ -1983,7 +1935,6 @@
       "type": "array",
       "values": "618e6c2fecf2e727",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -2012,7 +1963,6 @@
        "shape": [
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
@@ -2023,7 +1973,6 @@
       "type": "array",
       "values": "af5570f5a1810b7a",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": []
@@ -2048,14 +1997,12 @@
        "fill_value": 0.0,
        "node_type": "array",
        "shape": [],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/temps": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -2134,14 +2081,12 @@
         6,
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/text": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -2163,7 +2108,6 @@
       "type": "array",
       "values": "f2c006a27f5a7fbe",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -2196,7 +2140,6 @@
        "shape": [
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      }
@@ -2223,7 +2166,6 @@
      "/": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -2231,7 +2173,6 @@
      "/ints": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -2243,7 +2184,6 @@
       "type": "array",
       "values": "e9175db65a978909",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -2304,7 +2244,6 @@
         8,
         8
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
@@ -2326,7 +2265,6 @@
       "type": "array",
       "values": "618e6c2fecf2e727",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -2355,14 +2293,12 @@
        "shape": [
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/temps": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -2441,7 +2377,6 @@
         6,
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      }
@@ -2473,7 +2408,6 @@
      "/": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -2481,7 +2415,6 @@
      "/ints": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -2509,7 +2442,6 @@
       "type": "array",
       "values": "959b94ef14a2e5fe",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -2570,7 +2502,6 @@
         8,
         8
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
@@ -2581,7 +2512,6 @@
       "type": "array",
       "values": "dbda5da465810478",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -2613,7 +2543,6 @@
        "shape": [
         10
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
@@ -2635,7 +2564,6 @@
       "type": "array",
       "values": "618e6c2fecf2e727",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -2664,14 +2592,12 @@
        "shape": [
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/temps": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -2750,7 +2676,6 @@
         6,
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      }
@@ -2787,7 +2712,6 @@
      "/": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -2795,7 +2719,6 @@
      "/ints": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -2823,7 +2746,6 @@
       "type": "array",
       "values": "959b94ef14a2e5fe",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -2884,7 +2806,6 @@
         8,
         8
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
@@ -2906,7 +2827,6 @@
       "type": "array",
       "values": "c779afbf4cdb66d7",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -2938,7 +2858,6 @@
        "shape": [
         10
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
@@ -2960,7 +2879,6 @@
       "type": "array",
       "values": "618e6c2fecf2e727",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -2989,14 +2907,12 @@
        "shape": [
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/temps": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -3075,14 +2991,12 @@
         6,
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/text": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -3094,7 +3008,6 @@
       "type": "array",
       "values": "e8ce1e641d2180b4",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -3127,7 +3040,6 @@
        "shape": [
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      }
@@ -3150,7 +3062,6 @@
      "/": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -3158,7 +3069,6 @@
      "/ints": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -3170,7 +3080,6 @@
       "type": "array",
       "values": "6105c43293e26ae9",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -3199,14 +3108,12 @@
        "shape": [
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/temps": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -3285,7 +3192,6 @@
         6,
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      }
@@ -3306,7 +3212,6 @@
      "/": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -3314,7 +3219,6 @@
      "/temps": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -3393,7 +3297,6 @@
         6,
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      }
@@ -3415,7 +3318,6 @@
      "/": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -3423,7 +3325,6 @@
      "/temps": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -3503,7 +3404,6 @@
         6,
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      }
@@ -3548,7 +3448,6 @@
      "/": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -3556,7 +3455,6 @@
      "/c": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -3581,7 +3479,6 @@
       "type": "array",
       "values": "d83741d2d53b7020",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -3615,7 +3512,6 @@
         3,
         2
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
@@ -3636,7 +3532,6 @@
       "type": "array",
       "values": "a24048d2d7b12e9a",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -3669,14 +3564,12 @@
        "shape": [
         7
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/ints": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -3704,7 +3597,6 @@
       "type": "array",
       "values": "959b94ef14a2e5fe",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -3765,7 +3657,6 @@
         8,
         8
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
@@ -3787,7 +3678,6 @@
       "type": "array",
       "values": "c779afbf4cdb66d7",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -3819,7 +3709,6 @@
        "shape": [
         10
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
@@ -3841,7 +3730,6 @@
       "type": "array",
       "values": "618e6c2fecf2e727",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -3870,14 +3758,12 @@
        "shape": [
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/temps": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -3956,14 +3842,12 @@
         6,
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/text": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -3985,7 +3869,6 @@
       "type": "array",
       "values": "f2c006a27f5a7fbe",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -4018,7 +3901,6 @@
        "shape": [
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      }
@@ -4060,7 +3942,6 @@
      "/": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -4068,7 +3949,6 @@
      "/c": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -4093,7 +3973,6 @@
       "type": "array",
       "values": "d83741d2d53b7020",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -4127,14 +4006,12 @@
         3,
         2
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/ints": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -4162,7 +4039,6 @@
       "type": "array",
       "values": "959b94ef14a2e5fe",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -4223,7 +4099,6 @@
         8,
         8
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
@@ -4245,7 +4120,6 @@
       "type": "array",
       "values": "c779afbf4cdb66d7",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -4277,7 +4151,6 @@
        "shape": [
         10
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
@@ -4299,7 +4172,6 @@
       "type": "array",
       "values": "618e6c2fecf2e727",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -4328,14 +4200,12 @@
        "shape": [
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/temps": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -4414,14 +4284,12 @@
         6,
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/text": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -4443,7 +4311,6 @@
       "type": "array",
       "values": "f2c006a27f5a7fbe",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -4476,7 +4343,6 @@
        "shape": [
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      }
@@ -4498,7 +4364,6 @@
      "/": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -4506,7 +4371,6 @@
      "/temps": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -4586,7 +4450,6 @@
         6,
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      }
@@ -4633,7 +4496,6 @@
      "/": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -4641,7 +4503,6 @@
      "/c": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -4666,7 +4527,6 @@
       "type": "array",
       "values": "d83741d2d53b7020",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -4700,7 +4560,6 @@
         3,
         2
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
@@ -4721,7 +4580,6 @@
       "type": "array",
       "values": "a24048d2d7b12e9a",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -4754,14 +4612,12 @@
        "shape": [
         7
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/ints": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -4789,7 +4645,6 @@
       "type": "array",
       "values": "959b94ef14a2e5fe",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -4850,7 +4705,6 @@
         8,
         8
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
@@ -4872,7 +4726,6 @@
       "type": "array",
       "values": "c779afbf4cdb66d7",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -4904,7 +4757,6 @@
        "shape": [
         10
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
@@ -4926,7 +4778,6 @@
       "type": "array",
       "values": "618e6c2fecf2e727",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -4955,7 +4806,6 @@
        "shape": [
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
@@ -4970,7 +4820,6 @@
       "type": "array",
       "values": "9ed25294c5823762",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": []
@@ -4995,14 +4844,12 @@
        "fill_value": 0.0,
        "node_type": "array",
        "shape": [],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/temps": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -5081,14 +4928,12 @@
         6,
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/text": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -5110,7 +4955,6 @@
       "type": "array",
       "values": "f2c006a27f5a7fbe",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -5143,7 +4987,6 @@
        "shape": [
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      }
@@ -5174,7 +5017,6 @@
      "/": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -5182,7 +5024,6 @@
      "/ints": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -5210,7 +5051,6 @@
       "type": "array",
       "values": "959b94ef14a2e5fe",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -5271,7 +5111,6 @@
         8,
         8
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
@@ -5293,7 +5132,6 @@
       "type": "array",
       "values": "618e6c2fecf2e727",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -5322,14 +5160,12 @@
        "shape": [
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/temps": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -5408,7 +5244,6 @@
         6,
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      }
@@ -5443,7 +5278,6 @@
      "/": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -5451,7 +5285,6 @@
      "/ints": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -5479,7 +5312,6 @@
       "type": "array",
       "values": "959b94ef14a2e5fe",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -5540,7 +5372,6 @@
         8,
         8
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
@@ -5562,7 +5393,6 @@
       "type": "array",
       "values": "c779afbf4cdb66d7",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -5594,7 +5424,6 @@
        "shape": [
         10
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
@@ -5616,7 +5445,6 @@
       "type": "array",
       "values": "618e6c2fecf2e727",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -5645,14 +5473,12 @@
        "shape": [
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/temps": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -5731,7 +5557,6 @@
         6,
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      }
@@ -5770,7 +5595,6 @@
      "/": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -5778,7 +5602,6 @@
      "/ints": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -5806,7 +5629,6 @@
       "type": "array",
       "values": "959b94ef14a2e5fe",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -5867,7 +5689,6 @@
         8,
         8
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
@@ -5889,7 +5710,6 @@
       "type": "array",
       "values": "c779afbf4cdb66d7",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -5921,7 +5741,6 @@
        "shape": [
         10
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
@@ -5943,7 +5762,6 @@
       "type": "array",
       "values": "618e6c2fecf2e727",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -5972,14 +5790,12 @@
        "shape": [
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/temps": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -6058,14 +5874,12 @@
         6,
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/text": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -6087,7 +5901,6 @@
       "type": "array",
       "values": "f2c006a27f5a7fbe",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -6120,7 +5933,6 @@
        "shape": [
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      }
@@ -6146,7 +5958,6 @@
      "/": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -6154,7 +5965,6 @@
      "/ints": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -6177,7 +5987,6 @@
       "type": "array",
       "values": "618e6c2fecf2e727",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -6206,14 +6015,12 @@
        "shape": [
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      },
      "/temps": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -6292,7 +6099,6 @@
         6,
         5
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      }

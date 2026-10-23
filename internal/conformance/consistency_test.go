@@ -755,7 +755,8 @@ func checkLookup(t *testing.T, fx *fixture, what, name, want string, got icechun
 }
 
 // TestPythonRefs: spec version, branch and tag listings and lookups, lookups
-// that must fail, and the ancestry of every branch, tag and snapshot.
+// that must fail (including sessions at snapshot files nothing lists), and
+// the ancestry of every branch, tag and snapshot.
 func TestPythonRefs(t *testing.T) {
 	forEachFixture(t, func(t *testing.T, fx *fixture) {
 		ctx := context.Background()
@@ -807,6 +808,18 @@ func TestPythonRefs(t *testing.T) {
 				_, err := ancestry(ctx, fx.repo, icechunk.AtSnapshot(id))
 				if isError(want) && err == nil {
 					t.Errorf("ancestry of %s: icechunk-python fails (%s), go does not", name, want)
+				}
+			case "session":
+				// A snapshot file that no ref or repo info lists.
+				id, _ := icechunk.ParseSnapshotID(name)
+				s, err := fx.repo.ReadonlySession(ctx, icechunk.AtSnapshot(id))
+				switch {
+				case isError(want) && !errors.Is(err, icechunk.ErrSnapshotNotFound):
+					t.Errorf("session at unlisted snapshot %s: err = %v, want ErrSnapshotNotFound (python %s)", name, err, want)
+				case !isError(want) && err != nil:
+					t.Errorf("session at unlisted snapshot %s: %v (python opens it)", name, err)
+				case !isError(want) && s.SnapshotID().String() != want:
+					t.Errorf("session at unlisted snapshot %s: snapshot %s, python %s", name, s.SnapshotID(), want)
 				}
 			}
 		}

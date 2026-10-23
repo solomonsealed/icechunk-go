@@ -32,7 +32,7 @@ temperature = zarr.open_array("https://<worker>/zarr/main/temperature", mode="r"
 Needs Go ≥ 1.25 and Node (for `npx wrangler`).
 
 ```sh
-./build.sh                                   # → build/app.wasm (~2.7 MB gzipped) + build/wasm_exec.js
+./build.sh                                   # → build/app.wasm (~2.8 MB gzipped) + build/wasm_exec.js
 ./seed-r2.sh ../../testdata/upstream/test-repo-v2 test-repo-v2   # fill wrangler's local R2
 npx wrangler dev                             # http://localhost:8787
 curl 'localhost:8787/array/group1/small_chunks?ref=my-branch'

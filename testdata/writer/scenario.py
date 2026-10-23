@@ -43,6 +43,7 @@ import numpy as np
 
 import icechunk as ic
 import zarr
+import zarr_template  # noqa: F401  (registers the "template" chunk key encoding)
 from zarr.core.buffer import default_buffer_prototype
 from zarr.core.sync import sync
 from zarr.registry import get_codec_class
@@ -141,7 +142,8 @@ def gen_values(meta: dict, shape: list[int], seed: int) -> np.ndarray:
 
 def make_config(c: dict | None):
     """A scenario's repository config: inline_chunk_threshold_bytes,
-    num_updates_per_repo_info_file, and manifest_split {path, axis0, any}."""
+    num_updates_per_repo_info_file, manifest_split {path, axis0, any}, and
+    storage (StorageSettings fields, e.g. storage_class)."""
     if not c:
         return None
     cfg = ic.RepositoryConfig.default()
@@ -149,6 +151,8 @@ def make_config(c: dict | None):
         cfg.inline_chunk_threshold_bytes = c["inline_chunk_threshold_bytes"]
     if "num_updates_per_repo_info_file" in c:
         cfg.num_updates_per_repo_info_file = c["num_updates_per_repo_info_file"]
+    if "storage" in c:
+        cfg.storage = ic.StorageSettings(**c["storage"])
     if "manifest_split" in c:
         sp = c["manifest_split"]
         cfg.manifest = ic.ManifestConfig(splitting=ic.ManifestSplittingConfig.from_dict({
@@ -396,12 +400,17 @@ def normalize_codecs(codecs: list, endianless: bool) -> None:
 
 def zarr_doc(raw: bytes) -> dict:
     """zarr.json without differences that mean nothing: consolidated_metadata
-    null (same as absent), empty codec configurations, and the bytes codec's
-    endian for single-byte data types. consistency tests normalize Go's the
-    same way."""
+    null (same as absent), empty attributes and storage_transformers (their
+    defaults; zarr-python re-renders a repaired document with them, zarr-go
+    keeps the stored document's fields), empty codec configurations, and the
+    bytes codec's endian for single-byte data types. consistency tests
+    normalize Go's the same way."""
     doc = json.loads(raw)
     if doc.get("consolidated_metadata", 0) is None:
         del doc["consolidated_metadata"]
+    for key, empty in (("attributes", {}), ("storage_transformers", [])):
+        if key in doc and doc[key] == empty:
+            del doc[key]
     if "codecs" in doc:
         name = doc["data_type"] if isinstance(doc["data_type"], str) else doc["data_type"]["name"]
         normalize_codecs(doc["codecs"], name in ENDIANLESS)

@@ -1,8 +1,8 @@
 {
  "_meta": {
-  "icechunk": "2.2.2",
-  "numpy": "2.5.3",
-  "zarr": "3.4.0"
+  "icechunk": "2.3.0",
+  "numpy": "2.5.4",
+  "zarr": "3.4.1"
  },
  "canonical": {
   "ancestry": {
@@ -319,7 +319,6 @@
      "/": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -341,7 +340,6 @@
       "type": "array",
       "values": "fa7828278f94cc2d",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -370,7 +368,6 @@
        "shape": [
         4
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      }
@@ -387,7 +384,6 @@
      "/": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -409,7 +405,6 @@
       "type": "array",
       "values": "f14609acd088137d",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -438,7 +433,6 @@
        "shape": [
         4
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      }
@@ -455,7 +449,6 @@
      "/": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -477,7 +470,6 @@
       "type": "array",
       "values": "c6547da949e15546",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -506,7 +498,6 @@
        "shape": [
         4
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      }
@@ -545,7 +536,6 @@
       "type": "array",
       "values": "6abfc0fc1e2741db",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -581,7 +571,6 @@
        "shape": [
         3
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      }
@@ -598,7 +587,6 @@
      "/": {
       "type": "group",
       "zarr_json": {
-       "attributes": {},
        "node_type": "group",
        "zarr_format": 3
       }
@@ -620,7 +608,6 @@
       "type": "array",
       "values": "89dc3a5b67fba8a7",
       "zarr_json": {
-       "attributes": {},
        "chunk_grid": {
         "configuration": {
          "chunk_shape": [
@@ -649,7 +636,6 @@
        "shape": [
         4
        ],
-       "storage_transformers": [],
        "zarr_format": 3
       }
      }
