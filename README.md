@@ -303,3 +303,10 @@ python testdata/check_s3_objects.py http://localhost:5555 icechunk-check   # S3 
 ICECHUNK_S3_ENDPOINT=http://localhost:5555 ICECHUNK_S3_BUCKET=icechunk-check go test -run TestWriteToS3 ./internal/conformance
 python testdata/check_s3_objects.py http://localhost:5555 icechunk-check
 ```
+
+## License
+
+Apache License 2.0, as upstream; see [`LICENSE`](LICENSE). The schemas in
+`internal/fbs/schema` are verbatim copies of
+[Icechunk](https://github.com/earth-mover/icechunk)'s, Copyright 2024
+Earthmover PBC, under the same license.
