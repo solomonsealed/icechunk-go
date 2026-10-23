@@ -92,8 +92,7 @@ const (
 )
 
 // objectMetadata is the user metadata upstream stamps on the files it
-// writes, with this module's implementation name (as in file headers) as
-// the client.
+// writes, with the client name of file headers (format.ImplementationName).
 func objectMetadata(fileType string, specVersion uint8) map[string]string {
 	return map[string]string{
 		"icspecver":  strconv.Itoa(int(specVersion)),

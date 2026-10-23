@@ -738,7 +738,7 @@ func TestStorageSettings(t *testing.T) {
 			}
 			want := map[string]string{}
 			if metadata && fileType != "" {
-				want = map[string]string{"icspecver": "2", "icclient": "icechunk_go-0.1.0", "icfiletype": fileType, "iccompalg": "zstd"}
+				want = map[string]string{"icspecver": "2", "icclient": "ic-2.3.0", "icfiletype": fileType, "iccompalg": "zstd"}
 				if p.key == "repo" {
 					want[storage.WriteIDMetadataKey] = meta[storage.WriteIDMetadataKey]
 					if !uuid.MatchString(meta[storage.WriteIDMetadataKey]) {

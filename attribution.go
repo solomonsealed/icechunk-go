@@ -6,12 +6,14 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/solomonsealed/icechunk-go/internal/format"
 	"github.com/solomonsealed/icechunk-go/storage"
 )
 
 // CompatibleVersion is the upstream Icechunk release this module is aligned
-// with.
-const CompatibleVersion = "2.3.0"
+// with. Files and objects it writes carry upstream's client name for it
+// ("ic-2.3.0"), and requests upstream's User-Agent product token.
+const CompatibleVersion = format.CompatibleVersion
 
 // UserAgentProduct is the product token the User-Agent header of every
 // request a repository makes starts with: upstream's, at the release this

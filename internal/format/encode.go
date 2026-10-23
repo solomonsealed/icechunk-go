@@ -7,13 +7,14 @@ import (
 	"github.com/klauspost/compress/zstd"
 )
 
-// Version is this module's version, as it identifies itself in file
-// headers and User-Agent headers.
-const Version = "0.1.0"
+// CompatibleVersion is the upstream Icechunk release this module is aligned
+// with.
+const CompatibleVersion = "2.3.0"
 
-// ImplementationName is written into the header of every file this module
-// produces ("<name>-<version>", like upstream's "ic-2.3.0").
-const ImplementationName = "icechunk_go-" + Version
+// ImplementationName is the client name written into the header of every
+// file this module produces, and stamped on objects as their icclient
+// metadata: upstream's, at the release this module is aligned with.
+const ImplementationName = "ic-" + CompatibleVersion
 
 var (
 	encoderOnce sync.Once

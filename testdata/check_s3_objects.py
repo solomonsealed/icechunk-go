@@ -78,12 +78,10 @@ def main() -> None:
 
     def describe(objs):
         """Per kind of object, the set of (storage class, metadata) its objects
-        carry, with the writer's client name and the write ids generalized."""
+        carry, with the write ids generalized."""
         out = {}
         for k, (cls, meta) in objs.items():
             m = dict(meta)
-            if "icclient" in m:
-                m["icclient"] = "<client>"
             if "icechunkwriteid" in m:
                 if not UUID.match(m["icechunkwriteid"]):
                     failures.append(f"{k}: write id {m['icechunkwriteid']!r} is not a UUID")
@@ -93,9 +91,10 @@ def main() -> None:
 
     go_objs, py_objs = objects("go"), objects("py")
     go_desc, py_desc = describe(go_objs), describe(py_objs)
+    # Go writes upstream's client name, at the release it is aligned with.
     clients = {m.get("icclient") for _, m in go_objs.values()} - {None}
-    if clients != {"icechunk_go-0.1.0"}:
-        failures.append(f"go icclient {clients}")
+    if clients != {f"ic-{ic.__version__}"}:
+        failures.append(f"go icclient {clients}, python ic-{ic.__version__}")
 
     # py also holds the objects of Go's commit on top of it, which must
     # look the same.
