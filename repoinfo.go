@@ -3,11 +3,10 @@ package icechunk
 import (
 	"bytes"
 	"fmt"
+	"slices"
 	"sort"
 	"strings"
 	"time"
-
-	flatbuffers "github.com/google/flatbuffers/go"
 
 	"github.com/solomonsealed/icechunk-go/internal/fbs"
 	"github.com/solomonsealed/icechunk-go/internal/format"
@@ -102,128 +101,86 @@ func idFrom12(o *fbs.ObjectId12) SnapshotID {
 }
 
 func decodeMetadataItems(buf []byte, n int, get func(*fbs.MetadataItem, int) bool, specVersion uint8) (map[string]any, error) {
-	vecLen(n, buf)
-	if n == 0 {
-		return map[string]any{}, nil
+	return decodeMetadata(rawItems(vecLen(n, buf), get), specVersion)
+}
+
+func decodeMetadata(items []rawMetadataItem, specVersion uint8) (map[string]any, error) {
+	decode := format.DecodeFlexBuffer
+	if specVersion == 1 {
+		decode = format.DecodeMsgpack
 	}
-	out := make(map[string]any, n)
-	var item fbs.MetadataItem
-	for i := 0; i < n; i++ {
-		get(&item, i)
-		var v any
-		var err error
-		if specVersion == 1 {
-			v, err = format.DecodeMsgpack(item.ValueBytes())
-		} else {
-			v, err = format.DecodeFlexBuffer(item.ValueBytes())
-		}
+	out := make(map[string]any, len(items))
+	for _, it := range items {
+		v, err := decode(it.value)
 		if err != nil {
-			return nil, fmt.Errorf("decoding metadata %q: %w", item.Name(), err)
+			return nil, fmt.Errorf("decoding metadata %q: %w", it.name, err)
 		}
-		out[string(item.Name())] = v
+		out[it.name] = v
 	}
 	return out, nil
+}
+
+func deref(s *string) string {
+	if s == nil {
+		return ""
+	}
+	return *s
 }
 
 // parseRepoInfo decodes a `repo` file (header + compressed flatbuffer).
 func parseRepoInfo(raw []byte) (info *RepoInfo, err error) {
 	defer recoverFormat(&err)
-	h, buf, err := format.Decode(raw, format.FileTypeRepoInfo)
+	h, doc, err := decodeRepoDoc(raw, false)
 	if err != nil {
 		return nil, err
 	}
-	root := fbs.GetRootAsRepo(buf, 0)
 	info = &RepoInfo{
-		SpecVersion:       int(root.SpecVersion()),
-		Implementation:    h.Implementation,
-		Branches:          map[string]SnapshotID{},
-		Tags:              map[string]SnapshotID{},
-		RepoBeforeUpdates: string(root.RepoBeforeUpdates()),
+		SpecVersion:    int(doc.specVersion),
+		Implementation: h.Implementation,
+		Branches:       doc.branches,
+		Tags:           doc.tags,
+		DeletedTags:    doc.deletedTags,
+		Snapshots:      make([]SnapshotInfo, len(doc.snapshots)),
+		Status: RepoStatus{
+			Availability: availabilityName(doc.status.availability),
+			SetAt:        microsToTime(doc.status.setAt),
+			Reason:       deref(doc.status.reason),
+		},
+		EnabledFeatureFlags:  doc.enabledFlags,
+		DisabledFeatureFlags: doc.disabledFlags,
+		RepoBeforeUpdates:    deref(doc.repoBeforeUpdates),
 	}
 	if info.SpecVersion == 0 {
 		info.SpecVersion = int(h.SpecVersion)
 	}
-
-	n := vecLen(root.SnapshotsLength(), buf)
-	info.Snapshots = make([]SnapshotInfo, n)
-	parents := make([]int32, n)
-	var si fbs.SnapshotInfo
-	for i := 0; i < n; i++ {
-		root.Snapshots(&si, i)
-		md, err := decodeMetadataItems(buf, si.MetadataLength(), si.Metadata, 2)
+	for i, s := range doc.snapshots {
+		md, err := decodeMetadata(s.metadata, 2)
 		if err != nil {
 			return nil, err
 		}
-		info.Snapshots[i] = SnapshotInfo{
-			ID:        idFrom12(si.Id(nil)),
-			FlushedAt: microsToTime(si.FlushedAt()),
-			Message:   string(si.Message()),
-			Metadata:  md,
-		}
-		parents[i] = si.ParentOffset()
+		info.Snapshots[i] = SnapshotInfo{ID: s.id, ParentID: s.parent, FlushedAt: microsToTime(s.flushedAt), Message: s.message, Metadata: md}
 	}
-	for i, p := range parents {
-		if p >= 0 {
-			if int(p) >= n {
-				return nil, fmt.Errorf("%w: snapshot parent index %d out of range", ErrFormat, p)
-			}
-			pid := info.Snapshots[p].ID
-			info.Snapshots[i].ParentID = &pid
-		}
-	}
-
-	var ref fbs.Ref
-	snapAt := func(idx uint32) (SnapshotID, error) {
-		if int(idx) >= n {
-			return SnapshotID{}, fmt.Errorf("%w: ref snapshot index %d out of range", ErrFormat, idx)
-		}
-		return info.Snapshots[idx].ID, nil
-	}
-	for i := 0; i < root.BranchesLength(); i++ {
-		root.Branches(&ref, i)
-		id, err := snapAt(ref.SnapshotIndex())
-		if err != nil {
-			return nil, err
-		}
-		info.Branches[string(ref.Name())] = id
-	}
-	for i := 0; i < root.TagsLength(); i++ {
-		root.Tags(&ref, i)
-		id, err := snapAt(ref.SnapshotIndex())
-		if err != nil {
-			return nil, err
-		}
-		info.Tags[string(ref.Name())] = id
-	}
-	for i := 0; i < root.DeletedTagsLength(); i++ {
-		info.DeletedTags = append(info.DeletedTags, string(root.DeletedTags(i)))
-	}
-
-	if st := root.Status(nil); st != nil {
-		info.Status = RepoStatus{
-			Availability: availabilityName(st.Availability()),
-			SetAt:        microsToTime(st.SetAt()),
-			Reason:       string(st.LimitedAvailabilityReason()),
-		}
-	}
-	if info.Metadata, err = decodeMetadataItems(buf, root.MetadataLength(), root.Metadata, 2); err != nil {
+	if info.Metadata, err = decodeMetadata(doc.metadata, 2); err != nil {
 		return nil, err
 	}
-	if cfg := root.ConfigBytes(); len(cfg) > 0 {
-		if info.Config, err = format.DecodeFlexBuffer(cfg); err != nil {
+	if len(doc.config) > 0 {
+		if info.Config, err = format.DecodeFlexBuffer(doc.config); err != nil {
 			return nil, fmt.Errorf("decoding repo config: %w", err)
 		}
 	}
-	for i := 0; i < root.EnabledFeatureFlagsLength(); i++ {
-		info.EnabledFeatureFlags = append(info.EnabledFeatureFlags, root.EnabledFeatureFlags(i))
-	}
-	for i := 0; i < root.DisabledFeatureFlagsLength(); i++ {
-		info.DisabledFeatureFlags = append(info.DisabledFeatureFlags, root.DisabledFeatureFlags(i))
-	}
-	var up fbs.Update
-	for i := 0; i < root.LatestUpdatesLength(); i++ {
-		root.LatestUpdates(&up, i)
-		info.Updates = append(info.Updates, decodeUpdate(&up))
+	for _, u := range doc.updates {
+		kind := fbs.EnumNamesUpdateType[u.typ]
+		if kind == "" {
+			kind = fmt.Sprintf("Unknown(%d)", u.typ)
+		}
+		info.Updates = append(info.Updates, Update{
+			Kind:               strings.TrimSuffix(kind, "Update"),
+			UpdatedAt:          microsToTime(u.updatedAt),
+			Name:               u.name,
+			SnapshotID:         u.newSnap,
+			PreviousSnapshotID: u.prevSnap,
+			BackupPath:         deref(u.backupPath),
+		})
 	}
 	return info, nil
 }
@@ -240,67 +197,13 @@ func availabilityName(a fbs.RepoAvailability) string {
 	return fmt.Sprintf("unknown(%d)", a)
 }
 
-func decodeUpdate(up *fbs.Update) Update {
-	u := Update{
-		Kind:       fbs.EnumNamesUpdateType[up.UpdateTypeType()],
-		UpdatedAt:  microsToTime(up.UpdatedAt()),
-		BackupPath: string(up.BackupPath()),
-	}
-	if u.Kind == "" {
-		u.Kind = fmt.Sprintf("Unknown(%d)", up.UpdateTypeType())
-	}
-	u.Kind = strings.TrimSuffix(u.Kind, "Update")
-	var t flatbuffers.Table
-	if !up.UpdateType(&t) {
-		return u
-	}
-	switch up.UpdateTypeType() {
-	case fbs.UpdateTypeTagCreatedUpdate:
-		var x fbs.TagCreatedUpdate
-		x.Init(t.Bytes, t.Pos)
-		u.Name = string(x.Name())
-	case fbs.UpdateTypeTagDeletedUpdate:
-		var x fbs.TagDeletedUpdate
-		x.Init(t.Bytes, t.Pos)
-		u.Name, u.PreviousSnapshotID = string(x.Name()), idFrom12(x.PreviousSnapId(nil))
-	case fbs.UpdateTypeBranchCreatedUpdate:
-		var x fbs.BranchCreatedUpdate
-		x.Init(t.Bytes, t.Pos)
-		u.Name = string(x.Name())
-	case fbs.UpdateTypeBranchDeletedUpdate:
-		var x fbs.BranchDeletedUpdate
-		x.Init(t.Bytes, t.Pos)
-		u.Name, u.PreviousSnapshotID = string(x.Name()), idFrom12(x.PreviousSnapId(nil))
-	case fbs.UpdateTypeBranchResetUpdate:
-		var x fbs.BranchResetUpdate
-		x.Init(t.Bytes, t.Pos)
-		u.Name, u.PreviousSnapshotID = string(x.Name()), idFrom12(x.PreviousSnapId(nil))
-	case fbs.UpdateTypeNewCommitUpdate:
-		var x fbs.NewCommitUpdate
-		x.Init(t.Bytes, t.Pos)
-		u.Name, u.SnapshotID = string(x.Branch()), idFrom12(x.NewSnapId(nil))
-	case fbs.UpdateTypeCommitAmendedUpdate:
-		var x fbs.CommitAmendedUpdate
-		x.Init(t.Bytes, t.Pos)
-		u.Name = string(x.Branch())
-		u.SnapshotID, u.PreviousSnapshotID = idFrom12(x.NewSnapId(nil)), idFrom12(x.PreviousSnapId(nil))
-	case fbs.UpdateTypeNewDetachedSnapshotUpdate:
-		var x fbs.NewDetachedSnapshotUpdate
-		x.Init(t.Bytes, t.Pos)
-		u.SnapshotID = idFrom12(x.NewSnapId(nil))
-	}
-	return u
-}
-
 // snapshot returns the info for id using binary search over the sorted list.
 func (ri *RepoInfo) snapshot(id SnapshotID) (*SnapshotInfo, bool) {
-	i := sort.Search(len(ri.Snapshots), func(i int) bool {
-		return bytes.Compare(ri.Snapshots[i].ID[:], id[:]) >= 0
-	})
-	if i < len(ri.Snapshots) && ri.Snapshots[i].ID == id {
-		return &ri.Snapshots[i], true
+	i, ok := slices.BinarySearchFunc(ri.Snapshots, id, func(s SnapshotInfo, id SnapshotID) int { return bytes.Compare(s.ID[:], id[:]) })
+	if !ok {
+		return nil, false
 	}
-	return nil, false
+	return &ri.Snapshots[i], true
 }
 
 // BranchNames returns the branch names in sorted order.
