@@ -3,6 +3,7 @@ package icechunk
 import (
 	"bytes"
 	"fmt"
+	"slices"
 	"sort"
 	"time"
 
@@ -91,12 +92,20 @@ func strPtr(b []byte) *string {
 	return &s
 }
 
-// parseRepoDoc decodes a complete repo info file.
-func parseRepoDoc(raw []byte) (doc *repoDoc, err error) {
+// parseRepoDoc decodes a complete repo info file to rewrite it, refusing ops
+// log entries it could not write back.
+func parseRepoDoc(raw []byte) (*repoDoc, error) {
+	_, doc, err := decodeRepoDoc(raw, true)
+	return doc, err
+}
+
+// decodeRepoDoc decodes a repo info file. Unless strict, ops log entries of
+// unknown type or without a payload are kept with what could be read of them.
+func decodeRepoDoc(raw []byte, strict bool) (h format.Header, doc *repoDoc, err error) {
 	defer recoverFormat(&err)
-	_, buf, err := format.Decode(raw, format.FileTypeRepoInfo)
+	h, buf, err := format.Decode(raw, format.FileTypeRepoInfo)
 	if err != nil {
-		return nil, err
+		return h, nil, err
 	}
 	root := fbs.GetRootAsRepo(buf, 0)
 	doc = &repoDoc{
@@ -110,7 +119,7 @@ func parseRepoDoc(raw []byte) (doc *repoDoc, err error) {
 	doc.snapshots = make([]docSnapshot, n)
 	var si fbs.SnapshotInfo
 	parents := make([]int32, n)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		root.Snapshots(&si, i)
 		ds := docSnapshot{
 			id:        idFrom12(si.Id(nil)),
@@ -132,7 +141,7 @@ func parseRepoDoc(raw []byte) (doc *repoDoc, err error) {
 	for i, p := range parents {
 		if p >= 0 {
 			if int(p) >= n {
-				return nil, fmt.Errorf("%w: parent index out of range", ErrFormat)
+				return h, nil, fmt.Errorf("%w: snapshot parent index %d out of range", ErrFormat, p)
 			}
 			pid := doc.snapshots[p].id
 			doc.snapshots[i].parent = &pid
@@ -142,14 +151,14 @@ func parseRepoDoc(raw []byte) (doc *repoDoc, err error) {
 	for i := 0; i < root.BranchesLength(); i++ {
 		root.Branches(&ref, i)
 		if int(ref.SnapshotIndex()) >= n {
-			return nil, fmt.Errorf("%w: branch index out of range", ErrFormat)
+			return h, nil, fmt.Errorf("%w: ref snapshot index %d out of range", ErrFormat, ref.SnapshotIndex())
 		}
 		doc.branches[string(ref.Name())] = doc.snapshots[ref.SnapshotIndex()].id
 	}
 	for i := 0; i < root.TagsLength(); i++ {
 		root.Tags(&ref, i)
 		if int(ref.SnapshotIndex()) >= n {
-			return nil, fmt.Errorf("%w: tag index out of range", ErrFormat)
+			return h, nil, fmt.Errorf("%w: ref snapshot index %d out of range", ErrFormat, ref.SnapshotIndex())
 		}
 		doc.tags[string(ref.Name())] = doc.snapshots[ref.SnapshotIndex()].id
 	}
@@ -180,12 +189,12 @@ func parseRepoDoc(raw []byte) (doc *repoDoc, err error) {
 	for i := 0; i < vecLen(root.LatestUpdatesLength(), buf); i++ {
 		root.LatestUpdates(&up, i)
 		du, err := parseDocUpdate(&up)
-		if err != nil {
-			return nil, err
+		if err != nil && strict {
+			return h, nil, err
 		}
 		doc.updates = append(doc.updates, du)
 	}
-	return doc, nil
+	return h, doc, nil
 }
 
 func parseDocStatus(st *fbs.RepoStatus) docStatus {
@@ -261,17 +270,9 @@ func parseDocUpdate(up *fbs.Update) (docUpdate, error) {
 func (d *repoDoc) updatesLimit() int {
 	if d.hasConfig {
 		if cfg, err := format.DecodeFlexBuffer(d.config); err == nil {
-			if m, ok := cfg.(map[string]any); ok {
-				switch v := m["num_updates_per_repo_info_file"].(type) {
-				case uint64:
-					if v > 0 {
-						return int(v)
-					}
-				case int64:
-					if v > 0 {
-						return int(v)
-					}
-				}
+			m, _ := cfg.(map[string]any)
+			if n, ok := configUint(m["num_updates_per_repo_info_file"]); ok && n > 0 {
+				return int(n)
 			}
 		}
 	}
@@ -280,8 +281,7 @@ func (d *repoDoc) updatesLimit() int {
 
 // snapshotIndex returns the index of id in the sorted snapshot list.
 func (d *repoDoc) snapshotIndex(id SnapshotID) (int, bool) {
-	i := sort.Search(len(d.snapshots), func(i int) bool { return bytes.Compare(d.snapshots[i].id[:], id[:]) >= 0 })
-	return i, i < len(d.snapshots) && d.snapshots[i].id == id
+	return slices.BinarySearchFunc(d.snapshots, id, func(s docSnapshot, id SnapshotID) int { return bytes.Compare(s.id[:], id[:]) })
 }
 
 // nextUpdateTime returns now, or later if needed for the ops log to stay
@@ -299,25 +299,17 @@ func (d *repoDoc) nextUpdateTime(now time.Time) uint64 {
 // the log exceeds the per-file limit, older entries are left in the backup
 // chain (repo_before_updates).
 func (d *repoDoc) pushUpdate(u docUpdate, backupPath string, limit int) {
-	all := make([]docUpdate, 0, len(d.updates)+1)
-	all = append(all, u)
-	for i, prev := range d.updates {
-		if i == 0 {
-			bp := backupPath
-			prev.backupPath = &bp
-		}
-		all = append(all, prev)
+	all := append([]docUpdate{u}, d.updates...)
+	if len(all) > 1 {
+		all[1].backupPath = &backupPath
 	}
-	rbu := d.repoBeforeUpdates
-	var kept []docUpdate
-	for _, e := range all {
-		if len(kept) >= limit && e.backupPath != nil {
-			rbu = e.backupPath
+	for i, e := range all {
+		if i >= limit && e.backupPath != nil {
+			all, d.repoBeforeUpdates = all[:i], e.backupPath
 			break
 		}
-		kept = append(kept, e)
 	}
-	d.updates, d.repoBeforeUpdates = kept, rbu
+	d.updates = all
 }
 
 func (d *repoDoc) addSnapshot(s docSnapshot) error {
@@ -325,23 +317,12 @@ func (d *repoDoc) addSnapshot(s docSnapshot) error {
 	if found {
 		return fmt.Errorf("icechunk: duplicate snapshot id %s", s.id)
 	}
-	d.snapshots = append(d.snapshots, docSnapshot{})
-	copy(d.snapshots[i+1:], d.snapshots[i:])
-	d.snapshots[i] = s
+	d.snapshots = slices.Insert(d.snapshots, i, s)
 	return nil
 }
 
 // ---------------------------------------------------------------------------
 // Encoding
-
-func sortedNames(m map[string]SnapshotID) []string {
-	out := make([]string, 0, len(m))
-	for k := range m {
-		out = append(out, k)
-	}
-	sort.Strings(out)
-	return out
-}
 
 func createID12(b *flatbuffers.Builder, id ObjectID12) flatbuffers.UOffsetT {
 	return fbs.CreateObjectId12(b, id[0], id[1], id[2], id[3], id[4], id[5], id[6], id[7], id[8], id[9], id[10], id[11])
@@ -354,8 +335,8 @@ func createID8(b *flatbuffers.Builder, id NodeID) flatbuffers.UOffsetT {
 // offsetVector writes a vector of table/string offsets.
 func offsetVector(b *flatbuffers.Builder, offs []flatbuffers.UOffsetT) flatbuffers.UOffsetT {
 	b.StartVector(4, len(offs), 4)
-	for i := len(offs) - 1; i >= 0; i-- {
-		b.PrependUOffsetT(offs[i])
+	for _, off := range slices.Backward(offs) {
+		b.PrependUOffsetT(off)
 	}
 	return b.EndVector(len(offs))
 }
@@ -497,7 +478,7 @@ func (d *repoDoc) encode() ([]byte, error) {
 		return uint32(i), nil
 	}
 	refs := func(m map[string]SnapshotID) (flatbuffers.UOffsetT, error) {
-		names := sortedNames(m)
+		names := sortedKeys(m)
 		offs := make([]flatbuffers.UOffsetT, len(names))
 		for i, name := range names {
 			idx, err := index(m[name])
@@ -520,8 +501,7 @@ func (d *repoDoc) encode() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	deleted := append([]string(nil), d.deletedTags...)
-	sort.Strings(deleted)
+	deleted := slices.Sorted(slices.Values(d.deletedTags))
 	delOffs := make([]flatbuffers.UOffsetT, len(deleted))
 	for i, name := range deleted {
 		delOffs[i] = b.CreateString(name)
@@ -543,8 +523,8 @@ func (d *repoDoc) encode() ([]byte, error) {
 		var pruned flatbuffers.UOffsetT
 		if s.pruned != nil {
 			fbs.SnapshotInfoStartPrunedAncestorTxLogsVector(b, len(s.pruned))
-			for j := len(s.pruned) - 1; j >= 0; j-- {
-				createID12(b, s.pruned[j])
+			for _, v := range slices.Backward(s.pruned) {
+				createID12(b, v)
 			}
 			pruned = b.EndVector(len(s.pruned))
 		}
@@ -564,8 +544,8 @@ func (d *repoDoc) encode() ([]byte, error) {
 	metadata := metadataVector(b, d.metadata)
 	u16s := func(vals []uint16) flatbuffers.UOffsetT {
 		b.StartVector(2, len(vals), 2)
-		for i := len(vals) - 1; i >= 0; i-- {
-			b.PrependUint16(vals[i])
+		for _, val := range slices.Backward(vals) {
+			b.PrependUint16(val)
 		}
 		return b.EndVector(len(vals))
 	}
@@ -623,10 +603,5 @@ func (d *repoDoc) encode() ([]byte, error) {
 // featureFlagEnabled resolves a flag from the explicit overrides and the
 // flag's default (all currently defined flags default to enabled).
 func (d *repoDoc) featureFlagEnabled(id uint16) bool {
-	for _, f := range d.disabledFlags {
-		if f == id {
-			return false
-		}
-	}
-	return true
+	return !slices.Contains(d.disabledFlags, id)
 }
