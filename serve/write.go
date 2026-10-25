@@ -2,6 +2,7 @@ package serve
 
 import (
 	"bytes"
+	"cmp"
 	"context"
 	"crypto/subtle"
 	"encoding/json"
@@ -53,7 +54,7 @@ type arraySpecJSON struct {
 	DataType       string           `json:"data_type"`
 	FillValue      any              `json:"fill_value"`
 	Codecs         []zarr.CodecSpec `json:"codecs"`
-	DimensionNames []*string        `json:"dimension_names"`
+	DimensionNames []string         `json:"dimension_names"` // null names decode as ""
 	Attributes     map[string]any   `json:"attributes"`
 }
 
@@ -108,13 +109,7 @@ func (s *Service) write(ctx context.Context, r *Request) (*Response, error) {
 		return nil, err
 	}
 	q := r.URL.Query()
-	branch := q.Get("branch")
-	if branch == "" {
-		branch = s.DefaultRef
-	}
-	if branch == "" {
-		branch = "main"
-	}
+	branch := cmp.Or(q.Get("branch"), s.DefaultRef, "main")
 	path := r.URL.Path
 	var message string
 	session, err := s.Repo.WritableSession(ctx, branch)
@@ -129,15 +124,7 @@ func (s *Service) write(ctx context.Context, r *Request) (*Response, error) {
 		}
 		as := zarr.ArraySpec{
 			Shape: spec.Shape, ChunkShape: spec.ChunkShape, ShardShape: spec.ShardShape, DataType: spec.DataType,
-			FillValue: scalarFromJSON(spec.FillValue), Codecs: spec.Codecs, Attributes: spec.Attributes,
-		}
-		if spec.DimensionNames != nil {
-			as.DimensionNames = make([]string, len(spec.DimensionNames))
-			for i, n := range spec.DimensionNames {
-				if n != nil {
-					as.DimensionNames[i] = *n
-				}
-			}
+			FillValue: scalarFromJSON(spec.FillValue), Codecs: spec.Codecs, DimensionNames: spec.DimensionNames, Attributes: spec.Attributes,
 		}
 		target := strings.TrimPrefix(path, "/arrays/")
 		if _, err := session.CreateArray(ctx, target, as); err != nil {
@@ -172,10 +159,7 @@ func (s *Service) write(ctx context.Context, r *Request) (*Response, error) {
 	default:
 		return nil, &httpError{405, "method not allowed"}
 	}
-	if m := q.Get("message"); m != "" {
-		message = m
-	}
-	id, err := session.Commit(ctx, message, &icechunk.CommitOptions{Rebase: true})
+	id, err := session.Commit(ctx, cmp.Or(q.Get("message"), message), &icechunk.CommitOptions{Rebase: true})
 	if err != nil {
 		return nil, err
 	}
@@ -206,67 +190,17 @@ func ndFromJSON(dt zarr.DataType, shape []uint64, data []any) (*zarr.NDArray, er
 	}
 	var nd *zarr.NDArray
 	var err error
-	switch dt.Kind {
-	case zarr.KindString, zarr.KindBytes:
-		vals := make([]string, len(data))
-		for i, v := range data {
-			s, ok := v.(string)
-			if !ok {
-				return nil, fmt.Errorf("expected a string, got %v", v)
-			}
-			vals[i] = s
-		}
-		nd, err = zarr.FromStrings(shape, vals)
-	case zarr.KindBool:
-		vals := make([]bool, len(data))
-		for i, v := range data {
-			b, ok := v.(bool)
-			if !ok {
-				return nil, fmt.Errorf("expected a boolean, got %v", v)
-			}
-			vals[i] = b
-		}
-		nd, err = zarr.FromSlice(shape, vals)
-	case zarr.KindFloat:
-		vals := make([]float64, len(data))
-		for i, v := range data {
-			f, ok := toF64(scalarFromJSON(v))
-			if !ok {
-				return nil, fmt.Errorf("expected a number, got %v", v)
-			}
-			vals[i] = f
-		}
-		switch dt.Size {
-		case 4:
-			f32 := make([]float32, len(vals))
-			for i, v := range vals {
-				f32[i] = float32(v)
-			}
-			nd, err = zarr.FromSlice(shape, f32)
-		case 8:
-			nd, err = zarr.FromSlice(shape, vals)
-		default:
-			return nil, fmt.Errorf("writing %s from JSON is not supported", dt.Name)
-		}
-	case zarr.KindComplex:
-		vals := make([]complex128, len(data))
-		for i, v := range data {
-			c, ok := scalarFromJSON(v).(complex128)
-			if !ok {
-				return nil, fmt.Errorf("expected [re, im], got %v", v)
-			}
-			vals[i] = c
-		}
-		if dt.Size == 8 {
-			c64 := make([]complex64, len(vals))
-			for i, v := range vals {
-				c64[i] = complex64(v)
-			}
-			nd, err = zarr.FromSlice(shape, c64)
-		} else {
-			nd, err = zarr.FromSlice(shape, vals)
-		}
-	case zarr.KindInt, zarr.KindDatetime, zarr.KindTimedelta:
+	switch {
+	case dt.Variable():
+		nd, err = fromEach(shape, dt, data, "a string", func(v any) (string, bool) { s, ok := v.(string); return s, ok })
+	case dt.Kind == zarr.KindBool:
+		nd, err = fromEach(shape, dt, data, "a boolean", func(v any) (bool, bool) { b, ok := v.(bool); return b, ok })
+	// Floats and complex numbers are written as float32 or float64 parts.
+	case dt.Kind == zarr.KindFloat && (dt.Size == 4 || dt.Size == 8):
+		nd, err = fromEach(shape, dt, data, "a number", func(v any) (float64, bool) { return toF64(scalarFromJSON(v)) })
+	case dt.Kind == zarr.KindComplex && (dt.Size == 8 || dt.Size == 16):
+		nd, err = fromEach(shape, dt, data, "[re, im]", func(v any) (complex128, bool) { c, ok := scalarFromJSON(v).(complex128); return c, ok })
+	case dt.Kind == zarr.KindInt, dt.Kind == zarr.KindDatetime, dt.Kind == zarr.KindTimedelta:
 		vals := make([]int64, len(data))
 		for i, v := range data {
 			x, err := num(v)
@@ -278,7 +212,7 @@ func ndFromJSON(dt zarr.DataType, shape []uint64, data []any) (*zarr.NDArray, er
 			}
 		}
 		nd, err = intsAs(shape, vals, dt.Size)
-	case zarr.KindUint:
+	case dt.Kind == zarr.KindUint:
 		vals := make([]uint64, len(data))
 		for i, v := range data {
 			x, err := num(v)
@@ -298,6 +232,20 @@ func ndFromJSON(dt zarr.DataType, shape []uint64, data []any) (*zarr.NDArray, er
 	}
 	nd.DataType = dt // e.g. datetime64 stored as int64
 	return nd, nil
+}
+
+// fromEach builds an NDArray of type dt from data, converting each value
+// with conv, which reports whether the value is what the type needs.
+func fromEach[T any](shape []uint64, dt zarr.DataType, data []any, what string, conv func(any) (T, bool)) (*zarr.NDArray, error) {
+	vals := make([]T, len(data))
+	for i, v := range data {
+		x, ok := conv(v)
+		if !ok {
+			return nil, fmt.Errorf("expected %s, got %v", what, v)
+		}
+		vals[i] = x
+	}
+	return zarr.FromValues(shape, dt, vals)
 }
 
 func intsAs(shape []uint64, v []int64, size int) (*zarr.NDArray, error) {
