@@ -5,12 +5,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
 	"math/rand"
 	"os"
 	"path/filepath"
 	"slices"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/klauspost/compress/zstd"
 
@@ -202,6 +204,144 @@ func TestResolveVirtual(t *testing.T) {
 	}
 	if _, _, err := r.resolveVirtual("s3://elsewhere/x"); !errors.Is(err, ErrNoVirtualContainer) {
 		t.Errorf("unmapped location: %v", err)
+	}
+}
+
+// As upstream's, container prefixes match whole path segments: a prefix
+// gets a trailing "/" when it has none.
+func TestVirtualContainerPrefixesMatchSegments(t *testing.T) {
+	data, other, slashed := storage.NewMemory(nil), storage.NewMemory(nil), storage.NewMemory(nil)
+	r := &Repository{containers: virtualContainers(map[string]storage.Storage{
+		"s3://bucket/data": data,
+		"s3://other/x":     other,
+		"s3://other/x/":    slashed,
+	})}
+	for loc, want := range map[string]storage.Storage{
+		"s3://bucket/data/a.nc": data,
+		"s3://other/x/a.nc":     slashed,
+	} {
+		c, key, err := r.resolveVirtual(loc)
+		if err != nil || c.store != want || key != "a.nc" {
+			t.Errorf("resolveVirtual(%q) = %q, %q, %v", loc, c.prefix, key, err)
+		}
+	}
+	for _, loc := range []string{"s3://bucket/data2/a.nc", "s3://bucket/data", "s3://other/xy"} {
+		if _, key, err := r.resolveVirtual(loc); !errors.Is(err, ErrNoVirtualContainer) {
+			t.Errorf("resolveVirtual(%q) = %q, %v; want ErrNoVirtualContainer", loc, key, err)
+		}
+	}
+}
+
+// Repo update retries come from the stored config's repo_update_retries,
+// as icechunk-python 2.3.0 persists it, with each unset field taken from
+// upstream's repo update defaults; the storage retry settings do not apply.
+func TestResolveRepoUpdateRetries(t *testing.T) {
+	defaults := repoUpdateRetries{100, 50 * time.Millisecond, 30 * time.Second}
+	withDefault := func(d any) map[string]any {
+		return map[string]any{
+			"repo_update_retries": map[string]any{"default": d},
+			"storage": map[string]any{"retries": map[string]any{
+				"max_tries": uint64(1), "initial_backoff_ms": uint64(0), "max_backoff_ms": uint64(0),
+			}},
+		}
+	}
+	for _, c := range []struct {
+		name   string
+		config any
+		want   repoUpdateRetries
+	}{
+		{"no config", nil, defaults},
+		{"unset", map[string]any{"repo_update_retries": nil}, defaults},
+		{"no default", withDefault(nil), defaults},
+		{"partial", withDefault(map[string]any{"max_tries": uint64(3), "initial_backoff_ms": uint64(7), "max_backoff_ms": nil}),
+			repoUpdateRetries{3, 7 * time.Millisecond, 30 * time.Second}},
+		{"full", withDefault(map[string]any{"max_tries": int64(4), "initial_backoff_ms": int64(1), "max_backoff_ms": int64(2)}),
+			repoUpdateRetries{4, time.Millisecond, 2 * time.Millisecond}},
+	} {
+		if got := resolveRepoUpdateRetries(c.config); got != c.want {
+			t.Errorf("%s: %+v, want %+v", c.name, got, c.want)
+		}
+	}
+}
+
+// Retries follow upstream's schedule: immediate ones, then exponential
+// backoff from the initial delay, capped at the maximum.
+func TestRepoUpdateBackoff(t *testing.T) {
+	const ms = time.Millisecond
+	s := repoUpdateRetries{100, 50 * ms, 30 * time.Second}
+	want := []time.Duration{0, 0, 0, 0, 0, 50 * ms, 100 * ms, 200 * ms, 400 * ms, 800 * ms, 1600 * ms,
+		3200 * ms, 6400 * ms, 12800 * ms, 25600 * ms, 30000 * ms, 30000 * ms}
+	for i, w := range want {
+		if got := s.backoff(i + 1); got != w {
+			t.Errorf("retry %d: %v, want %v", i+1, got, w)
+		}
+	}
+	// As upstream's backoff, an initial delay above the cap is used once.
+	s = repoUpdateRetries{100, 5 * time.Second, time.Second}
+	if a, b := s.backoff(6), s.backoff(7); a != 5*time.Second || b != time.Second {
+		t.Errorf("initial above the cap: %v, %v", a, b)
+	}
+}
+
+// withRepoUpdateRetries returns a repository in memory whose stored config
+// sets repo_update_retries to maxTries (with 1 ms backoffs), and a second
+// handle on it to update it concurrently.
+func withRepoUpdateRetries(t *testing.T, maxTries int) (r, rival *Repository) {
+	t.Helper()
+	ctx := context.Background()
+	st := storage.NewMemory(nil)
+	rival, err := Create(ctx, st, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	cfg, err := format.EncodeFlexBuffer(map[string]any{"repo_update_retries": map[string]any{"default": map[string]any{
+		"max_tries": uint64(maxTries), "initial_backoff_ms": uint64(1), "max_backoff_ms": uint64(1),
+	}}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := rival.updateRepo(ctx, func(doc *repoDoc, _ string, _ time.Time) error {
+		doc.config, doc.hasConfig = cfg, true
+		return nil
+	}); err != nil {
+		t.Fatal(err)
+	}
+	if r, err = Open(ctx, st, nil); err != nil {
+		t.Fatal(err)
+	}
+	return r, rival
+}
+
+// updateWithConflicts updates r's repo info file, with rival updating it
+// under r during each of r's first conflicts attempts. It returns how many
+// attempts r made.
+func updateWithConflicts(r, rival *Repository, conflicts int) (int, error) {
+	ctx := context.Background()
+	attempts := 0
+	err := r.updateRepo(ctx, func(*repoDoc, string, time.Time) error {
+		attempts++
+		if attempts <= conflicts {
+			return rival.updateRepo(ctx, func(*repoDoc, string, time.Time) error { return nil })
+		}
+		return nil
+	})
+	return attempts, err
+}
+
+// As upstream's update_repo_info (since #2475): at most max_tries
+// attempts, the last of which can still succeed.
+func TestUpdateRepoMakesAtMostMaxTries(t *testing.T) {
+	for _, maxTries := range []int{1, 2, 6, 8} { // 8 goes past the immediate retries
+		r, rival := withRepoUpdateRetries(t, maxTries)
+		if attempts, err := updateWithConflicts(r, rival, math.MaxInt); attempts != maxTries || !errors.Is(err, ErrTooManyRetries) {
+			t.Errorf("max_tries %d, every attempt conflicting: %d attempts, %v", maxTries, attempts, err)
+		}
+	}
+	for _, maxTries := range []int{1, 2, 8} {
+		r, rival := withRepoUpdateRetries(t, maxTries)
+		if attempts, err := updateWithConflicts(r, rival, maxTries-1); attempts != maxTries || err != nil {
+			t.Errorf("max_tries %d, conflicting until the last: %d attempts, %v", maxTries, attempts, err)
+		}
 	}
 }
 
