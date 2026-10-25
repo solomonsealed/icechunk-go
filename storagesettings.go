@@ -73,14 +73,18 @@ func resolveWriteSettings(config any, override StorageSettings) writeSettings {
 
 // writeSettings returns the settings in effect for the repository's writes.
 func (r *Repository) writeSettings() writeSettings {
+	return resolveWriteSettings(r.storedConfig(), r.opts.StorageSettings)
+}
+
+// storedConfig returns the configuration of the last repo info file read
+// (RepoInfo.Config), without fetching it.
+func (r *Repository) storedConfig() any {
 	r.mu.Lock()
-	info := r.info
-	r.mu.Unlock()
-	var config any
-	if info != nil {
-		config = info.Config
+	defer r.mu.Unlock()
+	if r.info == nil {
+		return nil
 	}
-	return resolveWriteSettings(config, r.opts.StorageSettings)
+	return r.info.Config
 }
 
 // The file types of upstream's icfiletype object metadata.

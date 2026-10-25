@@ -66,9 +66,79 @@ var InitialSnapshotID = SnapshotID{0x0b, 0x1c, 0xc8, 0xd6, 0x78, 0x75, 0x80, 0xf
 const (
 	featureCreateTag  = 4
 	featureDeleteTag  = 5
-	maxRepoAttempts   = 10
 	defaultMaxRebases = 100
 )
+
+// Upstream's defaults for retrying repo info updates (RepoUpdateRetryConfig),
+// which apply to the fields the repository's config leaves unset.
+const (
+	defaultRepoUpdateMaxTries       = 100
+	defaultRepoUpdateInitialBackoff = 50 * time.Millisecond
+	defaultRepoUpdateMaxBackoff     = 30 * time.Second
+	// immediateRepoRetries is how many retries upstream makes without delay
+	// before it backs off exponentially.
+	immediateRepoRetries = 5
+)
+
+// repoUpdateRetries bound the attempts at updating the repo info file.
+type repoUpdateRetries struct {
+	maxTries                   int
+	initialBackoff, maxBackoff time.Duration
+}
+
+// resolveRepoUpdateRetries reads the repo_update_retries entry of a
+// repository's stored configuration, taking each unset field from
+// upstream's defaults, as upstream's RepoUpdateRetryConfig::retries does.
+func resolveRepoUpdateRetries(config any) repoUpdateRetries {
+	s := repoUpdateRetries{defaultRepoUpdateMaxTries, defaultRepoUpdateInitialBackoff, defaultRepoUpdateMaxBackoff}
+	cfg, _ := config.(map[string]any)
+	retries, _ := cfg["repo_update_retries"].(map[string]any)
+	d, _ := retries["default"].(map[string]any)
+	if n, ok := configUint(d["max_tries"]); ok && n > 0 {
+		s.maxTries = int(n)
+	}
+	if ms, ok := configUint(d["initial_backoff_ms"]); ok {
+		s.initialBackoff = time.Duration(ms) * time.Millisecond
+	}
+	if ms, ok := configUint(d["max_backoff_ms"]); ok {
+		s.maxBackoff = time.Duration(ms) * time.Millisecond
+	}
+	return s
+}
+
+// configUint returns an unsigned integer of a decoded configuration.
+func configUint(v any) (uint64, bool) {
+	switch x := v.(type) {
+	case uint64:
+		return x, true
+	case int64:
+		return uint64(x), x >= 0
+	}
+	return 0, false
+}
+
+// backoff returns the delay before retry n (from 1), without jitter:
+// none for the first immediateRepoRetries, then initialBackoff, doubling up
+// to maxBackoff, as upstream's backoff schedule.
+func (s repoUpdateRetries) backoff(n int) time.Duration {
+	if n <= immediateRepoRetries {
+		return 0
+	}
+	d := s.initialBackoff
+	for i := immediateRepoRetries + 1; i < n; i++ {
+		if d < s.maxBackoff {
+			d *= 2
+		}
+		d = min(d, s.maxBackoff)
+	}
+	return d
+}
+
+// repoUpdateRetries returns the repository's settings for retrying repo
+// info updates.
+func (r *Repository) repoUpdateRetries() repoUpdateRetries {
+	return resolveRepoUpdateRetries(r.storedConfig())
+}
 
 func (r *Repository) writer() (storage.Writer, error) {
 	if r.spec < 2 {
@@ -144,19 +214,20 @@ func backupName(now time.Time) string {
 
 // updateRepo applies mutate to the latest repo info file and writes the
 // result with a conditional put, retrying when another writer got there
-// first. As upstream requires, the replaced file is first copied to
-// overwritten/.
+// first, up to the repository's repo_update_retries (as upstream: at most
+// max_tries attempts). As upstream requires, the replaced file is first
+// copied to overwritten/.
 func (r *Repository) updateRepo(ctx context.Context, mutate func(doc *repoDoc, backup string, now time.Time) error) error {
 	w, err := r.writer()
 	if err != nil {
 		return err
 	}
 	ctx = r.req(ctx)
-	for attempt := 0; attempt < maxRepoAttempts; attempt++ {
-		if attempt >= 5 {
-			// Immediate retries first, then exponential backoff with jitter.
-			d := time.Duration(100<<min(attempt-5, 6)) * time.Millisecond
-			d += time.Duration(rand.Int64N(int64(d)))
+	retries := r.repoUpdateRetries()
+	for attempt := 1; attempt <= retries.maxTries; attempt++ {
+		// Immediate retries first, then exponential backoff with jitter.
+		if d := retries.backoff(attempt - 1); attempt > 1 && d > 0 {
+			d += time.Duration(rand.Float64() * float64(d))
 			select {
 			case <-time.After(d):
 			case <-ctx.Done():
@@ -219,7 +290,7 @@ func (r *Repository) updateRepo(ctx context.Context, mutate func(doc *repoDoc, b
 		}
 		return nil
 	}
-	return ErrTooManyRetries
+	return fmt.Errorf("%w (%d attempts)", ErrTooManyRetries, retries.maxTries)
 }
 
 // ---------------------------------------------------------------------------

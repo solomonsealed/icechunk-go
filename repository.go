@@ -35,9 +35,13 @@ type Options struct {
 	// "vcc://name/") to the Storage that serves them. A virtual chunk whose
 	// location starts with a prefix is read from that storage at the rest of
 	// the location, percent-decoded and without any ?query or #fragment; the
-	// longest matching prefix wins. Locations matching no prefix fail with
-	// ErrNoVirtualContainer, and locations with "." or ".." path segments are
-	// rejected, so only explicitly configured locations are ever accessed.
+	// longest matching prefix wins. As upstream's, prefixes match whole path
+	// segments: one not ending in "/" is matched as if it did, so
+	// "s3://bucket/data" does not match "s3://bucket/data2/x" (and a prefix
+	// given both ways is served by the storage of the one ending in "/").
+	// Locations matching no prefix fail with ErrNoVirtualContainer, and
+	// locations with "." or ".." path segments are rejected, so only
+	// explicitly configured locations are ever accessed.
 	VirtualChunkContainers map[string]storage.Storage
 
 	// CacheBytes bounds the memory used to cache decoded snapshots and
@@ -109,12 +113,7 @@ func Open(ctx context.Context, st storage.Storage, opts *Options) (*Repository, 
 		budget = 0
 	}
 	r.cache = cache.New[cacheKey](budget)
-	for prefix, s := range r.opts.VirtualChunkContainers {
-		r.containers = append(r.containers, virtualContainer{prefix: prefix, store: s})
-	}
-	sort.Slice(r.containers, func(i, j int) bool {
-		return len(r.containers[i].prefix) > len(r.containers[j].prefix)
-	})
+	r.containers = virtualContainers(r.opts.VirtualChunkContainers)
 
 	info, err := r.fetchRepoInfo(ctx)
 	switch {
@@ -642,6 +641,25 @@ func checkLen(data []byte, want int64, what string) ([]byte, error) {
 		return nil, fmt.Errorf("icechunk: %s: expected %d bytes, got %d", what, want, len(data))
 	}
 	return data, nil
+}
+
+// virtualContainers returns the containers of Options.VirtualChunkContainers,
+// longest prefix first. As upstream does with container prefixes and
+// credential keys, a prefix not ending in "/" gets one, so that it matches
+// whole path segments only.
+func virtualContainers(m map[string]storage.Storage) []virtualContainer {
+	var cs []virtualContainer
+	for prefix, s := range m {
+		if !strings.HasSuffix(prefix, "/") {
+			if _, ok := m[prefix+"/"]; ok {
+				continue
+			}
+			prefix += "/"
+		}
+		cs = append(cs, virtualContainer{prefix: prefix, store: s})
+	}
+	sort.Slice(cs, func(i, j int) bool { return len(cs[i].prefix) > len(cs[j].prefix) })
+	return cs
 }
 
 // resolveVirtual maps a virtual chunk location to its container and the

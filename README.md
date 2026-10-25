@@ -64,7 +64,10 @@ spec v1) stays with the official library; see
 - Commits follow upstream's protocol: chunks, manifests, transaction log and
   snapshot are written first, then the repo info file is replaced with a
   conditional write (after backing it up to `overwritten/`), retrying when
-  another writer got there first. With `CommitOptions{Rebase: true}` a
+  another writer got there first, as many times as the repository's
+  `repo_update_retries` config allows (upstream's defaults: 100 tries, the
+  first 5 retries immediate, then backing off from 50 ms up to 30 s). With
+  `CommitOptions{Rebase: true}` a
   commit whose branch moved is re-applied on the new tip unless the
   intervening transaction logs touched the same nodes or chunks. Like
   upstream, such commits record the rebases they took in their metadata
@@ -208,8 +211,9 @@ icechunk-go tag    ./repo v1 main
   coordinates.
 - Of the repository's storage settings, only the storage classes and
   `unsafe_use_metadata` apply. Writes are always conditional
-  (`unsafe_use_conditional_*` are ignored), never multipart, and
-  concurrency, retry and timeout settings are not used. R2 bindings cannot
+  (`unsafe_use_conditional_*` are ignored), never multipart, and their
+  concurrency, retry and timeout settings are not used (the repo info
+  update retries of `repo_update_retries` are). R2 bindings cannot
   copy objects, so repo info backups there are written anew, with the
   metadata of a repo info file.
 - Diffs between snapshots are not exposed.
