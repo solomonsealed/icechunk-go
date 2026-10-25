@@ -7,9 +7,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
 	"math"
 	"math/rand/v2"
 	"regexp"
+	"slices"
 	"sort"
 	"strings"
 	"time"
@@ -134,12 +136,6 @@ func (s repoUpdateRetries) backoff(n int) time.Duration {
 	return d
 }
 
-// repoUpdateRetries returns the repository's settings for retrying repo
-// info updates.
-func (r *Repository) repoUpdateRetries() repoUpdateRetries {
-	return resolveRepoUpdateRetries(r.storedConfig())
-}
-
 func (r *Repository) writer() (storage.Writer, error) {
 	if r.spec < 2 {
 		return nil, fmt.Errorf("icechunk: writing spec v%d repositories is not supported; upgrade with icechunk-python (icechunk.upgrade_icechunk_repository)", r.spec)
@@ -159,14 +155,8 @@ func (r *Repository) writer() (storage.Writer, error) {
 func encodeMetadata(md map[string]any) ([]rawMetadataItem, error) {
 	items := make([]rawMetadataItem, 0, len(md))
 	for k, v := range md {
-		raw, err := json.Marshal(v)
+		norm, err := normalizeJSON(k, v)
 		if err != nil {
-			return nil, fmt.Errorf("icechunk: metadata %q is not JSON-compatible: %w", k, err)
-		}
-		dec := json.NewDecoder(bytes.NewReader(raw))
-		dec.UseNumber()
-		var norm any
-		if err := dec.Decode(&norm); err != nil {
 			return nil, err
 		}
 		b, err := format.EncodeFlexBuffer(norm)
@@ -184,25 +174,34 @@ func encodeMetadata(md map[string]any) ([]rawMetadataItem, error) {
 // upstream's inject_icechunk_metadata does).
 func withIcechunkMetadata(md map[string]any, key string, v any) (map[string]any, error) {
 	out := make(map[string]any, len(md)+1)
-	for k, x := range md {
-		out[k] = x
-	}
+	maps.Copy(out, md)
 	ic := map[string]any{}
 	if prev, ok := md["__icechunk"]; ok {
-		raw, err := json.Marshal(prev)
+		norm, err := normalizeJSON("__icechunk", prev)
 		if err != nil {
-			return nil, fmt.Errorf("icechunk: metadata %q is not JSON-compatible: %w", "__icechunk", err)
+			return nil, err
 		}
-		dec := json.NewDecoder(bytes.NewReader(raw))
-		dec.UseNumber()
-		var obj map[string]any
-		if dec.Decode(&obj) == nil && obj != nil {
+		if obj, ok := norm.(map[string]any); ok {
 			ic = obj
 		}
 	}
 	ic[key] = v
 	out["__icechunk"] = ic
 	return out, nil
+}
+
+// normalizeJSON round-trips the metadata value v through JSON, keeping
+// numbers exact as json.Number.
+func normalizeJSON(name string, v any) (any, error) {
+	raw, err := json.Marshal(v)
+	if err != nil {
+		return nil, fmt.Errorf("icechunk: metadata %q is not JSON-compatible: %w", name, err)
+	}
+	dec := json.NewDecoder(bytes.NewReader(raw))
+	dec.UseNumber()
+	var norm any
+	err = dec.Decode(&norm)
+	return norm, err
 }
 
 // backupName names the copy of the repo info file kept in overwritten/:
@@ -223,7 +222,7 @@ func (r *Repository) updateRepo(ctx context.Context, mutate func(doc *repoDoc, b
 		return err
 	}
 	ctx = r.req(ctx)
-	retries := r.repoUpdateRetries()
+	retries := resolveRepoUpdateRetries(r.storedConfig())
 	for attempt := 1; attempt <= retries.maxTries; attempt++ {
 		// Immediate retries first, then exponential backoff with jitter.
 		if d := retries.backoff(attempt - 1); attempt > 1 && d > 0 {
@@ -546,35 +545,26 @@ func (s *Session) buildCommit(ctx context.Context, base *Snapshot, message strin
 		}
 	}
 	for id := range cs.chunks {
-		if !isNew[id] {
-			if _, ok := byID[id]; !ok {
-				return nil, conflict("an array with chunk changes no longer exists")
-			}
+		if _, ok := byID[id]; !ok && !isNew[id] {
+			return nil, conflict("an array with chunk changes no longer exists")
 		}
 	}
 
-	// Final node list.
+	// Final node list, copied because their manifests are rewritten below.
 	var nodes []*Node
 	for _, bn := range baseNodes {
-		n, err := cs.overlay(bn)
-		if errors.Is(err, ErrNodeNotFound) {
-			continue
+		if n, err := cs.overlay(bn); err == nil {
+			nodes = append(nodes, n)
 		}
-		c := *n
-		if n.Array != nil {
-			a := *n.Array
-			c.Array = &a
-		}
-		nodes = append(nodes, &c)
 	}
-	for _, n := range cs.newNodes {
+	nodes = slices.AppendSeq(nodes, maps.Values(cs.newNodes))
+	for i, n := range nodes {
 		c := *n
 		if n.Array != nil {
 			a := *n.Array
-			a.Manifests = nil
 			c.Array = &a
 		}
-		nodes = append(nodes, &c)
+		nodes[i] = &c
 	}
 	sort.Slice(nodes, func(i, j int) bool { return nodes[i].Path < nodes[j].Path })
 
@@ -614,30 +604,38 @@ func (s *Session) buildCommit(ctx context.Context, base *Snapshot, message strin
 	plan := &commitPlan{id: randomID12(), manifests: map[ManifestID][]byte{}, manifestPaths: map[ManifestID]string{}}
 	var files []ManifestFileInfo
 	seenFile := map[ManifestID]bool{}
+	// keep carries a base manifest over to the new snapshot as is.
+	keep := func(mr ManifestRef) error {
+		fi, ok := fileInfo[mr.ID]
+		if !ok {
+			return fmt.Errorf("%w: snapshot lacks info for manifest %s", ErrFormat, mr.ID)
+		}
+		if !seenFile[mr.ID] {
+			seenFile[mr.ID] = true
+			files = append(files, fi)
+		}
+		return nil
+	}
 	for _, n := range nodes {
 		if n.Type != ArrayNode {
 			continue
 		}
 		a := n.Array
 		edits := cs.chunks[n.ID]
-		changed := len(edits) > 0
-		for _, mr := range a.Manifests {
+		// shrunk reports a manifest holding refs outside a smaller new shape.
+		shrunk := func(mr ManifestRef) bool {
 			for d, r := range mr.Extents {
 				if d < len(a.Shape) && r.To > a.Shape[d].NumChunks {
-					changed = true // shrunk: drop refs outside the new shape
+					return true
 				}
 			}
+			return false
 		}
-		if !changed {
+		if len(edits) == 0 && !slices.ContainsFunc(a.Manifests, shrunk) {
 			// Arrays without chunk changes keep their manifests, as upstream.
 			for _, mr := range a.Manifests {
-				fi, ok := fileInfo[mr.ID]
-				if !ok {
-					return nil, fmt.Errorf("%w: snapshot lacks info for manifest %s", ErrFormat, mr.ID)
-				}
-				if !seenFile[mr.ID] {
-					seenFile[mr.ID] = true
-					files = append(files, fi)
+				if err := keep(mr); err != nil {
+					return nil, err
 				}
 			}
 			continue
@@ -647,18 +645,18 @@ func (s *Session) buildCommit(ctx context.Context, base *Snapshot, message strin
 		// a manifest that cannot be kept as is (it spans several splits, or
 		// reaches beyond a smaller new shape).
 		dirty := map[string]bool{}
+		bySplit := map[string][]chunkEntry{}
 		for _, e := range edits {
 			if a.validChunkCoord(e.coords) {
-				dirty[splits.of(e.coords)] = true
+				k := splits.of(e.coords)
+				dirty[k] = true
+				if e.ref != nil {
+					bySplit[k] = append(bySplit[k], e)
+				}
 			}
 		}
 		keepable := func(mr ManifestRef) bool {
-			for d, r := range mr.Extents {
-				if d < len(a.Shape) && r.To > a.Shape[d].NumChunks {
-					return false
-				}
-			}
-			return len(splits.overlapping(mr.Extents)) == 1
+			return !shrunk(mr) && len(splits.overlapping(mr.Extents)) == 1
 		}
 		for _, mr := range a.Manifests {
 			if !keepable(mr) {
@@ -668,16 +666,10 @@ func (s *Session) buildCommit(ctx context.Context, base *Snapshot, message strin
 			}
 		}
 		var refs []ManifestRef
-		bySplit := map[string][]chunkEntry{}
 		for _, mr := range a.Manifests {
 			if keepable(mr) && !dirty[splits.overlapping(mr.Extents)[0]] {
-				fi, ok := fileInfo[mr.ID]
-				if !ok {
-					return nil, fmt.Errorf("%w: snapshot lacks info for manifest %s", ErrFormat, mr.ID)
-				}
-				if !seenFile[mr.ID] {
-					seenFile[mr.ID] = true
-					files = append(files, fi)
+				if err := keep(mr); err != nil {
+					return nil, err
 				}
 				refs = append(refs, mr)
 				continue
@@ -687,11 +679,12 @@ func (s *Session) buildCommit(ctx context.Context, base *Snapshot, message strin
 				return nil, err
 			}
 			err = m.forEach(n.ID, func(coords []uint32, ref *ChunkRef) error {
-				if mr.contains(coords) && a.validChunkCoord(coords) {
-					if _, edited := edits[coordsKey(coords)]; !edited {
-						k := splits.of(coords)
-						bySplit[k] = append(bySplit[k], chunkEntry{coords: coords, ref: ref})
-					}
+				if !mr.contains(coords) || !a.validChunkCoord(coords) {
+					return nil
+				}
+				if _, edited := edits[coordsKey(coords)]; !edited {
+					k := splits.of(coords)
+					bySplit[k] = append(bySplit[k], chunkEntry{coords: coords, ref: ref})
 				}
 				return nil
 			})
@@ -699,15 +692,9 @@ func (s *Session) buildCommit(ctx context.Context, base *Snapshot, message strin
 				return nil, err
 			}
 		}
-		for _, e := range edits {
-			if e.ref != nil && a.validChunkCoord(e.coords) {
-				k := splits.of(e.coords)
-				bySplit[k] = append(bySplit[k], e)
-			}
-		}
 		// One manifest per split holding chunks, as upstream writes them;
 		// its extents are the bounding box of those chunks.
-		for _, k := range sortedSplitKeys(bySplit) {
+		for _, k := range slices.Sorted(maps.Keys(bySplit)) {
 			entries := bySplit[k]
 			sort.Slice(entries, func(i, j int) bool { return compareCoords(entries[i].coords, entries[j].coords) < 0 })
 			mid := randomID12()
@@ -745,7 +732,12 @@ func (s *Session) buildCommit(ctx context.Context, base *Snapshot, message strin
 		return nil, fmt.Errorf("icechunk: new snapshot does not decode: %w", err)
 	}
 
-	tx := &txLog{id: plan.id, updatedChunks: map[NodeID][][]uint32{}}
+	tx := &txLog{
+		id:            plan.id,
+		updatedGroups: slices.Collect(maps.Keys(cs.updatedGroups)),
+		updatedArrays: slices.Collect(maps.Keys(cs.updatedArrays)),
+		updatedChunks: map[NodeID][][]uint32{},
+	}
 	for _, n := range cs.newNodes {
 		if n.Type == GroupNode {
 			tx.newGroups = append(tx.newGroups, n.ID)
@@ -759,12 +751,6 @@ func (s *Session) buildCommit(ctx context.Context, base *Snapshot, message strin
 		} else {
 			tx.deletedArrays = append(tx.deletedArrays, id)
 		}
-	}
-	for id := range cs.updatedGroups {
-		tx.updatedGroups = append(tx.updatedGroups, id)
-	}
-	for id := range cs.updatedArrays {
-		tx.updatedArrays = append(tx.updatedArrays, id)
 	}
 	for id, edits := range cs.chunks {
 		for _, e := range edits {
@@ -826,12 +812,11 @@ func (ms manifestSplits) overlapping(extents []ChunkRange) []string {
 		}
 		var next []string
 		for _, k := range keys {
+			if d > 0 {
+				k += ","
+			}
 			for i := ms.index(d, lo); i <= ms.index(d, hi-1); i++ {
-				if d > 0 {
-					next = append(next, k+","+fmt.Sprint(i))
-				} else {
-					next = append(next, fmt.Sprint(i))
-				}
+				next = append(next, k+fmt.Sprint(i))
 			}
 		}
 		keys = next
@@ -839,26 +824,11 @@ func (ms manifestSplits) overlapping(extents []ChunkRange) []string {
 	return keys
 }
 
-func sortedSplitKeys(m map[string][]chunkEntry) []string {
-	keys := make([]string, 0, len(m))
-	for k := range m {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-	return keys
-}
-
 // compareExtents orders manifest refs by their extents.
 func compareExtents(a, b []ChunkRange) int {
-	for i := 0; i < min(len(a), len(b)); i++ {
-		if a[i].From != b[i].From {
-			return cmp.Compare(a[i].From, b[i].From)
-		}
-		if a[i].To != b[i].To {
-			return cmp.Compare(a[i].To, b[i].To)
-		}
-	}
-	return cmp.Compare(len(a), len(b))
+	return slices.CompareFunc(a, b, func(x, y ChunkRange) int {
+		return cmp.Or(cmp.Compare(x.From, y.From), cmp.Compare(x.To, y.To))
+	})
 }
 
 // splitSizes returns, per dimension, how many chunks each manifest of the
@@ -1153,10 +1123,8 @@ func (r *Repository) CreateTag(ctx context.Context, name string, id SnapshotID) 
 		if _, exists := doc.tags[name]; exists {
 			return docUpdate{}, fmt.Errorf("%w: tag %s", ErrAlreadyExists, name)
 		}
-		for _, d := range doc.deletedTags {
-			if d == name {
-				return docUpdate{}, fmt.Errorf("%w: tag %s was deleted and its name cannot be reused", ErrAlreadyExists, name)
-			}
+		if slices.Contains(doc.deletedTags, name) {
+			return docUpdate{}, fmt.Errorf("%w: tag %s was deleted and its name cannot be reused", ErrAlreadyExists, name)
 		}
 		if err := checkSnapshot(doc, id); err != nil {
 			return docUpdate{}, err
