@@ -154,8 +154,8 @@ func (r *Repository) writer() (storage.Writer, error) {
 // FlexBuffer blob) would make the repository unusable for it.
 func encodeMetadata(md map[string]any) ([]rawMetadataItem, error) {
 	items := make([]rawMetadataItem, 0, len(md))
-	for k, v := range md {
-		norm, err := normalizeJSON(k, v)
+	for _, k := range slices.Sorted(maps.Keys(md)) {
+		norm, err := normalizeJSON(k, md[k])
 		if err != nil {
 			return nil, err
 		}
@@ -165,7 +165,6 @@ func encodeMetadata(md map[string]any) ([]rawMetadataItem, error) {
 		}
 		items = append(items, rawMetadataItem{name: k, value: b})
 	}
-	sort.Slice(items, func(i, j int) bool { return items[i].name < items[j].name })
 	return items, nil
 }
 
@@ -550,7 +549,7 @@ func (s *Session) buildCommit(ctx context.Context, base *Snapshot, message strin
 		}
 	}
 
-	// Final node list, copied because their manifests are rewritten below.
+	// Final node list.
 	var nodes []*Node
 	for _, bn := range baseNodes {
 		if n, err := cs.overlay(bn); err == nil {
@@ -558,14 +557,6 @@ func (s *Session) buildCommit(ctx context.Context, base *Snapshot, message strin
 		}
 	}
 	nodes = slices.AppendSeq(nodes, maps.Values(cs.newNodes))
-	for i, n := range nodes {
-		c := *n
-		if n.Array != nil {
-			a := *n.Array
-			c.Array = &a
-		}
-		nodes[i] = &c
-	}
 	sort.Slice(nodes, func(i, j int) bool { return nodes[i].Path < nodes[j].Path })
 
 	// New nodes need valid parents: no ancestor may be an array, and a parent
@@ -616,7 +607,7 @@ func (s *Session) buildCommit(ctx context.Context, base *Snapshot, message strin
 		}
 		return nil
 	}
-	for _, n := range nodes {
+	for i, n := range nodes {
 		if n.Type != ArrayNode {
 			continue
 		}
@@ -640,7 +631,7 @@ func (s *Session) buildCommit(ctx context.Context, base *Snapshot, message strin
 			}
 			continue
 		}
-		splits := newManifestSplits(a, s.repo.splitSizes(n))
+		splits := manifestSplits{size: s.repo.splitSizes(n), shape: a.Shape}
 		// Splits to write anew: those with chunk edits, and those overlapping
 		// a manifest that cannot be kept as is (it spans several splits, or
 		// reaches beyond a smaller new shape).
@@ -655,19 +646,17 @@ func (s *Session) buildCommit(ctx context.Context, base *Snapshot, message strin
 				}
 			}
 		}
-		keepable := func(mr ManifestRef) bool {
-			return !shrunk(mr) && len(splits.overlapping(mr.Extents)) == 1
-		}
 		for _, mr := range a.Manifests {
-			if !keepable(mr) {
-				for _, k := range splits.overlapping(mr.Extents) {
+			if ks := splits.overlapping(mr.Extents); len(ks) != 1 || shrunk(mr) {
+				for _, k := range ks {
 					dirty[k] = true
 				}
 			}
 		}
+		// What is left to keep: manifests within one split that stays clean.
 		var refs []ManifestRef
 		for _, mr := range a.Manifests {
-			if keepable(mr) && !dirty[splits.overlapping(mr.Extents)[0]] {
+			if ks := splits.overlapping(mr.Extents); len(ks) == 1 && !dirty[ks[0]] {
 				if err := keep(mr); err != nil {
 					return nil, err
 				}
@@ -708,7 +697,11 @@ func (s *Session) buildCommit(ctx context.Context, base *Snapshot, message strin
 			refs = append(refs, ManifestRef{ID: mid, Extents: boundingBox(entries)})
 		}
 		sort.Slice(refs, func(i, j int) bool { return compareExtents(refs[i].Extents, refs[j].Extents) < 0 })
-		a.Manifests = refs
+		// A copy: n belongs to the base snapshot or to the session.
+		c, ca := *n, *a
+		ca.Manifests = refs
+		c.Array = &ca
+		nodes[i] = &c
 	}
 
 	// Snapshot timestamps must increase along the history.
@@ -770,20 +763,12 @@ func (s *Session) buildCommit(ctx context.Context, base *Snapshot, message strin
 // writes separate manifests for: along each dimension, runs of size[d]
 // chunks (0: the dimension is not split).
 type manifestSplits struct {
-	size []uint32
-	grid []uint32
-}
-
-func newManifestSplits(a *ArrayInfo, size []uint32) manifestSplits {
-	grid := make([]uint32, len(a.Shape))
-	for d, s := range a.Shape {
-		grid[d] = s.NumChunks
-	}
-	return manifestSplits{size: size, grid: grid}
+	size  []uint32
+	shape []DimensionShape
 }
 
 func (ms manifestSplits) index(d int, c uint32) uint32 {
-	if d >= len(ms.size) || ms.size[d] == 0 {
+	if ms.size[d] == 0 {
 		return 0
 	}
 	return c / ms.size[d]
@@ -802,8 +787,8 @@ func (ms manifestSplits) of(coords []uint32) string {
 // (empty extents cover the whole grid).
 func (ms manifestSplits) overlapping(extents []ChunkRange) []string {
 	keys := []string{""}
-	for d := range ms.grid {
-		lo, hi := uint32(0), ms.grid[d]
+	for d, s := range ms.shape {
+		lo, hi := uint32(0), s.NumChunks
 		if d < len(extents) {
 			lo, hi = extents[d].From, extents[d].To
 		}
@@ -838,13 +823,7 @@ func compareExtents(a, b []ChunkRange) int {
 // dimension; regular expressions match anywhere in the path or name.
 func (r *Repository) splitSizes(n *Node) []uint32 {
 	sizes := make([]uint32, len(n.Array.Shape))
-	r.mu.Lock()
-	info := r.info
-	r.mu.Unlock()
-	if info == nil {
-		return sizes
-	}
-	cfg, _ := info.Config.(map[string]any)
+	cfg, _ := r.storedConfig().(map[string]any)
 	manifest, _ := cfg["manifest"].(map[string]any)
 	splitting, _ := manifest["splitting"].(map[string]any)
 	rules, _ := splitting["split_sizes"].([]any)
@@ -994,15 +973,12 @@ func (s *Session) checkRebase(ctx context.Context, base, tip SnapshotID) error {
 		between = append(between, doc.snapshots[i].pruned...)
 		id = *doc.snapshots[i].parent
 	}
-	touched := map[NodeID]bool{}
-	for id := range s.cs.deleted {
-		touched[id] = true
-	}
-	for id := range s.cs.updatedGroups {
-		touched[id] = true
-	}
-	for id := range s.cs.updatedArrays {
-		touched[id] = true
+	// touched reports whether this session deleted node n or updated its metadata.
+	touched := func(n NodeID) bool {
+		_, deleted := s.cs.deleted[n]
+		_, group := s.cs.updatedGroups[n]
+		_, array := s.cs.updatedArrays[n]
+		return deleted || group || array
 	}
 	for _, id := range between {
 		raw, err := s.repo.storage.Get(s.repo.req(ctx), "transactions/"+id.String(), nil)
@@ -1018,7 +994,7 @@ func (s *Session) checkRebase(ctx context.Context, base, tip SnapshotID) error {
 		}
 		for _, list := range [][]NodeID{tx.updatedGroups, tx.updatedArrays, tx.deletedGroups, tx.deletedArrays} {
 			for _, n := range list {
-				if touched[n] {
+				if touched(n) {
 					return conflict(fmt.Sprintf("commit %s changed or deleted a node this session changed", id))
 				}
 				if _, ok := s.cs.chunks[n]; ok {
@@ -1027,7 +1003,7 @@ func (s *Session) checkRebase(ctx context.Context, base, tip SnapshotID) error {
 			}
 		}
 		for n, coords := range tx.updatedChunks {
-			if touched[n] {
+			if touched(n) {
 				return conflict(fmt.Sprintf("commit %s wrote chunks of a node this session changed", id))
 			}
 			ours := s.cs.chunks[n]
