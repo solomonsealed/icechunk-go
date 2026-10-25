@@ -230,6 +230,13 @@ func TestVirtualContainerPrefixesMatchSegments(t *testing.T) {
 			t.Errorf("resolveVirtual(%q) = %q, %v; want ErrNoVirtualContainer", loc, key, err)
 		}
 	}
+	// An empty prefix becomes "/", which no URL starts with.
+	empty := &Repository{containers: virtualContainers(map[string]storage.Storage{"": storage.NewMemory(nil)})}
+	for _, loc := range []string{"s3://bucket/a.nc", "file:///data/a.nc", "https://host/a.nc"} {
+		if _, key, err := empty.resolveVirtual(loc); !errors.Is(err, ErrNoVirtualContainer) {
+			t.Errorf("empty prefix: resolveVirtual(%q) = %q, %v; want ErrNoVirtualContainer", loc, key, err)
+		}
+	}
 }
 
 // Repo update retries come from the stored config's repo_update_retries,
