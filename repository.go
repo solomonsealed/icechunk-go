@@ -42,6 +42,13 @@ type Options struct {
 	// Locations matching no prefix fail with ErrNoVirtualContainer, and
 	// locations with "." or ".." path segments are rejected, so only
 	// explicitly configured locations are ever accessed.
+	//
+	// These prefixes alone decide what is read, since each comes with its
+	// Storage. That differs from upstream, which picks the longest url_prefix
+	// among the repository's configured containers and then needs exactly
+	// that url_prefix authorized: a prefix here also serves locations upstream
+	// refuses, such as those under a parent of a configured container's
+	// url_prefix, or matching no configured container.
 	VirtualChunkContainers map[string]storage.Storage
 
 	// CacheBytes bounds the memory used to cache decoded snapshots and

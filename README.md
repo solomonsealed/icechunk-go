@@ -205,6 +205,11 @@ icechunk-go tag    ./repo v1 main
   commits, move nodes, change configuration, or run garbage collection and
   expiration. Virtual references are not checked against the
   repository's configured virtual chunk containers.
+- Reads do not consult those containers either:
+  `Options.VirtualChunkContainers` alone decides what is read. A prefix there
+  also serves locations upstream refuses, such as those under a parent of a
+  configured container's `url_prefix` (upstream requires authorizing exactly
+  that `url_prefix`).
 - Rebase conflict detection is coarse: any commit that touched the same
   chunk, or changed or deleted the same node, conflicts.
 - As upstream's store addresses only the `default` chunk key encoding with
@@ -219,6 +224,13 @@ icechunk-go tag    ./repo v1 main
   update retries of `repo_update_retries` are). R2 bindings cannot
   copy objects, so repo info backups there are written anew, with the
   metadata of a repo info file.
+- Concurrent writers on local files must all be icechunk-go, on one machine.
+  Conditional writes are serialized with a lock file (`.icechunk-go.lock`,
+  using `flock` on Unix) that icechunk-python does not take, and upstream
+  warns that its own local storage is not safe for concurrent commits. As
+  with upstream's, network filesystems such as NFS are not supported for
+  concurrent writers (nor tested here). Use object storage for anything
+  shared. Taking turns on one directory works and is tested.
 - Diffs between snapshots are not exposed.
 - GCS and Azure are reachable only through S3-compatible (HMAC) or plain
   HTTP access, not their native auth.
