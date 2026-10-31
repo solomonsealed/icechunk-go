@@ -239,7 +239,7 @@ open an issue, which is worth doing for anything long-lived.
   test.
 - `testdata/upstream`: upstream's own on-disk compatibility fixtures. The tests
   assert the same facts as upstream's `test_can_read_old.py`.
-- `testdata/generated`: repositories written by icechunk-python 2.3.0 (with
+- `testdata/generated`: repositories written by icechunk-python 2.3.1 (with
   zarr-python 3.4.1; `testdata/requirements.txt` pins the environment) via
   `testdata/generate.py` (every data type and codec above, sharding,
   rectilinear grids, 2000 dictionary-compressed virtual chunks, checksums,
