@@ -9,7 +9,7 @@ import (
 
 // CompatibleVersion is the upstream Icechunk release this module is aligned
 // with.
-const CompatibleVersion = "2.3.0"
+const CompatibleVersion = "2.3.1"
 
 // ImplementationName is the client name written into the header of every
 // file this module produces, and stamped on objects as their icclient

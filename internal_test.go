@@ -240,7 +240,7 @@ func TestVirtualContainerPrefixesMatchSegments(t *testing.T) {
 }
 
 // Repo update retries come from the stored config's repo_update_retries,
-// as icechunk-python 2.3.0 persists it, with each unset field taken from
+// as icechunk-python 2.3.1 persists it, with each unset field taken from
 // upstream's repo update defaults; the storage retry settings do not apply.
 func TestResolveRepoUpdateRetries(t *testing.T) {
 	defaults := repoUpdateRetries{100, 50 * time.Millisecond, 30 * time.Second}

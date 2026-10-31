@@ -46,7 +46,7 @@ spec v1) stays with the official library; see
 - **Request attribution**, as in icechunk 2.3: every request names itself in
   its `User-Agent` header, with the array path and chunk coordinates it is
   for and the optional `Options.Attribution` labels (client, workload,
-  principal), e.g. `weatherlib/0.9 icechunk/2.3.0 (workload=nightly;
+  principal), e.g. `weatherlib/0.9 icechunk/2.3.1 (workload=nightly;
   array=g/temperature; chunk=0/1/2)`. The product token is upstream's, at
   the release this module is aligned with (`icechunk.CompatibleVersion`).
 - **An HTTP service** (`serve`): JSON API plus a read-only Zarr store, so
@@ -98,7 +98,7 @@ spec v1) stays with the official library; see
   metadata upstream stamps: `icspecver`, `icclient`, `icfiletype` and
   `iccompalg` on snapshots, manifests, transaction logs and the repo info
   file. Like file headers, `icclient` names upstream's client at the
-  release this module is aligned with (`ic-2.3.0`). A conditional write of the repo info file carries a write id
+  release this module is aligned with (`ic-2.3.1`). A conditional write of the repo info file carries a write id
   (`icechunkwriteid`): when it fails with a failed condition or a lost
   response, the store reads the object back, and the write succeeded if
   the object holds that id. Repo info backups are server-side copies where

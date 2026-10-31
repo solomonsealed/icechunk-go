@@ -44,7 +44,7 @@ func TestResolveWriteSettings(t *testing.T) {
 		t.Errorf("chunk without a class: %+v", o)
 	}
 	if o := w.file(fileTypeManifest); o.StorageClass != "M" || o.Metadata["icfiletype"] != "manifest" || o.Metadata["icspecver"] != "2" ||
-		o.Metadata["icclient"] != "ic-2.3.0" || o.Metadata["iccompalg"] != "zstd" || len(o.Metadata) != 4 {
+		o.Metadata["icclient"] != "ic-2.3.1" || o.Metadata["iccompalg"] != "zstd" || len(o.Metadata) != 4 {
 		t.Errorf("file: %+v", o)
 	}
 	uuid := regexp.MustCompile(`^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$`)
