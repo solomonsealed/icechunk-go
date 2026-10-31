@@ -60,7 +60,10 @@ spec v1) stays with the official library; see
   virtual references and deletions, then `Commit` with metadata. Reads in a
   writable session see its uncommitted changes. A `zarr.json` is accepted
   or refused (`ErrInvalidMetadata`) as upstream's store does, and its chunk
-  grid counted the same way.
+  grid counted the same way. As upstream, a repository whose status is not
+  online refuses `WritableSession` before anything is written, and the
+  commits of sessions opened earlier, with `ErrRepositoryNotOnline` giving
+  the status's reason.
 - Commits follow upstream's protocol: chunks, manifests, transaction log and
   snapshot are written first, then the repo info file is replaced with a
   conditional write (after backing it up to `overwritten/`), retrying when
@@ -273,11 +276,11 @@ open an issue, which is worth doing for anything long-lived.
   lists scenarios (arrays of every writable type and codec, partial and
   fill-value writes, zarr.json rewrites, deletions, virtual refs, refs and
   their refusals, concurrent sessions with and without rebase, a
-  non-default repository config, tricky node names, single-change
-  commits for the HTTP write endpoints, and `zarr.json` documents older
-  zarr-python releases stored: the repairs zarr-python 3.4.1 stores before
-  writing, the chunk grids upstream refuses and the chunk key encodings it
-  cannot address). `TestWriterScenarios` runs each
+  non-default repository config, a read-only repository, tricky node names,
+  single-change commits for the HTTP write endpoints, and `zarr.json`
+  documents older zarr-python releases stored: the repairs zarr-python 3.4.1
+  stores before writing, the chunk grids upstream refuses and the chunk key
+  encodings it cannot address). `TestWriterScenarios` runs each
   with the Go writer and compares every step's outcome and a canonical
   description of the result (values, chunk bytes for deterministic codecs,
   inline/native placement, keys, manifest extents, history, refs, ops log)

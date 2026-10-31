@@ -352,6 +352,57 @@ func TestUpdateRepoMakesAtMostMaxTries(t *testing.T) {
 	}
 }
 
+// As upstream: a repository that is not online refuses writable sessions on
+// any branch before anything is written, and the commits of sessions opened
+// earlier. Both errors give the status's reason, if it has one.
+func TestNotOnlineRefusals(t *testing.T) {
+	ctx := context.Background()
+	for _, c := range []struct {
+		reason *string
+		want   string
+	}{
+		{strPtr([]byte("frozen for tests")), "icechunk: repository is not online (status read-only): frozen for tests"},
+		{nil, "icechunk: repository is not online (status read-only)"},
+	} {
+		st := storage.NewMemory(nil)
+		r, err := Create(ctx, st, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		earlier, err := r.WritableSession(ctx, "main")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := earlier.CreateGroup(ctx, "/", nil); err != nil {
+			t.Fatal(err)
+		}
+		if err := r.updateRepo(ctx, func(doc *repoDoc, _ string, _ time.Time) error {
+			doc.status.availability, doc.status.reason = fbs.RepoAvailabilityReadOnly, c.reason
+			return nil
+		}); err != nil {
+			t.Fatal(err)
+		}
+		before, err := st.List(ctx, "")
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, branch := range []string{"main", "missing"} {
+			if _, err := r.WritableSession(ctx, branch); !errors.Is(err, ErrRepositoryNotOnline) || err.Error() != c.want {
+				t.Errorf("session on %s: %v, want %s", branch, err, c.want)
+			}
+		}
+		if after, err := st.List(ctx, ""); err != nil || !slices.Equal(before, after) {
+			t.Errorf("refused sessions changed the files from %v to %v (%v)", before, after, err)
+		}
+		if _, err := earlier.Commit(ctx, "refused", nil); !errors.Is(err, ErrRepositoryNotOnline) || err.Error() != c.want {
+			t.Errorf("commit of a session opened earlier: %v, want %s", err, c.want)
+		}
+		if tip, err := r.LookupBranch(ctx, "main"); err != nil || tip != InitialSnapshotID {
+			t.Errorf("after the refused commit, main is at %v (%v)", tip, err)
+		}
+	}
+}
+
 // PrunedLogsFor exposes a snapshot's pruned ancestor tx logs to tests.
 func PrunedLogsFor(t *testing.T, dir string, id SnapshotID) []string {
 	raw, err := os.ReadFile(filepath.Join(dir, "repo"))

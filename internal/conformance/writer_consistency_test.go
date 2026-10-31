@@ -60,7 +60,10 @@ type scenario struct {
 	// Config, when set, is the repository config icechunk-python creates
 	// the repository with (the Go writer cannot set config); the empty
 	// repository is kept in testdata/writer/initial/<name>.
-	Config map[string]any    `json:"config"`
+	Config map[string]any `json:"config"`
+	// Status, when set, is the repository status icechunk-python gives the
+	// repository (the Go writer cannot set status), kept the same way.
+	Status map[string]any    `json:"status"`
 	Steps  []json.RawMessage `json:"steps"`
 }
 
@@ -192,6 +195,8 @@ func category(err error) string {
 	case errors.Is(err, icechunk.ErrInvalidChunkCoords), errors.Is(err, icechunk.ErrNoVirtualContainer),
 		errors.Is(err, icechunk.ErrInvalidMetadata):
 		return "error:invalid"
+	case errors.Is(err, icechunk.ErrRepositoryNotOnline):
+		return "error:read_only"
 	}
 	return "error:other"
 }
@@ -962,11 +967,11 @@ func runGo(t *testing.T, name string, sc scenario, dir string, steps []step, wri
 }
 
 // createRepo creates a scenario's repository with the Go writer, or, for a
-// scenario with a config, copies the empty repository icechunk-python
-// created with it.
+// scenario with a config or status, copies the empty repository
+// icechunk-python created with it.
 func createRepo(t *testing.T, name string, sc scenario, dir string) {
 	t.Helper()
-	if sc.Config != nil {
+	if sc.Config != nil || sc.Status != nil {
 		if err := os.CopyFS(dir, os.DirFS(writerTestdata+"/initial/"+name)); err != nil {
 			t.Fatalf("copying the initial repository (run scenario.py record): %v", err)
 		}
@@ -1156,7 +1161,7 @@ func TestWriterScenariosLive(t *testing.T) {
 				if creator == "go" {
 					createRepo(t, name, scenarios[name], dir)
 				} else {
-					d.call(t, map[string]any{"cmd": "create", "repo": dir, "config": scenarios[name].Config})
+					d.call(t, map[string]any{"cmd": "create", "repo": dir, "config": scenarios[name].Config, "status": scenarios[name].Status})
 				}
 				runners := map[string]runner{"go": newGoRunner(t, dir), "http": newHTTPRunner(t, dir)}
 				outcomes, errs := make([]string, len(steps)), make([]error, len(steps))
