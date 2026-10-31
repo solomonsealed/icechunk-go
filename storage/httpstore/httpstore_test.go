@@ -452,7 +452,7 @@ func (f *recordingS3) take() [][2]string {
 }
 
 // Every request a repository makes carries its attribution in the
-// User-Agent header, as upstream's do (icechunk 2.3.0): chunk requests
+// User-Agent header, as upstream's do (since icechunk 2.3.0): chunk requests
 // (virtual ones included) name the array and chunk, manifest requests the
 // array, and the others neither.
 func TestAttributionUserAgents(t *testing.T) {
@@ -475,7 +475,7 @@ func TestAttributionUserAgents(t *testing.T) {
 		Attribution:            icechunk.Attribution{Client: "weatherlib/0.9", Workload: "nightly-ingest", Principal: "u_123"},
 		VirtualChunkContainers: map[string]storage.Storage{"s3://src/": httpstore.New(vs.URL, nil)},
 	}
-	const labels = "my-app/1 weatherlib/0.9 icechunk/2.3.0 (workload=nightly-ingest; principal=u_123"
+	const labels = "my-app/1 weatherlib/0.9 icechunk/2.3.1 (workload=nightly-ingest; principal=u_123"
 	check := func(what string, reqs [][2]string, chunks map[string]bool) {
 		t.Helper()
 		if len(reqs) == 0 {
@@ -544,7 +544,7 @@ func TestAttributionUserAgents(t *testing.T) {
 	}
 	check("read", srv.take(), map[string]bool{"0": true, "1": true})
 	vmu.Lock()
-	if len(virtualUA) == 0 || virtualUA[0] != "weatherlib/0.9 icechunk/2.3.0 (workload=nightly-ingest; principal=u_123; array=g/temperature; chunk=2)" {
+	if len(virtualUA) == 0 || virtualUA[0] != "weatherlib/0.9 icechunk/2.3.1 (workload=nightly-ingest; principal=u_123; array=g/temperature; chunk=2)" {
 		t.Errorf("virtual chunk requests sent %q", virtualUA)
 	}
 	vmu.Unlock()
@@ -558,7 +558,7 @@ func TestAttributionUserAgents(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, r := range srv.take() {
-		if r[1] != "my-app/1 icechunk/2.3.0" {
+		if r[1] != "my-app/1 icechunk/2.3.1" {
 			t.Errorf("unattributed %s sent %q", r[0], r[1])
 		}
 	}
@@ -738,7 +738,7 @@ func TestStorageSettings(t *testing.T) {
 			}
 			want := map[string]string{}
 			if metadata && fileType != "" {
-				want = map[string]string{"icspecver": "2", "icclient": "ic-2.3.0", "icfiletype": fileType, "iccompalg": "zstd"}
+				want = map[string]string{"icspecver": "2", "icclient": "ic-2.3.1", "icfiletype": fileType, "iccompalg": "zstd"}
 				if p.key == "repo" {
 					want[storage.WriteIDMetadataKey] = meta[storage.WriteIDMetadataKey]
 					if !uuid.MatchString(meta[storage.WriteIDMetadataKey]) {

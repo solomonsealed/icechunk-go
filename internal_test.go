@@ -240,7 +240,7 @@ func TestVirtualContainerPrefixesMatchSegments(t *testing.T) {
 }
 
 // Repo update retries come from the stored config's repo_update_retries,
-// as icechunk-python 2.3.0 persists it, with each unset field taken from
+// as icechunk-python 2.3.1 persists it, with each unset field taken from
 // upstream's repo update defaults; the storage retry settings do not apply.
 func TestResolveRepoUpdateRetries(t *testing.T) {
 	defaults := repoUpdateRetries{100, 50 * time.Millisecond, 30 * time.Second}
@@ -348,6 +348,57 @@ func TestUpdateRepoMakesAtMostMaxTries(t *testing.T) {
 		r, rival := withRepoUpdateRetries(t, maxTries)
 		if attempts, err := updateWithConflicts(r, rival, maxTries-1); attempts != maxTries || err != nil {
 			t.Errorf("max_tries %d, conflicting until the last: %d attempts, %v", maxTries, attempts, err)
+		}
+	}
+}
+
+// As upstream: a repository that is not online refuses writable sessions on
+// any branch before anything is written, and the commits of sessions opened
+// earlier. Both errors give the status's reason, if it has one.
+func TestNotOnlineRefusals(t *testing.T) {
+	ctx := context.Background()
+	for _, c := range []struct {
+		reason *string
+		want   string
+	}{
+		{strPtr([]byte("frozen for tests")), "icechunk: repository is not online (status read-only): frozen for tests"},
+		{nil, "icechunk: repository is not online (status read-only)"},
+	} {
+		st := storage.NewMemory(nil)
+		r, err := Create(ctx, st, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		earlier, err := r.WritableSession(ctx, "main")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := earlier.CreateGroup(ctx, "/", nil); err != nil {
+			t.Fatal(err)
+		}
+		if err := r.updateRepo(ctx, func(doc *repoDoc, _ string, _ time.Time) error {
+			doc.status.availability, doc.status.reason = fbs.RepoAvailabilityReadOnly, c.reason
+			return nil
+		}); err != nil {
+			t.Fatal(err)
+		}
+		before, err := st.List(ctx, "")
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, branch := range []string{"main", "missing"} {
+			if _, err := r.WritableSession(ctx, branch); !errors.Is(err, ErrRepositoryNotOnline) || err.Error() != c.want {
+				t.Errorf("session on %s: %v, want %s", branch, err, c.want)
+			}
+		}
+		if after, err := st.List(ctx, ""); err != nil || !slices.Equal(before, after) {
+			t.Errorf("refused sessions changed the files from %v to %v (%v)", before, after, err)
+		}
+		if _, err := earlier.Commit(ctx, "refused", nil); !errors.Is(err, ErrRepositoryNotOnline) || err.Error() != c.want {
+			t.Errorf("commit of a session opened earlier: %v, want %s", err, c.want)
+		}
+		if tip, err := r.LookupBranch(ctx, "main"); err != nil || tip != InitialSnapshotID {
+			t.Errorf("after the refused commit, main is at %v (%v)", tip, err)
 		}
 	}
 }

@@ -12,22 +12,24 @@ compressed bytes), and must match.
     python testdata/writer/scenario.py record [name ...]   # write testdata/writer/expected/
     python testdata/writer/scenario.py serve                # JSON lines, for live Go tests
 
-A scenario with a "config" starts from a repository icechunk-python creates
-with that config; `record` keeps a copy of it, empty, in
-testdata/writer/initial/<name> for the Go test (the Go writer cannot set
-repository config).
+A scenario with a "config" or a "status" starts from a repository
+icechunk-python creates with that config and gives that status; `record` keeps
+a copy of it, empty, in testdata/writer/initial/<name> for the Go test (the Go
+writer cannot set repository config or status).
 
 `serve` reads one command per line and answers one JSON object per line:
 
-    {"cmd": "create", "repo": DIR, "config": {...}} create a spec v2 repository
+    {"cmd": "create", "repo": DIR, "config": {...}, "status": {...}}
+                                                    create a spec v2 repository
     {"cmd": "step", "repo": DIR, "step": {...}}     apply one step: {"outcome": ...}
     {"cmd": "canonical", "repo": DIR}               {"canonical": ...} as read by Python
 
 so the Go test can interleave Python and Go writers on one repository.
 
 Step outcomes are "ok" or "error:<category>" with categories conflict,
-session, exists, not_found, invalid and other. Data written by "write" steps
-is generated from (seed, flat index) by formulas the Go test reproduces.
+session, exists, not_found, invalid, read_only and other. Data written by
+"write" steps is generated from (seed, flat index) by formulas the Go test
+reproduces.
 """
 
 from __future__ import annotations
@@ -79,6 +81,7 @@ CATEGORIES = {
     "NodeNotFoundError": "not_found",
     "NotFoundError": "not_found",
     "InvalidInputError": "invalid",
+    "ReadOnlyError": "read_only",
     # zarr-python's, when a step opens a missing array or a group as an array
     "ArrayNotFoundError": "not_found",
     "GroupNotFoundError": "not_found",
@@ -164,8 +167,12 @@ def make_config(c: dict | None):
     return cfg
 
 
-def create_repo(path: str, config: dict | None) -> None:
-    ic.Repository.create(ic.local_filesystem_storage(path), config=make_config(config), spec_version=2)
+def create_repo(path: str, config: dict | None, status: dict | None = None) -> None:
+    """A status is {availability, reason}, with a RepoAvailability name."""
+    repo = ic.Repository.create(ic.local_filesystem_storage(path), config=make_config(config), spec_version=2)
+    if status:
+        availability = getattr(ic.RepoAvailability, status["availability"])
+        repo.set_status(ic.RepoStatus(availability, limited_availability_reason=status.get("reason")))
 
 
 def raw_bytes(seed: int, size: int) -> bytes:
@@ -470,9 +477,9 @@ def record(names: list[str]) -> None:
     for name in names or sorted(scenarios):
         with tempfile.TemporaryDirectory() as tmp:
             path = str(Path(tmp) / "repo")
-            config = scenarios[name].get("config")
-            create_repo(path, config)
-            if config:
+            config, status = scenarios[name].get("config"), scenarios[name].get("status")
+            create_repo(path, config, status)
+            if config or status:
                 shutil.rmtree(INITIAL / name, ignore_errors=True)
                 shutil.copytree(path, INITIAL / name)
             runner = Runner(path)
@@ -496,7 +503,7 @@ def serve() -> None:
             repo = cmd.get("repo")
             if cmd["cmd"] == "create":
                 shutil.rmtree(repo, ignore_errors=True)
-                create_repo(repo, cmd.get("config"))
+                create_repo(repo, cmd.get("config"), cmd.get("status"))
                 runners.pop(repo, None)
                 reply = {}
             elif cmd["cmd"] == "step":

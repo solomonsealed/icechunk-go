@@ -46,7 +46,7 @@ spec v1) stays with the official library; see
 - **Request attribution**, as in icechunk 2.3: every request names itself in
   its `User-Agent` header, with the array path and chunk coordinates it is
   for and the optional `Options.Attribution` labels (client, workload,
-  principal), e.g. `weatherlib/0.9 icechunk/2.3.0 (workload=nightly;
+  principal), e.g. `weatherlib/0.9 icechunk/2.3.1 (workload=nightly;
   array=g/temperature; chunk=0/1/2)`. The product token is upstream's, at
   the release this module is aligned with (`icechunk.CompatibleVersion`).
 - **An HTTP service** (`serve`): JSON API plus a read-only Zarr store, so
@@ -60,7 +60,10 @@ spec v1) stays with the official library; see
   virtual references and deletions, then `Commit` with metadata. Reads in a
   writable session see its uncommitted changes. A `zarr.json` is accepted
   or refused (`ErrInvalidMetadata`) as upstream's store does, and its chunk
-  grid counted the same way.
+  grid counted the same way. As upstream, a repository whose status is not
+  online refuses `WritableSession` before anything is written, and the
+  commits of sessions opened earlier, with `ErrRepositoryNotOnline` giving
+  the status's reason.
 - Commits follow upstream's protocol: chunks, manifests, transaction log and
   snapshot are written first, then the repo info file is replaced with a
   conditional write (after backing it up to `overwritten/`), retrying when
@@ -98,7 +101,7 @@ spec v1) stays with the official library; see
   metadata upstream stamps: `icspecver`, `icclient`, `icfiletype` and
   `iccompalg` on snapshots, manifests, transaction logs and the repo info
   file. Like file headers, `icclient` names upstream's client at the
-  release this module is aligned with (`ic-2.3.0`). A conditional write of the repo info file carries a write id
+  release this module is aligned with (`ic-2.3.1`). A conditional write of the repo info file carries a write id
   (`icechunkwriteid`): when it fails with a failed condition or a lost
   response, the store reads the object back, and the write succeeded if
   the object holds that id. Repo info backups are server-side copies where
@@ -202,6 +205,11 @@ icechunk-go tag    ./repo v1 main
   commits, move nodes, change configuration, or run garbage collection and
   expiration. Virtual references are not checked against the
   repository's configured virtual chunk containers.
+- Reads do not consult those containers either:
+  `Options.VirtualChunkContainers` alone decides what is read. A prefix there
+  also serves locations upstream refuses, such as those under a parent of a
+  configured container's `url_prefix` (upstream requires authorizing exactly
+  that `url_prefix`).
 - Rebase conflict detection is coarse: any commit that touched the same
   chunk, or changed or deleted the same node, conflicts.
 - As upstream's store addresses only the `default` chunk key encoding with
@@ -216,6 +224,13 @@ icechunk-go tag    ./repo v1 main
   update retries of `repo_update_retries` are). R2 bindings cannot
   copy objects, so repo info backups there are written anew, with the
   metadata of a repo info file.
+- Concurrent writers on local files must all be icechunk-go, on one machine.
+  Conditional writes are serialized with a lock file (`.icechunk-go.lock`,
+  using `flock` on Unix) that icechunk-python does not take, and upstream
+  warns that its own local storage is not safe for concurrent commits. As
+  with upstream's, network filesystems such as NFS are not supported for
+  concurrent writers (nor tested here). Use object storage for anything
+  shared. Taking turns on one directory works and is tested.
 - Diffs between snapshots are not exposed.
 - GCS and Azure are reachable only through S3-compatible (HMAC) or plain
   HTTP access, not their native auth.
@@ -239,7 +254,7 @@ open an issue, which is worth doing for anything long-lived.
   test.
 - `testdata/upstream`: upstream's own on-disk compatibility fixtures. The tests
   assert the same facts as upstream's `test_can_read_old.py`.
-- `testdata/generated`: repositories written by icechunk-python 2.3.0 (with
+- `testdata/generated`: repositories written by icechunk-python 2.3.1 (with
   zarr-python 3.4.1; `testdata/requirements.txt` pins the environment) via
   `testdata/generate.py` (every data type and codec above, sharding,
   rectilinear grids, 2000 dictionary-compressed virtual chunks, checksums,
@@ -273,11 +288,11 @@ open an issue, which is worth doing for anything long-lived.
   lists scenarios (arrays of every writable type and codec, partial and
   fill-value writes, zarr.json rewrites, deletions, virtual refs, refs and
   their refusals, concurrent sessions with and without rebase, a
-  non-default repository config, tricky node names, single-change
-  commits for the HTTP write endpoints, and `zarr.json` documents older
-  zarr-python releases stored: the repairs zarr-python 3.4.1 stores before
-  writing, the chunk grids upstream refuses and the chunk key encodings it
-  cannot address). `TestWriterScenarios` runs each
+  non-default repository config, a read-only repository, tricky node names,
+  single-change commits for the HTTP write endpoints, and `zarr.json`
+  documents older zarr-python releases stored: the repairs zarr-python 3.4.1
+  stores before writing, the chunk grids upstream refuses and the chunk key
+  encodings it cannot address). `TestWriterScenarios` runs each
   with the Go writer and compares every step's outcome and a canonical
   description of the result (values, chunk bytes for deterministic codecs,
   inline/native placement, keys, manifest extents, history, refs, ops log)

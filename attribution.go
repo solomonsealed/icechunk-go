@@ -12,7 +12,7 @@ import (
 
 // CompatibleVersion is the upstream Icechunk release this module is aligned
 // with. Files and objects it writes carry upstream's client name for it
-// ("ic-2.3.0"), and requests upstream's User-Agent product token.
+// ("ic-2.3.1"), and requests upstream's User-Agent product token.
 const CompatibleVersion = format.CompatibleVersion
 
 // UserAgentProduct is the product token the User-Agent header of every
@@ -22,12 +22,12 @@ const CompatibleVersion = format.CompatibleVersion
 const UserAgentProduct = "icechunk/" + CompatibleVersion
 
 // Attribution labels the requests a repository makes to its object store,
-// as upstream's Attribution (icechunk 2.3.0) does. Storages that make HTTP
+// as upstream's Attribution (since icechunk 2.3.0) does. Storages that make HTTP
 // requests send each request's attribution as its User-Agent header (see
 // storage.WithUserAgent), so that the bucket owner can break traffic down
 // in access logs. A chunk read of an attributed repository sends
 //
-//	weatherlib/0.9 icechunk/2.3.0 (workload=nightly-ingest; principal=u_123; array=g/temperature; chunk=0/1/2)
+//	weatherlib/0.9 icechunk/2.3.1 (workload=nightly-ingest; principal=u_123; array=g/temperature; chunk=0/1/2)
 //
 // The repository adds the array path and chunk coordinates itself: chunk
 // reads and writes (virtual chunks included) carry both, manifest reads and

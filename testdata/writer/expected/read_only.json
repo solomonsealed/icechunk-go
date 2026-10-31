@@ -1,0 +1,83 @@
+{
+ "_meta": {
+  "icechunk": "2.3.1",
+  "numpy": "2.5.4",
+  "zarr": "3.4.1"
+ },
+ "canonical": {
+  "ancestry": {
+   "branch:main": [
+    "Repository initialized"
+   ]
+  },
+  "branches": {
+   "main": "Repository initialized"
+  },
+  "commits": {
+   "Repository initialized": {
+    "metadata": {
+     "__icechunk": {
+      "is_root": true
+     }
+    },
+    "parent": null
+   }
+  },
+  "config": null,
+  "deleted_tags": [],
+  "diffs": {},
+  "ops_log": [
+   [
+    "RepoStatusChanged",
+    null,
+    null,
+    null
+   ],
+   [
+    "RepoInitialized",
+    null,
+    null,
+    null
+   ]
+  ],
+  "snapshots": {
+   "Repository initialized": {
+    "keys": [],
+    "nodes": {}
+   }
+  },
+  "status": "read-only",
+  "tags": {},
+  "updates": [
+   [
+    "RepoStatusChanged",
+    null,
+    null,
+    null
+   ],
+   [
+    "RepoInitialized",
+    null,
+    null,
+    null
+   ]
+  ]
+ },
+ "outcomes": [
+  "error:read_only",
+  "error:read_only",
+  "error:read_only",
+  "error:read_only",
+  "error:read_only",
+  "error:read_only",
+  "error:read_only",
+  "error:read_only",
+  "error:read_only",
+  "error:session",
+  "error:read_only",
+  "error:read_only",
+  "error:read_only",
+  "error:read_only",
+  "error:read_only"
+ ]
+}

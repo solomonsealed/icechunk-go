@@ -154,7 +154,7 @@ func fakeFetch(t *testing.T, respond func(method string) (status int, headers ma
 }
 
 func TestS3PutHeadersAndReadBack(t *testing.T) {
-	ctx := storage.WithUserAgent(context.Background(), "icechunk/2.3.0")
+	ctx := storage.WithUserAgent(context.Background(), "icechunk/2.3.1")
 	s := NewS3(storage.S3Config{Bucket: "b", Endpoint: "https://s3.example", AccessKeyID: "AK", SecretAccessKey: "SK"})
 	var stored string // the write id the fake store holds
 	seen := fakeFetch(t, func(method string) (int, map[string]any) {
@@ -179,11 +179,11 @@ func TestS3PutHeadersAndReadBack(t *testing.T) {
 		t.Fatalf("requests: %v", *seen)
 	}
 	put := (*seen)[0]
-	if put["user-agent"] != "icechunk/2.3.0" || put["x-amz-storage-class"] != "STANDARD_IA" || put["x-amz-meta-icfiletype"] != "repo-info" ||
+	if put["user-agent"] != "icechunk/2.3.1" || put["x-amz-storage-class"] != "STANDARD_IA" || put["x-amz-meta-icfiletype"] != "repo-info" ||
 		put["x-amz-meta-icechunkwriteid"] != "w1" || !strings.Contains(put["authorization"], "x-amz-meta-icfiletype;") {
 		t.Errorf("PUT headers: %v", put)
 	}
-	if (*seen)[1]["user-agent"] != "icechunk/2.3.0" {
+	if (*seen)[1]["user-agent"] != "icechunk/2.3.1" {
 		t.Errorf("HEAD headers: %v", (*seen)[1])
 	}
 	// Another write holds the object: a genuine conflict.

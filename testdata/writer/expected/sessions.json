@@ -1,6 +1,6 @@
 {
  "_meta": {
-  "icechunk": "2.3.0",
+  "icechunk": "2.3.1",
   "numpy": "2.5.4",
   "zarr": "3.4.1"
  },

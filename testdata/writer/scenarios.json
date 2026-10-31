@@ -390,5 +390,26 @@
    {"op": "set_metadata", "session": "s4", "path": "/keys/template", "zarr_json": {"zarr_format": 3, "node_type": "array", "shape": [4, 4], "data_type": "int32", "chunk_grid": {"name": "regular", "configuration": {"chunk_shape": [2, 2]}}, "chunk_key_encoding": {"name": "template", "configuration": {"format": "{0}/{1}.bin"}}, "fill_value": 0, "codecs": [{"name": "bytes", "configuration": {"endian": "little"}}], "attributes": {}, "storage_transformers": []}},
    {"op": "write", "session": "s4", "path": "/keys/template", "start": [0, 0], "shape": [4, 4], "seed": 11}
   ]
+ },
+ "read_only": {
+  "description": "A repository whose status is read-only: writable sessions on any branch and every branch and tag operation are refused before their other checks, except deleting main, and the repository does not change.",
+  "status": {"availability": "read_only", "reason": "frozen for tests"},
+  "steps": [
+   {"op": "open", "session": "s1", "branch": "main"},
+   {"op": "open", "session": "s2", "branch": "nope"},
+   {"op": "create_branch", "name": "dev", "at": "Repository initialized"},
+   {"op": "create_branch", "name": "main", "at": "Repository initialized"},
+   {"op": "create_branch", "name": "dev", "at": "missing snapshot"},
+   {"op": "create_branch", "name": "", "at": "Repository initialized"},
+   {"op": "reset_branch", "name": "main", "at": "Repository initialized"},
+   {"op": "reset_branch", "name": "nope", "at": "Repository initialized"},
+   {"op": "reset_branch", "name": "main", "at": "missing snapshot"},
+   {"op": "delete_branch", "name": "main"},
+   {"op": "delete_branch", "name": "nope"},
+   {"op": "create_tag", "name": "v1", "at": "Repository initialized"},
+   {"op": "create_tag", "name": "v1", "at": "missing snapshot"},
+   {"op": "create_tag", "name": "", "at": "Repository initialized"},
+   {"op": "delete_tag", "name": "nope"}
+  ]
  }
 }

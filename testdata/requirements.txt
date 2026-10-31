@@ -1,7 +1,7 @@
 # The Python environment the fixtures, oracles and writer scenarios were
 # recorded with, and the live consistency tests compare against.
 #   python3.13 -m venv .venv && .venv/bin/pip install -r testdata/requirements.txt
-icechunk==2.3.0
+icechunk==2.3.1
 zarr==3.4.1
 numcodecs==0.17.1
 numpy==2.5.4

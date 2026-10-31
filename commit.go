@@ -241,7 +241,7 @@ func (r *Repository) updateRepo(ctx context.Context, mutate func(doc *repoDoc, b
 			return err
 		}
 		if doc.status.availability != fbs.RepoAvailabilityOnline {
-			return fmt.Errorf("%w (status %s)", ErrRepositoryNotOnline, availabilityName(doc.status.availability))
+			return notOnlineError(availabilityName(doc.status.availability), deref(doc.status.reason))
 		}
 		now := time.Now()
 		backup := backupName(now)
@@ -289,6 +289,16 @@ func (r *Repository) updateRepo(ctx context.Context, mutate func(doc *repoDoc, b
 		return nil
 	}
 	return fmt.Errorf("%w (%d attempts)", ErrTooManyRetries, retries.maxTries)
+}
+
+// notOnlineError refuses a write because of the repository's status. Like
+// upstream's error, it gives the reason recorded with the status, which is
+// where a repository tells writers why, and what they would need.
+func notOnlineError(availability, reason string) error {
+	if reason == "" {
+		return fmt.Errorf("%w (status %s)", ErrRepositoryNotOnline, availability)
+	}
+	return fmt.Errorf("%w (status %s): %s", ErrRepositoryNotOnline, availability, reason)
 }
 
 // ---------------------------------------------------------------------------
@@ -364,15 +374,24 @@ func Create(ctx context.Context, st storage.Storage, opts *Options) (*Repository
 }
 
 // WritableSession starts a session on the current tip of branch. Its
-// changes become visible to others only when committed.
+// changes become visible to others only when committed. As upstream, a
+// repository that is not online refuses the session, whatever the branch,
+// so that nothing gets written to it.
 func (r *Repository) WritableSession(ctx context.Context, branch string) (*Session, error) {
 	if _, err := r.writer(); err != nil {
 		return nil, err
 	}
 	r.Refresh() // always start from the latest tip
-	id, err := r.LookupBranch(ctx, branch)
+	info, err := r.RepoInfo(ctx)
 	if err != nil {
 		return nil, err
+	}
+	if st := info.Status; st.Availability != "online" {
+		return nil, notOnlineError(st.Availability, st.Reason)
+	}
+	id, ok := info.Branches[branch]
+	if !ok {
+		return nil, fmt.Errorf("%w: branch %s", ErrRefNotFound, branch)
 	}
 	snap, err := r.Snapshot(ctx, id)
 	if err != nil {
